@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #F1EAE0;
+  color: #2B2420;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.article-prose :where(p, h2, blockquote):not(:last-child) {
+  max-width: 700px;
+}
