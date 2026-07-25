@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { urlForImage } from '@/lib/sanity/image'
+import CropFrame from './CropFrame'
 import type { PostSummary } from '@/lib/sanity/queries'
 
 const gradients = [
-  'from-[#C79A6B] to-[#7A2E3A]',
-  'from-[#8A9A82] to-[#2B2420]',
-  'from-[#B8874A] to-[#5C222B]',
+  'from-[#8B6B35] to-[#5E1B26]',
+  'from-[#4A4038] to-[#211C18]',
+  'from-[#A9812F] to-[#3F1219]',
 ]
 
 export default function PostCard({ post, index = 0 }: { post: PostSummary; index?: number }) {
@@ -16,21 +17,22 @@ export default function PostCard({ post, index = 0 }: { post: PostSummary; index
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block">
-      <div className={`relative mb-4 aspect-[4/3] overflow-hidden bg-gradient-to-br ${gradients[index % gradients.length]}`}>
+      <div className={`relative mb-5 aspect-[4/3] overflow-hidden bg-gradient-to-br ${gradients[index % gradients.length]}`}>
+        <CropFrame />
         {post.coverImage && (
           <Image
             src={urlForImage(post.coverImage).width(700).height(525).url()}
             alt={post.coverImage.alt || post.title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         )}
       </div>
-      <p className="mb-2 font-mono text-[11px] uppercase tracking-wider text-sage">
-        {post.category?.title || 'Blog'} · {date}
+      <p className="mb-2 font-mono text-[11px] uppercase tracking-widest text-ochre">
+        {post.category?.title || 'Blog'} <span className="text-line">—</span> {date}
       </p>
-      <h3 className="mb-2 font-display text-xl leading-snug">{post.title}</h3>
-      <p className="text-[15px] text-ink-soft">{post.excerpt}</p>
+      <h3 className="mb-2 font-display text-xl leading-snug transition-colors group-hover:text-wine">{post.title}</h3>
+      <p className="text-[15px] leading-relaxed text-ink-soft">{post.excerpt}</p>
     </Link>
   )
 }
