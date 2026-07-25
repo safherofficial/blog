@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Fraunces, Inter, Space_Mono } from 'next/font/google'
+import { Fraunces, Inter, Source_Serif_4, Space_Mono } from 'next/font/google'
 import './globals.css'
 
 const fraunces = Fraunces({
@@ -9,6 +9,12 @@ const fraunces = Fraunces({
   variable: '--font-fraunces',
 })
 const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-inter' })
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  weight: ['400', '500', '600'],
+  variable: '--font-serif',
+})
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-space-mono' })
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
@@ -26,7 +32,7 @@ export const metadata: Metadata = {
 // vivono in app/(site)/layout.tsx, così NON compaiono dentro /studio.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it" className={`${fraunces.variable} ${inter.variable} ${spaceMono.variable}`}>
+    <html lang="it" className={`${fraunces.variable} ${inter.variable} ${sourceSerif.variable} ${spaceMono.variable}`}>
       <body className="font-body">{children}</body>
     </html>
   )
