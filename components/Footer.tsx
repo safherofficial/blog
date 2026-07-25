@@ -30,7 +30,13 @@ export default function Footer({ authorName, instagramUrl }: { authorName?: stri
         </div>
       </div>
       <div className="wrap mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-xs text-ink-soft">
-        <span>&copy; {new Date().getFullYear()} Controluce - {authorName || '[Il tuo nome]'}. Tutti i diritti riservati.</span>
+        <span>
+          &copy; {new Date().getFullYear()} Controluce - {authorName || '[Il tuo nome]'}. Tutti i diritti riservati.
+          {' - '}
+          <Link href="/privacy-policy" className="nav-link hover:text-wine transition-colors">
+            Privacy Policy
+          </Link>
+        </span>
         <span className="font-mono uppercase tracking-widest">Impaginato con cura editoriale</span>
       </div>
     </footer>
