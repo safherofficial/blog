@@ -5,18 +5,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#F1EAE0',
-        'bg-soft': '#E7DDCC',
-        ink: '#2B2420',
-        'ink-soft': '#6B5F52',
-        wine: '#7A2E3A',
-        'wine-dark': '#5C222B',
-        ochre: '#B8874A',
+        bg: '#FAF6EF',
+        'bg-soft': '#F1E9DC',
+        ink: '#211C18',
+        'ink-soft': '#6E6255',
+        wine: '#5E1B26',
+        'wine-dark': '#3F1219',
+        ochre: '#A9812F',
         sage: '#7C8A6E',
-        line: '#D9CDB8',
+        line: '#E4D9C7',
       },
       fontFamily: {
         display: ['var(--font-fraunces)', 'Georgia', 'serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
         body: ['var(--font-inter)', 'sans-serif'],
         mono: ['var(--font-space-mono)', 'monospace'],
       },
