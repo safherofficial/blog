@@ -19,18 +19,18 @@ export default function Footer({ authorName, instagramUrl }: { authorName?: stri
         </nav>
         <div className="md:text-right">
           <p className="mb-2 text-[13px] font-mono uppercase tracking-widest text-ink-soft">Seguimi</p>
-          
+          <a
             href={instagramUrl || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="nav-link text-sm text-ink hover:text-wine transition-colors"
           >
-            Instagram ↗
+            Instagram
           </a>
         </div>
       </div>
       <div className="wrap mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-xs text-ink-soft">
-        <span>© {new Date().getFullYear()} Controluce — {authorName || '[Il tuo nome]'}. Tutti i diritti riservati.</span>
+        <span>&copy; {new Date().getFullYear()} Controluce - {authorName || '[Il tuo nome]'}. Tutti i diritti riservati.</span>
         <span className="font-mono uppercase tracking-widest">Impaginato con cura editoriale</span>
       </div>
     </footer>
