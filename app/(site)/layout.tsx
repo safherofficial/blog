@@ -20,7 +20,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       />
       <Header instagramUrl={settings?.instagramUrl} />
       {children}
-      <Footer authorName={settings?.authorName} />
+      <Footer authorName={settings?.authorName} instagramUrl={settings?.instagramUrl} />
     </>
   )
 }
