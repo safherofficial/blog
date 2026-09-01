@@ -1,10 +1,13 @@
 import type { MetadataRoute } from 'next'
-import { getAllPosts } from '@/lib/sanity/queries'
+import { getAllPosts, getAllCategorySlugs } from '@/lib/sanity/queries'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPosts().catch(() => [])
+  const [posts, categorySlugs] = await Promise.all([
+    getAllPosts().catch(() => []),
+    getAllCategorySlugs().catch(() => []),
+  ])
 
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${siteUrl}/blog/${post.slug}`,
@@ -13,9 +16,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
+  const categoryEntries: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+    url: `${siteUrl}/categoria/${slug}`,
+    changeFrequency: 'weekly',
+    priority: 0.5,
+  }))
+
   return [
     { url: siteUrl, changeFrequency: 'weekly', priority: 1 },
     { url: `${siteUrl}/about`, changeFrequency: 'monthly', priority: 0.6 },
     ...postEntries,
+    ...categoryEntries,
   ]
 }
