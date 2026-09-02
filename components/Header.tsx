@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function Header({ instagramUrl }: { instagramUrl?: string }) {
+export default function Header({ instagramUrl }: { instagramUrl?: string | null }) {
   return (
     <header className="bg-bg">
       <div className="wrap flex items-center justify-between border-b border-line py-2.5 text-[11px] font-mono uppercase tracking-widest text-ink-soft">
