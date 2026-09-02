@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function Footer({ authorName, instagramUrl }: { authorName?: string; instagramUrl?: string }) {
+export default function Footer({ authorName, instagramUrl }: { authorName?: string | null; instagramUrl?: string | null }) {
   return (
     <footer className="border-t border-line py-14">
       <div className="wrap grid grid-cols-1 gap-10 md:grid-cols-3">
