@@ -1,0 +1,192 @@
+import { sql } from '@vercel/postgres'
+
+export { sql }
+
+export type CoverImage = {
+  url: string
+  alt?: string | null
+}
+
+export type PortableTextBlock = {
+  _key: string
+  _type: 'block' | 'image'
+  style?: 'normal' | 'h2' | 'blockquote'
+  children?: Array<{ _key: string; _type: 'span'; text: string; marks?: string[] }>
+  markDefs?: unknown[]
+  url?: string
+  alt?: string | null
+}
+
+export type PostSummary = {
+  _id: string
+  title: string
+  slug: string
+  excerpt: string
+  coverImage: CoverImage | null
+  publishedAt: string
+  category: { title: string; slug: string } | null
+}
+
+export type PostFull = PostSummary & {
+  body: PortableTextBlock[]
+  seoTitle?: string | null
+  seoDescription?: string | null
+}
+
+export type SiteSettings = {
+  siteTitle: string
+  tagline?: string | null
+  authorName?: string | null
+  authorBio?: PortableTextBlock[] | null
+  authorPhoto?: CoverImage | null
+  instagramUrl?: string | null
+  signatureQuote?: string | null
+}
+
+export type CategoryInfo = {
+  _id: string
+  title: string
+  slug: string
+}
+
+export async function getAllPosts(): Promise<PostSummary[]> {
+  const { rows } = await sql<PostSummary>`
+    SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+           CASE WHEN p.cover_image_url IS NULL THEN NULL
+                ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+           p.published_at AS "publishedAt",
+           CASE WHEN c.id IS NULL THEN NULL
+                ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
+    FROM posts p
+    LEFT JOIN categories c ON c.id = p.category_id
+    WHERE p.slug IS NOT NULL AND p.published = TRUE
+    ORDER BY p.published_at DESC
+  `
+  return rows
+}
+
+export async function getLatestPosts(limit = 3): Promise<PostSummary[]> {
+  const { rows } = await sql<PostSummary>`
+    SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+           CASE WHEN p.cover_image_url IS NULL THEN NULL
+                ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+           p.published_at AS "publishedAt",
+           CASE WHEN c.id IS NULL THEN NULL
+                ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
+    FROM posts p
+    LEFT JOIN categories c ON c.id = p.category_id
+    WHERE p.slug IS NOT NULL AND p.published = TRUE
+    ORDER BY p.published_at DESC
+    LIMIT ${Math.max(1, Math.min(limit, 50))}
+  `
+  return rows
+}
+
+export async function getPostBySlug(slug: string): Promise<PostFull | null> {
+  const { rows } = await sql<PostFull>`
+    SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+           CASE WHEN p.cover_image_url IS NULL THEN NULL
+                ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+           p.published_at AS "publishedAt",
+           CASE WHEN c.id IS NULL THEN NULL
+                ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category,
+           p.body, p.seo_title AS "seoTitle", p.seo_description AS "seoDescription"
+    FROM posts p
+    LEFT JOIN categories c ON c.id = p.category_id
+    WHERE p.slug = ${slug} AND p.published = TRUE
+    LIMIT 1
+  `
+  return rows[0] || null
+}
+
+export async function getAllPostSlugs(): Promise<string[]> {
+  const { rows } = await sql<{ slug: string }>`
+    SELECT slug FROM posts WHERE slug IS NOT NULL AND published = TRUE ORDER BY published_at DESC
+  `
+  return rows.map((row) => row.slug)
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  const { rows } = await sql<SiteSettings>`
+    SELECT site_title AS "siteTitle", tagline, author_name AS "authorName",
+           author_bio AS "authorBio",
+           CASE WHEN author_photo_url IS NULL THEN NULL
+                ELSE json_build_object('url', author_photo_url, 'alt', author_photo_alt) END AS "authorPhoto",
+           instagram_url AS "instagramUrl", signature_quote AS "signatureQuote"
+    FROM site_settings WHERE id = 1 LIMIT 1
+  `
+  return rows[0] || null
+}
+
+export async function getAllCategorySlugs(): Promise<string[]> {
+  const { rows } = await sql<{ slug: string }>`SELECT slug FROM categories ORDER BY title`
+  return rows.map((row) => row.slug)
+}
+
+export async function getCategoryBySlug(slug: string): Promise<CategoryInfo | null> {
+  const { rows } = await sql<CategoryInfo>`
+    SELECT id AS "_id", title, slug FROM categories WHERE slug = ${slug} LIMIT 1
+  `
+  return rows[0] || null
+}
+
+export async function getPostsByCategory(slug: string): Promise<PostSummary[]> {
+  const { rows } = await sql<PostSummary>`
+    SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+           CASE WHEN p.cover_image_url IS NULL THEN NULL
+                ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+           p.published_at AS "publishedAt",
+           json_build_object('title', c.title, 'slug', c.slug) AS category
+    FROM posts p
+    INNER JOIN categories c ON c.id = p.category_id
+    WHERE c.slug = ${slug} AND p.published = TRUE
+    ORDER BY p.published_at DESC
+  `
+  return rows
+}
+
+export async function getRelatedPosts(currentId: string, categorySlug?: string | null, limit = 3): Promise<PostSummary[]> {
+  if (categorySlug) {
+    const { rows: sameCategory } = await sql<PostSummary>`
+      SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+             CASE WHEN p.cover_image_url IS NULL THEN NULL
+                  ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+             p.published_at AS "publishedAt",
+             json_build_object('title', c.title, 'slug', c.slug) AS category
+      FROM posts p
+      INNER JOIN categories c ON c.id = p.category_id
+      WHERE p.id <> ${currentId} AND p.published = TRUE AND c.slug = ${categorySlug}
+      ORDER BY p.published_at DESC LIMIT ${Math.max(1, Math.min(limit, 20))}
+    `
+    if (sameCategory.length >= limit) return sameCategory
+
+    const excludeIds = [currentId, ...sameCategory.map((p) => p._id)]
+    const { rows: fillers } = await sql<PostSummary>`
+      SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+             CASE WHEN p.cover_image_url IS NULL THEN NULL
+                  ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+             p.published_at AS "publishedAt",
+             CASE WHEN c.id IS NULL THEN NULL
+                  ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
+      FROM posts p
+      LEFT JOIN categories c ON c.id = p.category_id
+      WHERE p.published = TRUE AND NOT (p.id = ANY(${excludeIds}::uuid[]))
+      ORDER BY p.published_at DESC LIMIT ${limit - sameCategory.length}
+    `
+    return [...sameCategory, ...fillers]
+  }
+
+  const { rows } = await sql<PostSummary>`
+    SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+           CASE WHEN p.cover_image_url IS NULL THEN NULL
+                ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+           p.published_at AS "publishedAt",
+           CASE WHEN c.id IS NULL THEN NULL
+                ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
+    FROM posts p
+    LEFT JOIN categories c ON c.id = p.category_id
+    WHERE p.id <> ${currentId} AND p.published = TRUE
+    ORDER BY p.published_at DESC LIMIT ${Math.max(1, Math.min(limit, 20))}
+  `
+  return rows
+}
