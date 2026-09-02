@@ -161,6 +161,7 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
     if (sameCategory.length >= limit) return sameCategory
 
     const excludeIds = [currentId, ...sameCategory.map((p) => p._id)]
+    const excludeIdsLiteral = `{${excludeIds.join(',')}}`
     const { rows: fillers } = await sql<PostSummary>`
       SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
              CASE WHEN p.cover_image_url IS NULL THEN NULL
@@ -170,7 +171,7 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
                   ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
       FROM posts p
       LEFT JOIN categories c ON c.id = p.category_id
-      WHERE p.published = TRUE AND NOT (p.id = ANY(${excludeIds}::uuid[]))
+      WHERE p.published = TRUE AND NOT (p.id = ANY(${excludeIdsLiteral}::uuid[]))
       ORDER BY p.published_at DESC LIMIT ${limit - sameCategory.length}
     `
     return [...sameCategory, ...fillers]
