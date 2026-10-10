@@ -6,10 +6,17 @@ export default function BackToTop() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
+    let ticking = false
     function onScroll() {
-      setVisible(window.scrollY > 500)
+      if (ticking) return
+      ticking = true
+      window.requestAnimationFrame(() => {
+        setVisible(window.scrollY > 500)
+        ticking = false
+      })
     }
-    window.addEventListener('scroll', onScroll)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -18,13 +25,12 @@ export default function BackToTop() {
   return (
     <button
       type="button"
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      aria-label="Torna su"
-      className="fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center border border-ochre bg-ink text-bg transition-colors hover:bg-wine"
+      onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}
+      aria-label="Torna all'inizio della pagina"
+      title="Torna su"
+      className="scroll-top-control fixed bottom-6 right-6 z-30 flex h-12 w-12 items-center justify-center border border-ochre bg-ink text-bg"
     >
-      <span aria-hidden className="font-mono text-[10px] uppercase tracking-widest">
-        Su
-      </span>
+      <span aria-hidden="true" className="font-mono text-xs">↑</span>
     </button>
   )
 }

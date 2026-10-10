@@ -39,7 +39,7 @@ export default async function HomePage() {
             <div className="flex flex-wrap items-center gap-5">
               <Link
                 href="#articoli"
-                className="hero-cta inline-flex items-center gap-4 border border-[#D3AB76] bg-[#D3AB76] px-6 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#211A15] transition-all duration-300 hover:border-[#F0D4AD] hover:bg-[#F0D4AD]"
+                className="hero-cta inline-flex items-center gap-4 border border-[#D3AB76] bg-[#D3AB76] px-6 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#211A15]"
               >
                 Esplora gli articoli <span aria-hidden="true" className="text-lg leading-none">↘</span>
               </Link>
@@ -50,11 +50,12 @@ export default async function HomePage() {
         <div className="pointer-events-none absolute bottom-6 left-8 z-10 hidden font-mono text-[9px] uppercase tracking-[0.25em] text-white/55 md:block">
           Controluce — oltre la superficie
         </div>
+        <div className="hero-edge-mark pointer-events-none absolute bottom-0 right-8 z-10 hidden h-20 w-px origin-bottom bg-gradient-to-t from-[#D5B27F]/80 to-transparent md:block" aria-hidden="true" />
       </section>
 
       <section id="articoli" className="py-20 md:py-28">
         <div className="wrap">
-          <div className="mb-12 flex flex-col gap-5 border-b border-line pb-7 sm:flex-row sm:items-end sm:justify-between md:mb-14">
+          <div className="reveal-on-scroll mb-12 flex flex-col gap-5 border-b border-line pb-7 sm:flex-row sm:items-end sm:justify-between md:mb-14">
             <div>
               <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Dal blog</p>
               <h2 className="font-display text-4xl leading-tight tracking-tight md:text-5xl">Ultimi articoli</h2>
@@ -64,7 +65,7 @@ export default async function HomePage() {
             </p>
           </div>
           {posts.length === 0 ? (
-            <p className="border-l border-ochre py-2 pl-5 text-ink-soft">Nessun articolo è ancora disponibile. Torna presto per leggere i nuovi contenuti.</p>
+            <p className="reveal-on-scroll border-l border-ochre py-2 pl-5 text-ink-soft">Nessun articolo è ancora disponibile. Torna presto per leggere i nuovi contenuti.</p>
           ) : (
             <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-3 md:gap-y-16">
               {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
@@ -74,7 +75,7 @@ export default async function HomePage() {
       </section>
 
       {settings?.signatureQuote && (
-        <section className="quote-section relative overflow-hidden border-y border-[#40352A] bg-ink py-20 text-bg md:py-28">
+        <section className="quote-section reveal-on-scroll relative overflow-hidden border-y border-[#40352A] bg-ink py-20 text-bg md:py-28">
           <div className="quote-glow pointer-events-none absolute inset-0" aria-hidden="true" />
           <div className="wrap relative max-w-[860px] text-center">
             <p className="mb-2 font-display text-7xl leading-none italic text-ochre" aria-hidden="true">&ldquo;</p>
@@ -84,14 +85,14 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="bg-bg-soft py-16 text-center md:py-20">
+      <section className="reading-invitation reveal-on-scroll bg-bg-soft py-16 text-center md:py-20">
         <div className="wrap">
           <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Resta aggiornato</p>
           <h2 className="mb-4 font-display text-3xl md:text-4xl">Le storie migliori meritano tempo.</h2>
           <p className="mx-auto mb-8 max-w-[52ch] font-serif text-lg leading-relaxed text-ink-soft">
             Segui il feed RSS nel tuo lettore preferito e ritrova i nuovi articoli quando vuoi. Nessuna registrazione necessaria.
           </p>
-          <Link href="/rss" className="inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine transition-all duration-300 hover:bg-wine hover:text-bg">
+          <Link href="/rss" className="editorial-button inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine hover:bg-wine hover:text-bg">
             Segui il feed RSS <span aria-hidden="true" className="text-lg leading-none">↗</span>
           </Link>
         </div>

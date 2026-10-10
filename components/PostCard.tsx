@@ -15,9 +15,9 @@ export default function PostCard({ post, index = 0 }: { post: PostSummary; index
   })
 
   return (
-    <article className="editorial-card group min-w-0" style={{ animationDelay: `${Math.min(index, 4) * 90}ms` }}>
-      <Link href={`/blog/${post.slug}`} className="block">
-        <div className={`relative mb-5 aspect-[4/3] overflow-hidden border border-line/70 bg-gradient-to-br ${gradients[index % gradients.length]}`}>
+    <article className="editorial-card reveal-on-scroll group min-w-0" style={{ animationDelay: `${Math.min(index, 4) * 90}ms` }}>
+      <Link href={`/blog/${post.slug}`} className="block" aria-label={`Leggi: ${post.title}`}>
+        <div className={`editorial-media-frame relative mb-5 aspect-[4/3] overflow-hidden border border-line/70 bg-gradient-to-br ${gradients[index % gradients.length]}`}>
           <CropFrame />
           {post.coverImage?.url && (
             <Image
@@ -29,7 +29,8 @@ export default function PostCard({ post, index = 0 }: { post: PostSummary; index
               className="editorial-card-image object-cover"
             />
           )}
-          <span className="pointer-events-none absolute inset-3 border border-white/20 transition-all duration-500 group-hover:inset-4 group-hover:border-white/40" aria-hidden="true" />
+          <span className="pointer-events-none absolute inset-3 border border-white/20 transition-all duration-700 group-hover:inset-5 group-hover:border-white/50" aria-hidden="true" />
+          <span className="card-image-index absolute bottom-5 left-5 z-10 font-mono text-[9px] uppercase tracking-[0.22em] text-white/85">{String(index + 1).padStart(2, '0')} / CONTROLUCE</span>
         </div>
       </Link>
       <p className="mb-3 flex flex-wrap items-center gap-x-2 font-mono text-[10px] uppercase tracking-[0.13em] text-ink-soft">
@@ -39,10 +40,10 @@ export default function PostCard({ post, index = 0 }: { post: PostSummary; index
         <span aria-hidden="true" className="text-ochre">/</span>
         <time dateTime={post.publishedAt}>{date}</time>
       </p>
-      <Link href={`/blog/${post.slug}`} className="block">
-        <h3 className="mb-3 font-display text-2xl leading-snug tracking-tight transition-colors duration-300 group-hover:text-wine">{post.title}</h3>
+      <Link href={`/blog/${post.slug}`} className="post-title-link block">
+        <h3 className="mb-3 font-display text-2xl leading-snug tracking-tight text-ink transition-colors duration-300 group-hover:text-wine">{post.title}</h3>
         <p className="text-[15px] leading-relaxed text-ink-soft">{post.excerpt}</p>
-        <span className="mt-5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-wine transition-all duration-300 group-hover:gap-3">
+        <span className="post-read-more mt-5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-wine transition-all duration-300 group-hover:gap-4">
           Continua a leggere <span aria-hidden="true">↗</span>
         </span>
       </Link>
