@@ -28,19 +28,26 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   const posts = await getPostsByCategory(params.slug).catch(() => [])
 
   return (
-    <section className="py-20 md:py-24">
-      <div className="wrap">
-        <Link
-          href="/#articoli"
-          className="nav-link mb-8 inline-block font-mono text-[11px] uppercase tracking-widest text-ink-soft hover:text-wine"
-        >
-          {'<- Torna a tutti gli articoli'}
-        </Link>
-        <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-wine">Categoria</p>
-        <h1 className="mb-12 border-b border-line pb-8 font-display text-4xl md:text-5xl">{category.title}</h1>
+    <section className="category-page">
+      <div className="category-masthead py-16 md:py-20">
+        <div className="wrap reveal-on-scroll">
+          <Link
+            href="/#articoli"
+            className="nav-link mb-9 inline-block font-mono text-[10px] uppercase tracking-[0.19em] text-[#D8C3A6] hover:text-[#F5D7A8]"
+          >
+            {'← Tutti gli articoli'}
+          </Link>
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.27em] text-[#D9B47F]">Esplora per tema</p>
+          <h1 className="max-w-[20ch] font-display text-4xl leading-tight tracking-tight text-[#F5EFE5] sm:text-5xl md:text-6xl">{category.title}</h1>
+          <p className="mt-5 max-w-[46ch] font-serif text-lg leading-relaxed text-[#D9C9B7]">
+            Storie e pensieri raccolti sotto un unico sguardo.
+          </p>
+        </div>
+      </div>
 
+      <div className="wrap py-16 md:py-24">
         {posts.length === 0 ? (
-          <p className="text-ink-soft">Nessun articolo ancora in questa categoria.</p>
+          <p className="reveal-on-scroll border-l border-ochre py-2 pl-5 text-ink-soft">Nessun articolo ancora in questa categoria.</p>
         ) : (
           <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
             {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}

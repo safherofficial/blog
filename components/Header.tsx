@@ -2,30 +2,39 @@ import Link from 'next/link'
 
 export default function Header({ siteTitle = 'Controluce', instagramUrl }: { siteTitle?: string | null; instagramUrl?: string | null }) {
   return (
-    <header className="bg-bg">
-      <div className="wrap flex items-center justify-between border-b border-line py-2.5 text-[11px] font-mono uppercase tracking-widest text-ink-soft">
-        <span>Storie, riflessioni e vita quotidiana</span>
+    <header className="site-header bg-bg">
+      <div className="masthead-rule" aria-hidden="true" />
+      <div className="wrap topbar flex items-center justify-between border-b border-line py-2.5">
+        <span className="flex items-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-ink-soft sm:text-[10px] sm:tracking-[0.22em]">
+          <span className="topbar-light" aria-hidden="true" />
+          Storie, riflessioni e vita quotidiana
+        </span>
         {instagramUrl ? (
-          <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="nav-link transition-colors hover:text-wine">
-            Instagram
+          <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="nav-link font-mono text-[10px] uppercase tracking-widest text-ink-soft transition-colors hover:text-wine">
+            Instagram <span aria-hidden="true">↗</span>
           </a>
         ) : (
-          <Link href="/rss" className="nav-link transition-colors hover:text-wine">Feed RSS</Link>
+          <Link href="/rss" className="nav-link font-mono text-[10px] uppercase tracking-widest text-ink-soft transition-colors hover:text-wine">Feed RSS <span aria-hidden="true">↗</span></Link>
         )}
       </div>
 
-      <div className="wrap border-b border-line py-7 text-center">
-        <Link href="/" className="font-display text-4xl tracking-tight md:text-5xl">
-          {siteTitle === 'Controluce' ? <>Contro<em className="text-wine not-italic italic">luce</em></> : siteTitle}
+      <div className="wrap brand-masthead border-b border-line py-6 text-center md:py-7">
+        <Link href="/" className="brand-link inline-flex flex-col items-center" aria-label={`${siteTitle || 'Controluce'} — homepage`}>
+          <span className="font-display text-4xl leading-none tracking-tight text-ink md:text-[3.35rem]">
+            {siteTitle === 'Controluce' ? <>Contro<span className="brand-emphasis italic">luce</span></> : siteTitle}
+          </span>
+          <span className="brand-subtitle mt-3 font-mono text-[8px] uppercase tracking-[0.32em] text-ink-soft sm:text-[9px]">
+            Oltre la superficie
+          </span>
         </Link>
       </div>
 
-      <nav aria-label="Navigazione principale" className="wrap flex items-center justify-center gap-3 py-3 text-[13px] font-mono uppercase tracking-widest text-ink-soft md:gap-4">
-        <Link href="/" className="nav-link transition-colors hover:text-wine">Home</Link>
-        <span aria-hidden className="text-line">·</span>
-        <Link href="/about" className="nav-link transition-colors hover:text-wine">Chi sono</Link>
-        <span aria-hidden className="text-line">·</span>
-        <Link href="/#articoli" className="nav-link transition-colors hover:text-wine">Articoli</Link>
+      <nav aria-label="Navigazione principale" className="site-nav wrap flex items-center justify-center gap-5 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft sm:gap-8 sm:text-[11px]">
+        <Link href="/" className="site-nav-link nav-link transition-colors hover:text-wine">Home</Link>
+        <span aria-hidden="true" className="nav-separator">✳</span>
+        <Link href="/about" className="site-nav-link nav-link transition-colors hover:text-wine">Chi sono</Link>
+        <span aria-hidden="true" className="nav-separator">✳</span>
+        <Link href="/#articoli" className="site-nav-link nav-link transition-colors hover:text-wine">Articoli</Link>
       </nav>
     </header>
   )

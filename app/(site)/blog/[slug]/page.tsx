@@ -53,7 +53,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
   const coverImageUrl = getImageUrl(post.coverImage)
 
   return (
-    <article>
+    <article className="article-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -70,35 +70,42 @@ export default async function PostPage({ params }: { params: { slug: string } })
         }}
       />
 
-      <div className="wrap border-b border-line py-16">
-        <Link
-          href="/#articoli"
-          className="nav-link mb-8 inline-block font-mono text-[11px] uppercase tracking-widest text-ink-soft hover:text-wine"
-        >
-          {'<- Torna agli articoli'}
-        </Link>
-        <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-wine">
-          {post.category ? (
-            <Link href={`/categoria/${post.category.slug}`} className="nav-link hover:text-wine">
-              {post.category.title}
-            </Link>
-          ) : (
-            'Blog'
-          )}
-        </p>
-        <h1 className="max-w-[22ch] font-display text-4xl leading-tight md:text-6xl">{post.title}</h1>
-        <p className="mt-7 font-mono text-xs uppercase tracking-widest text-ink-soft">{date}</p>
-      </div>
+      <header className="article-masthead relative overflow-hidden border-b border-[#4E3B2B] py-14 md:py-20">
+        <div className="article-masthead-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="wrap article-masthead-content relative z-10 reveal-on-scroll">
+          <Link
+            href="/#articoli"
+            className="article-back-link nav-link mb-9 inline-block font-mono text-[10px] uppercase tracking-[0.19em]"
+          >
+            {'← Torna agli articoli'}
+          </Link>
+          <p className="article-category mb-5 font-mono text-[10px] uppercase tracking-[0.26em]">
+            {post.category ? (
+              <Link href={`/categoria/${post.category.slug}`} className="nav-link">
+                {post.category.title}
+              </Link>
+            ) : (
+              'Dal diario'
+            )}
+          </p>
+          <h1 className="max-w-[22ch] font-display text-4xl leading-[1.08] tracking-tight text-[#F5EFE5] sm:text-5xl md:text-6xl lg:text-7xl">{post.title}</h1>
+          <p className="article-date mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em]">
+            <span className="inline-block h-px w-8 bg-[#C9A879]" />
+            <time dateTime={post.publishedAt}>{date}</time>
+          </p>
+        </div>
+      </header>
 
       {post.coverImage && (
         <div className="wrap">
-          <div className="relative my-12 aspect-[21/9] overflow-hidden">
+          <div className="editorial-media-frame reveal-on-scroll relative my-10 aspect-[21/9] overflow-hidden border border-line md:my-14">
             <CropFrame />
             <Image
               src={post.coverImage.url}
               alt={post.coverImage.alt || post.title}
               fill
               priority
+              sizes="(max-width: 767px) 100vw, 1160px"
               unoptimized
               className="object-cover"
             />
@@ -106,22 +113,29 @@ export default async function PostPage({ params }: { params: { slug: string } })
         </div>
       )}
 
-      <div className="wrap mx-auto max-w-[720px] pb-24">
+      <div className="wrap mx-auto max-w-[760px] pb-24 pt-8 md:pt-12 reveal-on-scroll">
         <PostBody value={post.body} />
+        <div className="article-end-mark mt-16 flex items-center justify-center gap-3" aria-hidden="true">
+          <span className="h-px w-12 bg-line" />
+          <span className="font-display text-xl italic text-ochre">C</span>
+          <span className="h-px w-12 bg-line" />
+        </div>
       </div>
 
       {relatedPosts.length > 0 && (
-        <div className="border-t border-line bg-bg-soft py-20">
+        <section className="border-t border-line bg-bg-soft py-20 md:py-24">
           <div className="wrap">
-            <p className="mb-1 font-mono text-xs uppercase tracking-[0.2em] text-wine">Continua a leggere</p>
-            <h2 className="mb-12 font-display text-3xl md:text-4xl">Altri articoli</h2>
+            <div className="reveal-on-scroll mb-10">
+              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">Continua a leggere</p>
+              <h2 className="font-display text-3xl md:text-4xl">Altri articoli</h2>
+            </div>
             <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
               {relatedPosts.map((relatedPost, i) => (
                 <PostCard key={relatedPost._id} post={relatedPost} index={i} />
               ))}
             </div>
           </div>
-        </div>
+        </section>
       )}
     </article>
   )

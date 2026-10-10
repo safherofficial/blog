@@ -5,14 +5,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Warm charcoal, antique gold and soft parchment sampled from the Controluce backlit portrait.
+        // One cohesive palette derived from the warm backlight and shadow in the Controluce portrait.
         bg: '#F5EFE5',
         'bg-soft': '#E9DED0',
         ink: '#211A15',
-        'ink-soft': '#706155',
+        'ink-soft': '#6A5C50',
         wine: '#604633',
         'wine-dark': '#34251D',
-        ochre: '#C9A879',
+        ochre: '#8A683F',
+        'gold-soft': '#D5B27F',
         sage: '#8C8173',
         line: '#D9C9B7',
       },

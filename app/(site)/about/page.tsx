@@ -16,39 +16,48 @@ export default async function AboutPage() {
   const settings = await getSiteSettings().catch(() => null)
 
   return (
-    <section className="py-20 md:py-24">
-      <div className="wrap grid grid-cols-1 items-center gap-14 md:grid-cols-[0.85fr_1.15fr] md:gap-16">
-        <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-ochre to-wine">
+    <section className="about-page py-16 md:py-24">
+      <div className="wrap grid grid-cols-1 items-center gap-12 md:grid-cols-[0.85fr_1.15fr] md:gap-16">
+        <div className="editorial-media-frame reveal-on-scroll relative aspect-[4/5] overflow-hidden border border-line bg-gradient-to-br from-ochre to-wine">
           <CropFrame />
           {settings?.authorPhoto && (
             <Image
               src={settings.authorPhoto.url}
               alt={settings.authorPhoto.alt || settings.authorName || 'Foto profilo'}
               fill
+              sizes="(max-width: 767px) 100vw, 42vw"
               unoptimized
               className="object-cover"
             />
           )}
+          {!settings?.authorPhoto && (
+            <div className="about-image-caption absolute inset-x-0 bottom-0 z-10 p-6 font-display text-2xl italic text-[#F5EFE5]">
+              Uno sguardo oltre la superficie.
+            </div>
+          )}
         </div>
-        <div>
-          <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-wine">Chi c&apos;è dietro Controluce</p>
-          <h1 className="mb-6 font-display text-4xl md:text-5xl">
+        <div className="reveal-on-scroll">
+          <p className="mb-5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">
+            <span className="inline-block h-px w-8 bg-ochre" />
+            Chi c&apos;è dietro Controluce
+          </p>
+          <h1 className="mb-7 max-w-[19ch] font-display text-4xl leading-tight tracking-tight text-ink md:text-5xl">
             {settings?.authorName ? `Ciao, sono ${settings.authorName}.` : 'Uno sguardo personale sulle cose di ogni giorno.'}
           </h1>
           {settings?.authorBio ? (
-            <div className="mb-8 max-w-[62ch] space-y-5 font-serif text-lg leading-relaxed text-ink-soft [&_p]:mb-5">
+            <div className="mb-9 max-w-[62ch] space-y-5 font-serif text-lg leading-relaxed text-ink-soft [&_p]:mb-5">
               <PortableText value={settings.authorBio} />
             </div>
           ) : (
-            <p className="mb-8 text-ink-soft">
-              Controluce è uno spazio dedicato a storie, riflessioni e piccoli rituali della vita quotidiana.
+            <p className="mb-9 max-w-[54ch] font-serif text-lg leading-relaxed text-ink-soft">
+              Controluce è uno spazio dedicato a storie, riflessioni e piccoli rituali della vita quotidiana. Un luogo per rallentare, osservare meglio e trovare significati anche nelle cose più semplici.
             </p>
           )}
           <Link
             href="/#articoli"
-            className="inline-block border border-wine bg-wine px-7 py-3.5 font-mono text-[13px] uppercase tracking-widest text-white hover:bg-wine-dark"
+            className="editorial-button inline-flex items-center gap-4 border border-wine bg-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.16em] text-bg hover:border-wine-dark hover:bg-wine-dark"
           >
-            Leggi gli articoli
+            Leggi gli articoli <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </div>

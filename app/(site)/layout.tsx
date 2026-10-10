@@ -1,6 +1,7 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BackToTop from '@/components/BackToTop'
+import RevealEffects from '@/components/RevealEffects'
 import { getSiteSettings } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
 
@@ -9,7 +10,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const siteTitle = settings?.siteTitle || 'Controluce'
 
   return (
-    <>
+    <div className="site-shell">
+      <RevealEffects />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -25,6 +27,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <div className="site-page-transition">{children}</div>
       <Footer siteTitle={siteTitle} authorName={settings?.authorName} instagramUrl={settings?.instagramUrl} />
       <BackToTop />
-    </>
+    </div>
   )
 }
