@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 /**
  * Small, dependency-free interactions for the public editorial experience.
- * Keeps the visual treatment subtle and respects the user's motion preferences.
+ * Keeps motion subtle and respects the user's motion preferences.
  */
 export default function RevealEffects() {
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function RevealEffects() {
     const observeRevealElements = (scope: ParentNode) => {
       const elements: Element[] = []
       if (scope instanceof Element && scope.matches('.reveal-on-scroll')) elements.push(scope)
-      scope.querySelectorAll?.('.reveal-on-scroll').forEach((element) => elements.push(element))
+      scope.querySelectorAll('.reveal-on-scroll').forEach((element) => elements.push(element))
 
       for (const element of elements) {
         if (observed.has(element)) continue
