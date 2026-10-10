@@ -60,7 +60,7 @@ export async function getAllPosts(): Promise<PostSummary[]> {
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
-    WHERE p.slug IS NOT NULL AND p.published = TRUE
+    WHERE p.slug IS NOT NULL AND p.published = TRUE AND p.published_at <= NOW()
     ORDER BY p.published_at DESC
   `
   return rows
@@ -71,12 +71,12 @@ export async function getLatestPosts(limit = 3): Promise<PostSummary[]> {
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
            CASE WHEN p.cover_image_url IS NULL THEN NULL
                 ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-           p.published_at AS "publishedAt",
+           p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
            CASE WHEN c.id IS NULL THEN NULL
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
-    WHERE p.slug IS NOT NULL AND p.published = TRUE
+    WHERE p.slug IS NOT NULL AND p.published = TRUE AND p.published_at <= NOW()
     ORDER BY p.published_at DESC
     LIMIT ${Math.max(1, Math.min(limit, 50))}
   `
@@ -94,7 +94,7 @@ export async function getPostBySlug(slug: string): Promise<PostFull | null> {
            p.body, p.seo_title AS "seoTitle", p.seo_description AS "seoDescription"
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
-    WHERE p.slug = ${slug} AND p.published = TRUE
+    WHERE p.slug = ${slug} AND p.published = TRUE AND p.published_at <= NOW()
     LIMIT 1
   `
   return rows[0] || null
@@ -102,7 +102,9 @@ export async function getPostBySlug(slug: string): Promise<PostFull | null> {
 
 export async function getAllPostSlugs(): Promise<string[]> {
   const { rows } = await sql<{ slug: string }>`
-    SELECT slug FROM posts WHERE slug IS NOT NULL AND published = TRUE ORDER BY published_at DESC
+    SELECT slug FROM posts
+    WHERE slug IS NOT NULL AND published = TRUE AND published_at <= NOW()
+    ORDER BY published_at DESC
   `
   return rows.map((row) => row.slug)
 }
@@ -140,7 +142,7 @@ export async function getPostsByCategory(slug: string): Promise<PostSummary[]> {
            json_build_object('title', c.title, 'slug', c.slug) AS category
     FROM posts p
     INNER JOIN categories c ON c.id = p.category_id
-    WHERE c.slug = ${slug} AND p.published = TRUE
+    WHERE c.slug = ${slug} AND p.published = TRUE AND p.published_at <= NOW()
     ORDER BY p.published_at DESC
   `
   return rows
@@ -157,7 +159,7 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
              json_build_object('title', c.title, 'slug', c.slug) AS category
       FROM posts p
       INNER JOIN categories c ON c.id = p.category_id
-      WHERE p.id <> ${currentId} AND p.published = TRUE AND c.slug = ${categorySlug}
+      WHERE p.id <> ${currentId} AND p.published = TRUE AND p.published_at <= NOW() AND c.slug = ${categorySlug}
       ORDER BY p.published_at DESC LIMIT ${safeLimit}
     `
     if (sameCategory.length >= safeLimit) return sameCategory
@@ -173,7 +175,7 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
                   ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
       FROM posts p
       LEFT JOIN categories c ON c.id = p.category_id
-      WHERE p.published = TRUE AND NOT (p.id = ANY(${excludeIdsLiteral}::uuid[]))
+      WHERE p.published = TRUE AND p.published_at <= NOW() AND NOT (p.id = ANY(${excludeIdsLiteral}::uuid[]))
       ORDER BY p.published_at DESC LIMIT ${safeLimit - sameCategory.length}
     `
     return [...sameCategory, ...fillers]
@@ -188,7 +190,7 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
-    WHERE p.id <> ${currentId} AND p.published = TRUE
+    WHERE p.id <> ${currentId} AND p.published = TRUE AND p.published_at <= NOW()
     ORDER BY p.published_at DESC LIMIT ${safeLimit}
   `
   return rows
