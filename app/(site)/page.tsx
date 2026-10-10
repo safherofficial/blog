@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import PostCard from '@/components/PostCard'
-import CropFrame from '@/components/CropFrame'
 import { getLatestPosts, getSiteSettings } from '@/lib/db'
 
 export const revalidate = 60
@@ -14,54 +13,60 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="border-b border-line py-20 md:py-28">
-        <div className="wrap grid grid-cols-1 items-center gap-14 md:grid-cols-2 md:gap-16">
-          <div>
-            <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-wine">Diario editoriale</p>
-            <h1 className="mb-6 font-display text-5xl leading-[1.05] tracking-tight md:text-6xl">
-              Piccole cose,<br /><em className="italic text-wine">guardate meglio.</em>
+      <section className="home-hero relative isolate flex min-h-[700px] overflow-hidden border-b border-line md:min-h-[78vh] lg:min-h-[calc(100svh-130px)]">
+        <Image
+          src="/images/controluce-hero.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="home-hero-image object-cover object-[40%_center]"
+        />
+        <div className="home-hero-overlay absolute inset-0" aria-hidden="true" />
+        <div className="wrap relative z-10 flex w-full items-end py-16 md:items-center md:py-24">
+          <div className="home-hero-copy editorial-reveal w-full max-w-2xl md:ml-auto">
+            <p className="mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-[#E1BD8D]">
+              <span className="inline-block h-px w-9 bg-[#D5AC76]" />
+              Diario editoriale · Uno sguardo personale
+            </p>
+            <h1 className="mb-7 font-display text-5xl leading-[1.02] tracking-tight text-[#FBF4E9] sm:text-6xl md:text-7xl lg:text-[5.5rem]">
+              Piccole cose,<br />
+              <em className="font-normal italic text-[#D9B78A]">guardate meglio.</em>
             </h1>
-            <p className="mb-9 max-w-[46ch] font-serif text-lg leading-relaxed text-ink-soft">
+            <p className="mb-9 max-w-[44ch] font-serif text-lg leading-relaxed text-[#F0E5D7] md:text-xl">
               {settings?.tagline || 'Storie, riflessioni e piccoli rituali di vita quotidiana raccontati con uno sguardo personale.'}
             </p>
-            <Link href="#articoli" className="inline-block border border-wine bg-wine px-7 py-3.5 font-mono text-[13px] uppercase tracking-widest text-white transition-colors hover:bg-wine-dark">
-              Leggi gli ultimi articoli
-            </Link>
+            <div className="flex flex-wrap items-center gap-5">
+              <Link
+                href="#articoli"
+                className="hero-cta inline-flex items-center gap-4 border border-[#D3AB76] bg-[#D3AB76] px-6 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#211A15] transition-all duration-300 hover:border-[#F0D4AD] hover:bg-[#F0D4AD]"
+              >
+                Esplora gli articoli <span aria-hidden="true" className="text-lg leading-none">↘</span>
+              </Link>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#E5D4C0]/80">Leggi · Rifletti · Riscopri</span>
+            </div>
           </div>
-          <div className="relative aspect-[4/5] overflow-hidden bg-gradient-to-br from-ochre to-wine">
-            <CropFrame />
-            {settings?.authorPhoto?.url ? (
-              <Image
-                src={settings.authorPhoto.url}
-                alt={settings.authorPhoto.alt || settings.authorName || 'Immagine editoriale'}
-                fill
-                unoptimized
-                priority
-                className="object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-end p-6">
-                <p className="max-w-[28ch] font-display text-2xl italic leading-snug text-white">
-                  Uno spazio per osservare meglio le cose di ogni giorno.
-                </p>
-              </div>
-            )}
-          </div>
+        </div>
+        <div className="pointer-events-none absolute bottom-6 left-8 z-10 hidden font-mono text-[9px] uppercase tracking-[0.25em] text-white/55 md:block">
+          Controluce — oltre la superficie
         </div>
       </section>
 
-      <section id="articoli" className="py-20 md:py-24">
+      <section id="articoli" className="py-20 md:py-28">
         <div className="wrap">
-          <div className="mb-12 flex items-baseline justify-between border-b border-line pb-5">
+          <div className="mb-12 flex flex-col gap-5 border-b border-line pb-7 sm:flex-row sm:items-end sm:justify-between md:mb-14">
             <div>
-              <p className="mb-1 font-mono text-xs uppercase tracking-[0.2em] text-wine">Dal blog</p>
-              <h2 className="font-display text-3xl md:text-4xl">Ultimi articoli</h2>
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Dal blog</p>
+              <h2 className="font-display text-4xl leading-tight tracking-tight md:text-5xl">Ultimi articoli</h2>
             </div>
+            <p className="max-w-[34ch] font-serif text-base leading-relaxed text-ink-soft">
+              Pensieri, scoperte e storie quotidiane, raccontati con calma e curiosità.
+            </p>
           </div>
           {posts.length === 0 ? (
-            <p className="text-ink-soft">Nessun articolo è ancora disponibile. Torna presto per leggere i nuovi contenuti.</p>
+            <p className="border-l border-ochre py-2 pl-5 text-ink-soft">Nessun articolo è ancora disponibile. Torna presto per leggere i nuovi contenuti.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-3 md:gap-y-16">
               {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
             </div>
           )}
@@ -69,24 +74,25 @@ export default async function HomePage() {
       </section>
 
       {settings?.signatureQuote && (
-        <section className="bg-ink py-24 text-bg">
-          <div className="wrap max-w-[760px] text-center">
-            <p className="mb-0 font-display text-6xl italic text-ochre">&ldquo;</p>
-            <p className="mb-6 font-display text-2xl italic leading-snug">{settings.signatureQuote}</p>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-ochre">— {settings.authorName || settings.siteTitle || 'Controluce'}</p>
+        <section className="quote-section relative overflow-hidden border-y border-[#40352A] bg-ink py-20 text-bg md:py-28">
+          <div className="quote-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+          <div className="wrap relative max-w-[860px] text-center">
+            <p className="mb-2 font-display text-7xl leading-none italic text-ochre" aria-hidden="true">&ldquo;</p>
+            <p className="mb-8 font-display text-2xl italic leading-relaxed text-[#F4E9DB] md:text-4xl md:leading-snug">{settings.signatureQuote}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#C9A879]">— {settings.authorName || settings.siteTitle || 'Controluce'}</p>
           </div>
         </section>
       )}
 
-      <section className="bg-bg-soft py-16 text-center">
+      <section className="bg-bg-soft py-16 text-center md:py-20">
         <div className="wrap">
-          <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-wine">Resta aggiornato</p>
-          <h2 className="mb-3 font-display text-2xl">Leggi i nuovi articoli, quando escono.</h2>
-          <p className="mx-auto mb-7 max-w-[52ch] text-ink-soft">
-            Segui il feed RSS nel tuo lettore preferito. Nessuna registrazione necessaria.
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Resta aggiornato</p>
+          <h2 className="mb-4 font-display text-3xl md:text-4xl">Le storie migliori meritano tempo.</h2>
+          <p className="mx-auto mb-8 max-w-[52ch] font-serif text-lg leading-relaxed text-ink-soft">
+            Segui il feed RSS nel tuo lettore preferito e ritrova i nuovi articoli quando vuoi. Nessuna registrazione necessaria.
           </p>
-          <Link href="/rss" className="inline-block border border-wine bg-wine px-7 py-3.5 font-mono text-[13px] uppercase tracking-widest text-white transition-colors hover:bg-wine-dark">
-            Segui il feed RSS
+          <Link href="/rss" className="inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine transition-all duration-300 hover:bg-wine hover:text-bg">
+            Segui il feed RSS <span aria-hidden="true" className="text-lg leading-none">↗</span>
           </Link>
         </div>
       </section>

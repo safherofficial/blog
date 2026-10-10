@@ -5,15 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#FAF6EF',
-        'bg-soft': '#F1E9DC',
-        ink: '#211C18',
-        'ink-soft': '#6E6255',
-        wine: '#5E1B26',
-        'wine-dark': '#3F1219',
-        ochre: '#A9812F',
-        sage: '#7C8A6E',
-        line: '#E4D9C7',
+        // Warm charcoal, antique gold and soft parchment sampled from the Controluce backlit portrait.
+        bg: '#F5EFE5',
+        'bg-soft': '#E9DED0',
+        ink: '#211A15',
+        'ink-soft': '#706155',
+        wine: '#604633',
+        'wine-dark': '#34251D',
+        ochre: '#C9A879',
+        sage: '#8C8173',
+        line: '#D9C9B7',
       },
       fontFamily: {
         display: ['var(--font-fraunces)', 'Georgia', 'serif'],
