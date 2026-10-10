@@ -3,8 +3,9 @@
 import { useEffect } from 'react'
 
 /**
- * Small, dependency-free interactions for the public editorial experience.
- * Keeps motion subtle and respects the user's motion preferences.
+ * Dependency-free motion for the public editorial experience.
+ * Keeps effects light, respects reduced-motion preferences and avoids
+ * doing layout work on every pointer/scroll event.
  */
 export default function RevealEffects() {
   useEffect(() => {
@@ -12,20 +13,34 @@ export default function RevealEffects() {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const root = document.documentElement
 
-    let frame = 0
+    let pointerFrame = 0
+    let scrollFrame = 0
     let pointerX = window.innerWidth * 0.58
     let pointerY = window.innerHeight * 0.24
 
     const paintPointer = () => {
       root.style.setProperty('--pointer-x', `${pointerX}px`)
       root.style.setProperty('--pointer-y', `${pointerY}px`)
-      frame = 0
+      pointerFrame = 0
     }
 
     const handlePointerMove = (event: PointerEvent) => {
       pointerX = event.clientX
       pointerY = event.clientY
-      if (!frame) frame = window.requestAnimationFrame(paintPointer)
+      if (!pointerFrame) pointerFrame = window.requestAnimationFrame(paintPointer)
+    }
+
+    const paintScrollProgress = () => {
+      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = scrollableHeight > 0
+        ? Math.min(1, Math.max(0, window.scrollY / scrollableHeight))
+        : 0
+      root.style.setProperty('--scroll-progress', String(progress))
+      scrollFrame = 0
+    }
+
+    const handleScrollOrResize = () => {
+      if (!scrollFrame) scrollFrame = window.requestAnimationFrame(paintScrollProgress)
     }
 
     let observer: IntersectionObserver | undefined
@@ -71,14 +86,29 @@ export default function RevealEffects() {
       paintPointer()
     }
 
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true })
+    window.addEventListener('resize', handleScrollOrResize, { passive: true })
+    paintScrollProgress()
+
     return () => {
       observer?.disconnect()
       mutationObserver.disconnect()
       window.removeEventListener('pointermove', handlePointerMove)
-      if (frame) window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', handleScrollOrResize)
+      window.removeEventListener('resize', handleScrollOrResize)
+      if (pointerFrame) window.cancelAnimationFrame(pointerFrame)
+      if (scrollFrame) window.cancelAnimationFrame(scrollFrame)
       root.classList.remove('has-reveal-motion')
+      root.style.removeProperty('--scroll-progress')
     }
   }, [])
 
-  return <div className="ambient-light" aria-hidden="true" />
+  return (
+    <>
+      <div className="reading-progress" aria-hidden="true">
+        <span className="reading-progress__fill" />
+      </div>
+      <div className="ambient-light" aria-hidden="true" />
+    </>
+  )
 }
