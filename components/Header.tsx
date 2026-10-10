@@ -1,32 +1,31 @@
 import Link from 'next/link'
 
-export default function Header({ instagramUrl }: { instagramUrl?: string | null }) {
+export default function Header({ siteTitle = 'Controluce', instagramUrl }: { siteTitle?: string | null; instagramUrl?: string | null }) {
   return (
     <header className="bg-bg">
       <div className="wrap flex items-center justify-between border-b border-line py-2.5 text-[11px] font-mono uppercase tracking-widest text-ink-soft">
-        <span>Diario editoriale - dal 2026</span>
-        <a
-          href={instagramUrl || '#'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="nav-link hover:text-wine transition-colors"
-        >
-          Instagram
-        </a>
+        <span>Storie, riflessioni e vita quotidiana</span>
+        {instagramUrl ? (
+          <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="nav-link transition-colors hover:text-wine">
+            Instagram
+          </a>
+        ) : (
+          <a href="/feed.xml" className="nav-link transition-colors hover:text-wine">Feed RSS</a>
+        )}
       </div>
 
       <div className="wrap border-b border-line py-7 text-center">
         <Link href="/" className="font-display text-4xl tracking-tight md:text-5xl">
-          Contro<em className="text-wine not-italic italic">luce</em>
+          {siteTitle === 'Controluce' ? <>Contro<em className="text-wine not-italic italic">luce</em></> : siteTitle}
         </Link>
       </div>
 
-      <nav className="wrap flex items-center justify-center gap-3 py-3 text-[13px] font-mono uppercase tracking-widest text-ink-soft md:gap-4">
-        <Link href="/" className="nav-link hover:text-wine transition-colors">Home</Link>
-        <span aria-hidden className="text-line">.</span>
-        <Link href="/about" className="nav-link hover:text-wine transition-colors">Chi sono</Link>
-        <span aria-hidden className="text-line">.</span>
-        <Link href="/#articoli" className="nav-link hover:text-wine transition-colors">Articoli</Link>
+      <nav aria-label="Navigazione principale" className="wrap flex items-center justify-center gap-3 py-3 text-[13px] font-mono uppercase tracking-widest text-ink-soft md:gap-4">
+        <Link href="/" className="nav-link transition-colors hover:text-wine">Home</Link>
+        <span aria-hidden className="text-line">·</span>
+        <Link href="/about" className="nav-link transition-colors hover:text-wine">Chi sono</Link>
+        <span aria-hidden className="text-line">·</span>
+        <Link href="/#articoli" className="nav-link transition-colors hover:text-wine">Articoli</Link>
       </nav>
     </header>
   )

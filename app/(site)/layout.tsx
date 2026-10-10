@@ -2,26 +2,28 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import BackToTop from '@/components/BackToTop'
 import { getSiteSettings } from '@/lib/db'
+import { safeJsonLd } from '@/lib/content/safe-json'
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings().catch(() => null)
+  const siteTitle = settings?.siteTitle || 'Controluce'
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLd({
             '@context': 'https://schema.org',
             '@type': 'Blog',
-            name: settings?.siteTitle || 'Controluce',
-            author: { '@type': 'Person', name: settings?.authorName || '[Il tuo nome]' },
+            name: siteTitle,
+            author: settings?.authorName ? { '@type': 'Person', name: settings.authorName } : undefined,
           }),
         }}
       />
-      <Header instagramUrl={settings?.instagramUrl} />
+      <Header siteTitle={siteTitle} instagramUrl={settings?.instagramUrl} />
       {children}
-      <Footer authorName={settings?.authorName} instagramUrl={settings?.instagramUrl} />
+      <Footer siteTitle={siteTitle} authorName={settings?.authorName} instagramUrl={settings?.instagramUrl} />
       <BackToTop />
     </>
   )

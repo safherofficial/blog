@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: category.title,
     description: 'Tutti gli articoli nella categoria ' + category.title + ' su Controluce.',
+    alternates: { canonical: `/categoria/${category.slug}` },
   }
 }
 
@@ -42,9 +43,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="text-ink-soft">Nessun articolo ancora in questa categoria.</p>
         ) : (
           <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
-            {posts.map((post, i) => (
-              <PostCard key={post._id} post={post} index={i} />
-            ))}
+            {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
           </div>
         )}
       </div>

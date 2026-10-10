@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllPostSlugs, getPostBySlug, getRelatedPosts } from '@/lib/db'
 import { imageUrl as getImageUrl } from '@/lib/content/images'
+import { safeJsonLd } from '@/lib/content/safe-json'
 import PostBody from '@/components/PostBody'
 import PostCard from '@/components/PostCard'
 import CropFrame from '@/components/CropFrame'
@@ -49,18 +50,22 @@ export default async function PostPage({ params }: { params: { slug: string } })
   })
 
   const relatedPosts = await getRelatedPosts(post._id, post.category?.slug).catch(() => [])
+  const coverImageUrl = getImageUrl(post.coverImage)
 
   return (
     <article>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: safeJsonLd({
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
             headline: post.title,
             description: post.excerpt,
             datePublished: post.publishedAt,
+            mainEntityOfPage: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'}/blog/${post.slug}`,
+            image: coverImageUrl || undefined,
+            author: { '@type': 'Person', name: 'Controluce' },
           }),
         }}
       />

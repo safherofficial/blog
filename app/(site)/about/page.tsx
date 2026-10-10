@@ -9,7 +9,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Chi sono',
-  description: 'Scopri chi c\'è dietro Controluce.',
+  description: "Scopri chi c'è dietro Controluce.",
 }
 
 export default async function AboutPage() {
@@ -23,22 +23,25 @@ export default async function AboutPage() {
           {settings?.authorPhoto && (
             <Image
               src={settings.authorPhoto.url}
-              alt={settings.authorName || 'Foto profilo'}
+              alt={settings.authorPhoto.alt || settings.authorName || 'Foto profilo'}
               fill
-              unoptimized className="object-cover"
+              unoptimized
+              className="object-cover"
             />
           )}
         </div>
         <div>
           <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-wine">Chi c&apos;è dietro Controluce</p>
-          <h1 className="mb-6 font-display text-4xl md:text-5xl">Ciao, sono {settings?.authorName || '[Il tuo nome]'}.</h1>
+          <h1 className="mb-6 font-display text-4xl md:text-5xl">
+            {settings?.authorName ? `Ciao, sono ${settings.authorName}.` : 'Uno sguardo personale sulle cose di ogni giorno.'}
+          </h1>
           {settings?.authorBio ? (
             <div className="mb-8 max-w-[62ch] space-y-5 font-serif text-lg leading-relaxed text-ink-soft [&_p]:mb-5">
               <PortableText value={settings.authorBio} />
             </div>
           ) : (
             <p className="mb-8 text-ink-soft">
-              La biografia si modifica da /admin → Impostazioni.
+              Controluce è uno spazio dedicato a storie, riflessioni e piccoli rituali della vita quotidiana.
             </p>
           )}
           <Link
