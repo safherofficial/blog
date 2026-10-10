@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
-import { editorTextToPortableText } from '@/lib/content/editor'
+import { validatePostInput } from '@/lib/content/post-input'
 
 export async function GET() {
   if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
@@ -17,21 +17,28 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
-  const data = await request.json().catch(() => null)
-  if (!data?.title || !data?.slug || !data?.excerpt) return NextResponse.json({ error: 'Titolo, slug e anteprima sono obbligatori.' }, { status: 400 })
 
-  const body = Array.isArray(data.body) ? data.body : editorTextToPortableText(String(data.bodyText || ''))
-  const publishedAt = data.publishedAt ? new Date(data.publishedAt) : new Date()
-  if (Number.isNaN(publishedAt.getTime())) return NextResponse.json({ error: 'Data di pubblicazione non valida.' }, { status: 400 })
+  const data = await request.json().catch(() => null)
+  const parsed = validatePostInput(data)
+  if ('error' in parsed) return NextResponse.json({ error: parsed.error }, { status: 400 })
+  const post = parsed.value
 
   try {
     const { rows } = await sql`
-      INSERT INTO posts (title, slug, excerpt, cover_image_url, cover_image_alt, category_id, published_at, published, body, seo_title, seo_description)
-      VALUES (${data.title.trim()}, ${data.slug.trim()}, ${data.excerpt.trim()}, ${data.coverImageUrl || null}, ${data.coverImageAlt || null}, ${data.categoryId || null}, ${publishedAt.toISOString()}, ${data.published !== false}, ${JSON.stringify(body)}::jsonb, ${data.seoTitle || null}, ${data.seoDescription || null})
+      INSERT INTO posts (
+        title, slug, excerpt, cover_image_url, cover_image_alt, category_id,
+        published_at, published, body, seo_title, seo_description
+      )
+      VALUES (
+        ${post.title}, ${post.slug}, ${post.excerpt}, ${post.coverImageUrl}, ${post.coverImageAlt},
+        ${post.categoryId}, ${post.publishedAt}, ${post.published}, ${JSON.stringify(post.body)}::jsonb,
+        ${post.seoTitle}, ${post.seoDescription}
+      )
       RETURNING id
     `
     return NextResponse.json({ id: rows[0].id }, { status: 201 })
   } catch (error: any) {
-    return NextResponse.json({ error: error?.code === '23505' ? 'Slug già utilizzato.' : 'Impossibile creare l’articolo.' }, { status: 400 })
+    if (error?.code === '23505') return NextResponse.json({ error: 'Slug già utilizzato.' }, { status: 409 })
+    return NextResponse.json({ error: 'Impossibile creare l’articolo.' }, { status: 500 })
   }
 }

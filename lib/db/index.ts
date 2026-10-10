@@ -24,6 +24,7 @@ export type PostSummary = {
   excerpt: string
   coverImage: CoverImage | null
   publishedAt: string
+  updatedAt?: string
   category: { title: string; slug: string } | null
 }
 
@@ -54,7 +55,7 @@ export async function getAllPosts(): Promise<PostSummary[]> {
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
            CASE WHEN p.cover_image_url IS NULL THEN NULL
                 ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-           p.published_at AS "publishedAt",
+           p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
            CASE WHEN c.id IS NULL THEN NULL
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
     FROM posts p
@@ -87,7 +88,7 @@ export async function getPostBySlug(slug: string): Promise<PostFull | null> {
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
            CASE WHEN p.cover_image_url IS NULL THEN NULL
                 ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-           p.published_at AS "publishedAt",
+           p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
            CASE WHEN c.id IS NULL THEN NULL
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category,
            p.body, p.seo_title AS "seoTitle", p.seo_description AS "seoDescription"
@@ -135,7 +136,7 @@ export async function getPostsByCategory(slug: string): Promise<PostSummary[]> {
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
            CASE WHEN p.cover_image_url IS NULL THEN NULL
                 ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-           p.published_at AS "publishedAt",
+           p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
            json_build_object('title', c.title, 'slug', c.slug) AS category
     FROM posts p
     INNER JOIN categories c ON c.id = p.category_id
@@ -146,19 +147,20 @@ export async function getPostsByCategory(slug: string): Promise<PostSummary[]> {
 }
 
 export async function getRelatedPosts(currentId: string, categorySlug?: string | null, limit = 3): Promise<PostSummary[]> {
+  const safeLimit = Math.max(1, Math.min(limit, 20))
   if (categorySlug) {
     const { rows: sameCategory } = await sql<PostSummary>`
       SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
              CASE WHEN p.cover_image_url IS NULL THEN NULL
                   ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-             p.published_at AS "publishedAt",
+             p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
              json_build_object('title', c.title, 'slug', c.slug) AS category
       FROM posts p
       INNER JOIN categories c ON c.id = p.category_id
       WHERE p.id <> ${currentId} AND p.published = TRUE AND c.slug = ${categorySlug}
-      ORDER BY p.published_at DESC LIMIT ${Math.max(1, Math.min(limit, 20))}
+      ORDER BY p.published_at DESC LIMIT ${safeLimit}
     `
-    if (sameCategory.length >= limit) return sameCategory
+    if (sameCategory.length >= safeLimit) return sameCategory
 
     const excludeIds = [currentId, ...sameCategory.map((p) => p._id)]
     const excludeIdsLiteral = `{${excludeIds.join(',')}}`
@@ -166,13 +168,13 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
       SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
              CASE WHEN p.cover_image_url IS NULL THEN NULL
                   ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-             p.published_at AS "publishedAt",
+             p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
              CASE WHEN c.id IS NULL THEN NULL
                   ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
       FROM posts p
       LEFT JOIN categories c ON c.id = p.category_id
       WHERE p.published = TRUE AND NOT (p.id = ANY(${excludeIdsLiteral}::uuid[]))
-      ORDER BY p.published_at DESC LIMIT ${limit - sameCategory.length}
+      ORDER BY p.published_at DESC LIMIT ${safeLimit - sameCategory.length}
     `
     return [...sameCategory, ...fillers]
   }
@@ -181,13 +183,13 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
            CASE WHEN p.cover_image_url IS NULL THEN NULL
                 ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-           p.published_at AS "publishedAt",
+           p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
            CASE WHEN c.id IS NULL THEN NULL
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
     WHERE p.id <> ${currentId} AND p.published = TRUE
-    ORDER BY p.published_at DESC LIMIT ${Math.max(1, Math.min(limit, 20))}
+    ORDER BY p.published_at DESC LIMIT ${safeLimit}
   `
   return rows
 }

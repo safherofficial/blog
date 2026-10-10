@@ -1,89 +1,76 @@
 # Controluce
 
-Next.js 14 (App Router, TypeScript, Tailwind) + **Vercel Postgres**.
-Contenuti, categorie e impostazioni sono gestiti nel database Postgres collegato a Vercel.
+Blog editoriale realizzato con Next.js 14 (App Router, TypeScript, Tailwind CSS) e Vercel Postgres.
 
-## 1. Configurazione Vercel
+Articoli, categorie e impostazioni vengono gestiti dal database PostgreSQL collegato a Vercel.
 
-Imposta queste variabili d'ambiente:
+## Configurazione
+
+Imposta le seguenti variabili d'ambiente nel progetto Vercel:
 
 ```env
 POSTGRES_URL=...
 ADMIN_PASSWORD=una-password-lunga-e-casuale
+ADMIN_SESSION_SECRET=una-chiave-casuale-distinta-dalla-password
 NEXT_PUBLIC_SITE_URL=https://www.tuodominio.it
 ```
 
-`POSTGRES_URL` deve essere quella fornita dall'integrazione Postgres collegata
-al progetto Vercel.
+`ADMIN_SESSION_SECRET` dovrebbe essere un segreto casuale indipendente dalla password amministrativa. Se non è impostato, il codice usa `ADMIN_PASSWORD` come fallback per mantenere la compatibilità con le installazioni esistenti.
 
-## 2. Crea le tabelle
+Esegui integralmente `db/schema.sql` nel SQL editor del database Vercel Postgres. Lo script crea le tabelle `posts`, `categories` e `site_settings`, gli indici e i trigger per `updated_at`.
 
-Apri il SQL editor del database Vercel Postgres ed esegui integralmente:
-
-```text
-db/schema.sql
-```
-
-Lo script crea:
-
-- `posts`
-- `categories`
-- `site_settings`
-
-con indici, relazioni e trigger per `updated_at`.
-
-## 3. Installazione e deploy
+## Sviluppo, build e controlli
 
 ```bash
 npm install
+npm run dev
+npm run lint
+npm run typecheck
 npm run build
 ```
 
-Poi fai push su GitHub e deploya su Vercel.
+La GitHub Action esegue lint, controllo TypeScript e build su push e pull request. Il repository dovrebbe versionare anche il lockfile npm generato dal team per rendere riproducibili le installazioni.
 
-## 4. Pannello editoriale
+## Pannello editoriale
 
-Il pannello editoriale è disponibile su:
+Il pannello è disponibile su `/admin`. L'accesso è protetto da `ADMIN_PASSWORD` e da un cookie HTTP-only firmato, con scadenza lato server dopo otto ore. È disponibile anche il logout. La protezione anti-tentativi ripetuti in memoria è best-effort: per un sito pubblico configura anche il rate limiting a livello di piattaforma.
 
-```text
-/admin
-```
-
-L'accesso è protetto da `ADMIN_PASSWORD` e da un cookie HTTP-only firmato.
-
-Dal pannello puoi:
-
-- creare, modificare e cancellare articoli;
-- pubblicare o lasciare un articolo come bozza;
-- gestire titolo, slug, anteprima e SEO;
-- assegnare categorie;
-- impostare URL e alt delle immagini;
-- modificare le impostazioni del sito e la biografia.
+Il pannello permette di creare, modificare e cancellare articoli, salvare le bozze, pubblicare contenuti, assegnare categorie e modificare le impostazioni del sito. I nuovi articoli vengono salvati come bozze per impostazione predefinita.
 
 ### Formato del corpo articolo
 
-L'editor usa un formato testuale semplice che viene convertito in Portable
-Text e salvato nel campo JSONB `posts.body`:
+- Testo normale: paragrafi separati da una riga vuota.
+- `## Titolo`: intestazione H2.
+- `> Citazione`: citazione.
+- `![Testo alternativo](https://...)`: immagine inline (URL HTTPS).
 
-- testo normale: paragrafi separati da una riga vuota;
-- `## Titolo`: H2;
-- `> Citazione`: citazione;
-- `![Testo alternativo](https://...)`: immagine inline.
+Le immagini sono salvate come URL, non come file binari.
 
-Le immagini sono quindi memorizzate come URL nel database. Il database non
-contiene i file binari delle immagini.
+## Feed e SEO
+
+- Homepage: `/`
+- Articoli: `/blog/[slug]`
+- Categorie: `/categoria/[slug]`
+- Pagina autore: `/about`
+- Privacy Policy: `/privacy-policy`
+- Feed RSS: `/feed.xml`
+- Sitemap: `/sitemap.xml`
+- Robots: `/robots.txt`
+
+La newsletter email non è attiva: la homepage propone il feed RSS, senza raccogliere indirizzi email. Prima di introdurre newsletter, analytics o marketing, aggiorna la privacy policy e implementa i controlli di consenso necessari.
 
 ## Struttura
 
 ```text
-app/(site)/       → sito pubblico
-app/admin/        → pannello editoriale Postgres
-app/api/admin/    → API protette del pannello
-app/sitemap.ts    → sitemap dinamica da Postgres
-app/robots.ts     → robots.txt
-components/       → componenti UI
-lib/db/           → accesso Vercel Postgres e query contenuti
-lib/content/     → conversione immagini/editor
-lib/admin-auth.ts → autenticazione pannello
- db/schema.sql    → schema database
+app/(site)/        → pagine pubbliche
+app/admin/         → pannello editoriale
+app/api/admin/     → API amministrative
+app/feed.xml/      → feed RSS
+app/sitemap.ts     → sitemap dinamica
+app/robots.ts      → robots.txt
+components/        → componenti UI
+lib/db/            → accesso Postgres e query contenuti
+lib/content/       → editor, validazione e contenuti
+lib/admin-auth.ts  → sessione amministrativa
+db/schema.sql      → schema database
 ```
