@@ -20,21 +20,18 @@ export default async function AboutPage() {
       <div className="wrap grid grid-cols-1 items-center gap-12 md:grid-cols-[0.85fr_1.15fr] md:gap-16">
         <div className="editorial-media-frame reveal-on-scroll relative aspect-[4/5] overflow-hidden border border-line bg-gradient-to-br from-ochre to-wine">
           <CropFrame />
-          {settings?.authorPhoto && (
-            <Image
-              src={settings.authorPhoto.url}
-              alt={settings.authorPhoto.alt || settings.authorName || 'Foto profilo'}
-              fill
-              sizes="(max-width: 767px) 100vw, 42vw"
-              unoptimized
-              className="object-cover"
-            />
-          )}
-          {!settings?.authorPhoto && (
-            <div className="about-image-caption absolute inset-x-0 bottom-0 z-10 p-6 font-display text-2xl italic text-[#F5EFE5]">
-              Uno sguardo oltre la superficie.
-            </div>
-          )}
+          <Image
+            src={settings?.authorPhoto?.url || '/images/controluce-hero.webp'}
+            alt={
+              settings?.authorPhoto
+                ? settings.authorPhoto.alt || settings.authorName || 'Foto profilo'
+                : 'Ritratto in controluce di una donna di profilo, con luce ambrata sui capelli'
+            }
+            fill
+            sizes="(max-width: 767px) 100vw, 42vw"
+            unoptimized={Boolean(settings?.authorPhoto)}
+            className="object-cover object-[14%_center]"
+          />
         </div>
         <div className="reveal-on-scroll">
           <p className="mb-5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">
