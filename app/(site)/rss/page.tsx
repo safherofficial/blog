@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: 'Segui Controluce via RSS',
   description: 'Ricevi i nuovi articoli di Controluce nel tuo lettore RSS, senza registrazione e senza newsletter.',
   alternates: {
+    canonical: '/rss',
     types: {
       'application/rss+xml': '/feed.xml',
     },

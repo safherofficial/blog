@@ -1,9 +1,17 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import PostCard from '@/components/PostCard'
 import { getLatestPosts, getSiteSettings } from '@/lib/db'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+    types: { 'application/rss+xml': '/feed.xml' },
+  },
+}
 
 export default async function HomePage() {
   const [posts, settings] = await Promise.all([

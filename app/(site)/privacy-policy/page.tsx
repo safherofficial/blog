@@ -7,6 +7,10 @@ export const revalidate = 60
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'Informativa sulla privacy di Controluce.',
+  alternates: {
+    canonical: '/privacy-policy',
+    types: { 'application/rss+xml': '/feed.xml' },
+  },
 }
 
 export default async function PrivacyPolicyPage() {

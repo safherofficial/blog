@@ -37,6 +37,16 @@ Il pannello è disponibile su `/admin`. L'accesso è protetto da `ADMIN_PASSWORD
 
 Il pannello permette di creare, modificare e cancellare articoli, salvare le bozze, pubblicare contenuti, assegnare categorie e modificare le impostazioni del sito. I nuovi articoli vengono salvati come bozze per impostazione predefinita.
 
+### Controlli SEO
+
+Il pannello include un motore di analisi SEO (`lib/seo/`), pensato per intercettare gli errori che penalizzano il posizionamento su Google, Bing e altri motori.
+
+- **Editor articolo:** punteggio 0-100 in tempo reale, anteprima del risultato Google (desktop e mobile), contatori di lunghezza e un elenco di problemi cliccabili (titolo e descrizione fuori misura, duplicati, slug, thin content, sottotitoli, alt mancanti, immagini `http://`, leggibilità, parola chiave principale). Se cambi lo slug di un articolo già pubblico ricevi un avviso, perché il sito non crea redirect automatici.
+- **Salute SEO:** analisi di tutti gli articoli e della configurazione (`NEXT_PUBLIC_SITE_URL`, dominio canonico, categorie vuote in sitemap, pagina «Chi sono», segreto di sessione).
+- **Scansione del sito pubblicato:** visita le pagine online come un crawler e controlla robots.txt, sitemap, feed, stato HTTP, title, description, canonical, `noindex`, H1, alt delle immagini e tempi di risposta. Interroga solo l'origine corrente.
+- La parola chiave principale serve solo ai controlli e non viene salvata nel database. Le regole sono funzioni pure in `lib/seo/post-analyzer.ts` e `lib/seo/site-audit.ts`.
+- Mentre scrivi, una copia di sicurezza del testo viene conservata nel browser: se la sessione scade o chiudi la scheda, l'editor propone di ripristinarla.
+
 ### Formato del corpo articolo
 
 - Testo normale: paragrafi separati da una riga vuota.

@@ -10,6 +10,10 @@ export const revalidate = 60
 export const metadata: Metadata = {
   title: 'Chi sono',
   description: "Scopri chi c'è dietro Controluce.",
+  alternates: {
+    canonical: '/about',
+    types: { 'application/rss+xml': '/feed.xml' },
+  },
 }
 
 export default async function AboutPage() {
