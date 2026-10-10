@@ -23,6 +23,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: 'Controluce — Blog di lifestyle e vita quotidiana', template: '%s — Controluce' },
   description: 'Storie, riflessioni e piccoli rituali di vita quotidiana raccontati con uno sguardo personale.',
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
   openGraph: { type: 'website', siteName: 'Controluce', locale: 'it_IT' },
   twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true },

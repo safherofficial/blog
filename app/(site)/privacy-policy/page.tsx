@@ -51,8 +51,8 @@ export default async function PrivacyPolicyPage() {
             <h2>Finalità e base giuridica</h2>
             <p>
               I dati tecnici vengono trattati nella misura necessaria al funzionamento, alla sicurezza e alla manutenzione
-              del sito, nonché per adempiere agli obblighi di legge applicabili. L'eventuale attivazione futura di newsletter,
-              analytics o strumenti di marketing richiederà l'aggiornamento di questa informativa e l'implementazione degli
+              del sito, nonché per adempiere agli obblighi di legge applicabili. L&apos;eventuale attivazione futura di newsletter,
+              analytics o strumenti di marketing richiederà l&apos;aggiornamento di questa informativa e l&apos;implementazione degli
               eventuali consensi necessari prima della raccolta dei relativi dati.
             </p>
           </div>
@@ -67,7 +67,7 @@ export default async function PrivacyPolicyPage() {
           </div>
 
           <div>
-            <h2>Diritti dell'interessato</h2>
+            <h2>Diritti dell&apos;interessato</h2>
             <p>
               Nei casi previsti dal Regolamento (UE) 2016/679, puoi richiedere accesso, rettifica, cancellazione,
               limitazione del trattamento o opporti al trattamento, e puoi proporre reclamo al Garante per la protezione
@@ -82,16 +82,16 @@ export default async function PrivacyPolicyPage() {
           <div>
             <h2>Cookie</h2>
             <p>
-              L'applicazione non implementa intenzionalmente cookie pubblicitari o di profilazione. I cookie tecnici
-              e gli eventuali cookie impostati dai fornitori infrastrutturali devono essere verificati nell'ambiente
+              L&apos;applicazione non implementa intenzionalmente cookie pubblicitari o di profilazione. I cookie tecnici
+              e gli eventuali cookie impostati dai fornitori infrastrutturali devono essere verificati nell&apos;ambiente
               effettivamente pubblicato e descritti in modo coerente con la configurazione reale.
             </p>
           </div>
         </div>
 
         <p className="mt-12 text-sm text-ink-soft">
-          Questo testo descrive l'implementazione attuale e non costituisce consulenza legale. Prima del lancio,
-          completa l'identità e i recapiti del titolare e verifica i trattamenti effettivi, i fornitori e gli obblighi
+          Questo testo descrive l&apos;implementazione attuale e non costituisce consulenza legale. Prima del lancio,
+          completa l&apos;identità e i recapiti del titolare e verifica i trattamenti effettivi, i fornitori e gli obblighi
           applicabili al tuo caso.
         </p>
 
