@@ -14,14 +14,14 @@ export default function Footer({ siteTitle = 'Controluce', authorName, instagram
           <Link href="/" className="nav-link w-fit transition-colors hover:text-wine">Home</Link>
           <Link href="/about" className="nav-link w-fit transition-colors hover:text-wine">Chi sono</Link>
           <Link href="/#articoli" className="nav-link w-fit transition-colors hover:text-wine">Articoli</Link>
-          <Link href="/feed.xml" className="nav-link w-fit transition-colors hover:text-wine">Feed RSS</Link>
+          <Link href="/rss" className="nav-link w-fit transition-colors hover:text-wine">Feed RSS</Link>
         </nav>
         <div className="md:text-right">
           <p className="mb-2 text-[13px] font-mono uppercase tracking-widest text-ink-soft">Seguimi</p>
           {instagramUrl ? (
             <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="nav-link text-sm text-ink transition-colors hover:text-wine">Instagram</a>
           ) : (
-            <Link href="/feed.xml" className="nav-link text-sm text-ink transition-colors hover:text-wine">Ricevi gli aggiornamenti via RSS</Link>
+            <Link href="/rss" className="nav-link text-sm text-ink transition-colors hover:text-wine">Ricevi gli aggiornamenti via RSS</Link>
           )}
         </div>
       </div>

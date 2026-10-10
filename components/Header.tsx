@@ -10,7 +10,7 @@ export default function Header({ siteTitle = 'Controluce', instagramUrl }: { sit
             Instagram
           </a>
         ) : (
-          <a href="/feed.xml" className="nav-link transition-colors hover:text-wine">Feed RSS</a>
+          <Link href="/rss" className="nav-link transition-colors hover:text-wine">Feed RSS</Link>
         )}
       </div>
 

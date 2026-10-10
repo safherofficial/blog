@@ -85,9 +85,9 @@ export default async function HomePage() {
           <p className="mx-auto mb-7 max-w-[52ch] text-ink-soft">
             Segui il feed RSS nel tuo lettore preferito. Nessuna registrazione necessaria.
           </p>
-          <a href="/feed.xml" className="inline-block border border-wine bg-wine px-7 py-3.5 font-mono text-[13px] uppercase tracking-widest text-white transition-colors hover:bg-wine-dark">
+          <Link href="/rss" className="inline-block border border-wine bg-wine px-7 py-3.5 font-mono text-[13px] uppercase tracking-widest text-white transition-colors hover:bg-wine-dark">
             Segui il feed RSS
-          </a>
+          </Link>
         </div>
       </section>
     </>
