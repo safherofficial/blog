@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 
 export const metadata: Metadata = {
   title: 'Segui Controluce via RSS',
@@ -12,6 +13,18 @@ export const metadata: Metadata = {
 }
 
 export default function RssPage() {
+  const requestHeaders = headers()
+  const host = (
+    requestHeaders.get('x-forwarded-host') ||
+    requestHeaders.get('host') ||
+    ''
+  ).split(',')[0].trim()
+  const forwardedProtocol = requestHeaders.get('x-forwarded-proto')?.split(',')[0].trim()
+  const protocol = forwardedProtocol || (host.startsWith('localhost') ? 'http' : 'https')
+  const fallbackOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
+  const origin = host ? `${protocol}://${host}` : fallbackOrigin
+  const feedUrl = new URL('/feed.xml', origin).toString()
+
   return (
     <main>
       <section className="border-b border-line py-20 md:py-28">
@@ -27,9 +40,9 @@ export default function RssPage() {
           <div className="border border-line bg-bg-soft p-6 md:p-8">
             <h2 className="mb-3 font-display text-2xl">Aggiungi il feed al tuo lettore</h2>
             <p className="mb-5 leading-relaxed text-ink-soft">
-              Copia l’indirizzo qui sotto e incollalo nella funzione “Aggiungi feed” o “Aggiungi fonte” della tua app RSS.
+              Copia l’indirizzo completo qui sotto e incollalo nella funzione “Aggiungi feed” o “Aggiungi fonte” della tua app RSS.
             </p>
-            <code className="block break-all border border-line bg-bg px-4 py-3 font-mono text-sm">/feed.xml</code>
+            <code className="block break-all border border-line bg-bg px-4 py-3 font-mono text-sm">{feedUrl}</code>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href="/feed.xml"
