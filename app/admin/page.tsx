@@ -22,6 +22,12 @@ type Post = {
 
 const input = 'w-full border border-line bg-white px-3 py-2 text-sm outline-none focus:border-wine'
 
+function getPostStatus(post: Post): string {
+  if (!post.published) return 'Bozza'
+  if (post.published_at && new Date(post.published_at).getTime() > Date.now()) return 'Programmato'
+  return 'Pubblicato'
+}
+
 function toLocalDateTimeInput(value?: string): string {
   const date = value ? new Date(value) : new Date()
   if (Number.isNaN(date.getTime())) return ''
@@ -129,7 +135,8 @@ export default function AdminPage() {
         body: JSON.stringify(data),
       })
       const result = await res.json().catch(() => ({}))
-      setMessage(res.ok ? (data.published ? 'Articolo salvato e pubblicato.' : 'Bozza salvata.') : result.error || 'Errore nel salvataggio.')
+      const scheduled = data.published === true && typeof data.publishedAt === 'string' && Date.parse(data.publishedAt) > Date.now()
+      setMessage(res.ok ? (scheduled ? 'Articolo programmato.' : data.published ? 'Articolo salvato e pubblicato.' : 'Bozza salvata.') : result.error || 'Errore nel salvataggio.')
       if (res.ok) {
         await load()
         setSelected(null)
@@ -238,7 +245,7 @@ export default function AdminPage() {
                 {posts.map((post) => (
                   <button key={post.id} onClick={() => setSelected(post)} className="block w-full border-b border-line p-3 text-left hover:bg-bg-soft">
                     <span className="block font-display text-lg">{post.title}</span>
-                    <span className="text-xs text-ink-soft">{post.category_title || 'Blog'} · {post.published ? 'Pubblicato' : 'Bozza'}</span>
+                    <span className="text-xs text-ink-soft">{post.category_title || 'Blog'} · {getPostStatus(post)}</span>
                   </button>
                 ))}
                 {posts.length === 0 && <p className="p-3 text-sm text-ink-soft">Non ci sono ancora articoli.</p>}

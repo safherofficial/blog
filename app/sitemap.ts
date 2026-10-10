@@ -3,6 +3,9 @@ import { getAllPosts, getAllCategorySlugs } from '@/lib/db'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
 
+// Refresh sitemap entries for newly published and scheduled posts without a new deployment.
+export const revalidate = 300
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [posts, categorySlugs] = await Promise.all([
     getAllPosts().catch(() => []),
