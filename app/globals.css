@@ -614,3 +614,228 @@ html.has-reveal-motion .reveal-on-scroll:not(.is-visible) {
     transform: none;
   }
 }
+
+/* Final polish: tactile navigation, editorial reading rhythm and quiet feedback. */
+:root {
+  --scroll-progress: 0;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #A8875F #EFE6DA;
+}
+
+html::-webkit-scrollbar {
+  width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #EFE6DA;
+}
+
+html::-webkit-scrollbar-thumb {
+  border: 3px solid #EFE6DA;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #C8A575, #765338);
+}
+
+body {
+  overflow-x: clip;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.site-shell {
+  min-height: 100svh;
+  overflow-x: clip;
+}
+
+/* A low-profile progress cue makes long reads feel considered without competing
+   with the masthead or adding a separate JavaScript dependency. */
+.reading-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(138, 104, 63, 0.1);
+}
+
+.reading-progress__fill {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  background: linear-gradient(90deg, #604633 0%, #A17A45 48%, #E0C18F 100%);
+  box-shadow: 0 0 12px rgba(201, 168, 121, 0.3);
+  will-change: transform;
+}
+
+.reading-progress__fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3rem;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 244, 222, 0.8));
+}
+
+.masthead-rule {
+  background-size: 180% 100%;
+  animation: masthead-sheen 16s ease-in-out infinite;
+}
+
+@keyframes masthead-sheen {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.home-hero-image {
+  transition: transform 1400ms var(--motion-ease), filter 900ms ease;
+  transform-origin: 50% 45%;
+}
+
+.editorial-card:focus-within {
+  transform: translateY(-4px);
+}
+
+.editorial-card:focus-within::after {
+  border-color: rgba(177, 140, 94, 0.34);
+  transform: scale(1);
+}
+
+.editorial-card:focus-within .editorial-card-image {
+  filter: saturate(1.06) contrast(1.02);
+}
+
+.editorial-media-frame {
+  box-shadow: 0 16px 44px rgba(42, 29, 20, 0.045);
+}
+
+.article-prose h2 {
+  position: relative;
+  letter-spacing: -0.03em;
+}
+
+.article-prose h2::before {
+  content: '';
+  display: block;
+  width: 2.4rem;
+  height: 1px;
+  margin-bottom: 0.9rem;
+  background: linear-gradient(90deg, #8A683F, rgba(138, 104, 63, 0.2));
+}
+
+.article-prose :where(ul, ol) {
+  margin-bottom: 1.8rem;
+  padding-left: 1.4em;
+}
+
+.article-prose li {
+  padding-left: 0.25em;
+}
+
+.article-prose li + li {
+  margin-top: 0.55rem;
+}
+
+.article-prose li::marker {
+  color: #A17A45;
+}
+
+.article-prose a {
+  color: #604633;
+  text-decoration-line: underline;
+  text-decoration-color: rgba(138, 104, 63, 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: color 250ms ease, text-decoration-color 250ms ease;
+}
+
+.article-prose a:hover {
+  color: #8A683F;
+  text-decoration-color: currentColor;
+}
+
+.article-prose blockquote {
+  border-radius: 0 2px 2px 0;
+}
+
+.footer-link,
+.site-nav-link,
+.article-back-link {
+  text-underline-offset: 0.45em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-hero:hover .home-hero-image {
+    transform: scale(1.04);
+    filter: saturate(0.96) contrast(1.04);
+  }
+
+  .editorial-media-frame:hover {
+    box-shadow: 0 24px 64px rgba(42, 29, 20, 0.1);
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    gap: 12px;
+  }
+
+  .topbar > span:first-child {
+    max-width: 72%;
+    line-height: 1.55;
+  }
+
+  .topbar > a {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 9px;
+  }
+
+  .site-nav {
+    gap: 10px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .home-hero {
+    min-height: max(650px, calc(100svh - 112px));
+  }
+
+  .home-hero h1 {
+    font-size: clamp(2.75rem, 11.5vw, 3.75rem);
+  }
+
+  .reading-progress {
+    height: 2px;
+  }
+
+  .scroll-top-control {
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masthead-rule {
+    animation: none;
+  }
+
+  .home-hero-image {
+    transition: none;
+  }
+
+  .editorial-card:focus-within {
+    transform: none;
+  }
+}
+
