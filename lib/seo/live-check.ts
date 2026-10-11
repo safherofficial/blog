@@ -5,7 +5,7 @@ import type { SeoIssue } from './types'
 export type LiveCheckInput = {
   /** Origine su cui interrogare il sito (quella della richiesta corrente). */
   origin: string
-  /** URL canonico configurato (NEXT_PUBLIC_SITE_URL o il valore di ripiego). */
+  /** URL canonico configurato (SITE_URL o il valore di ripiego). */
   siteUrl: string
   postSlugs: string[]
   categorySlugs: string[]
@@ -84,7 +84,7 @@ async function checkPage(origin: string, siteUrl: string, path: string): Promise
   } else {
     const expected = trimSlash(new URL(path, siteUrl).toString())
     if (trimSlash(facts.canonical) !== expected) {
-      add('warning', 'canonical-mismatch', `Il canonical punta a ${facts.canonical} invece di ${expected}.`, 'Verifica NEXT_PUBLIC_SITE_URL: un canonical su un altro dominio sposta il posizionamento altrove.')
+      add('warning', 'canonical-mismatch', `Il canonical punta a ${facts.canonical} invece di ${expected}.`, 'Verifica SITE_URL: un canonical su un altro dominio sposta il posizionamento altrove.')
     }
   }
 
@@ -124,7 +124,7 @@ async function checkGlobals(input: LiveCheckInput, expectedPaths: string[]): Pro
       else {
         const foreign = locs.filter((loc) => { try { return new URL(loc).host !== new URL(input.origin).host } catch { return true } })
         if (foreign.length > 0 && siteHost !== new URL(input.origin).host) {
-          add('error', 'sitemap-host', `La sitemap elenca ${foreign.length} URL su ${siteHost}, ma il sito risponde su ${new URL(input.origin).host}.`, 'Google scarterà quegli URL: correggi NEXT_PUBLIC_SITE_URL.')
+          add('error', 'sitemap-host', `La sitemap elenca ${foreign.length} URL su ${siteHost}, ma il sito risponde su ${new URL(input.origin).host}.`, 'Google scarterà quegli URL: correggi SITE_URL.')
         }
         const present = new Set(locs.map((l) => { try { return trimSlash(new URL(l).pathname) } catch { return l } }))
         const missing = expectedPaths.filter((p) => p.startsWith('/blog/') && !present.has(trimSlash(p)))
