@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const bio = shortText(settings?.authorBio, 155)
   return pageMetadata({
     title: name ? `Chi sono — ${name}` : 'Chi sono',
-    description: bio || `Scopri chi c'è dietro ${settings?.siteTitle || 'Controluce'}: uno spazio di storie, riflessioni e piccoli rituali di vita quotidiana.`,
+    description: bio || `Sono Lea, e ${settings?.siteTitle || 'Controluce'} è il mio spazio per condividere storie, idee, curiosità e punti di vista sulla vita quotidiana.`,
     path: '/about',
     image: settings?.authorPhoto?.url,
     imageAlt: settings?.authorPhoto?.alt || undefined,
@@ -71,7 +71,7 @@ export default async function AboutPage() {
             Chi c&apos;è dietro Controluce
           </p>
           <h1 className="mb-7 max-w-[19ch] font-display text-4xl leading-tight tracking-tight text-ink md:text-5xl">
-            {settings?.authorName ? `Ciao, sono ${settings.authorName}.` : 'Uno sguardo personale sulle cose di ogni giorno.'}
+            {settings?.authorName ? `Ciao, sono ${settings.authorName}.` : 'Uno sguardo personale, oltre la superficie.'}
           </h1>
           {settings?.authorBio ? (
             <div className="mb-9 max-w-[62ch] space-y-5 font-serif text-lg leading-relaxed text-ink-soft [&_p]:mb-5">
@@ -79,7 +79,7 @@ export default async function AboutPage() {
             </div>
           ) : (
             <p className="mb-9 max-w-[54ch] font-serif text-lg leading-relaxed text-ink-soft">
-              Controluce è uno spazio dedicato a storie, riflessioni e piccoli rituali della vita quotidiana. Un luogo per rallentare, osservare meglio e trovare significati anche nelle cose più semplici.
+              Sono Lea, e Controluce è il mio spazio per condividere storie, idee, curiosità e punti di vista sulla vita quotidiana. Un invito a rallentare, guardare le cose da prospettive diverse e scoprire qualcosa di nuovo, anche nei dettagli più semplici.
             </p>
           )}
           <Link
