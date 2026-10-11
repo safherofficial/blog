@@ -3,17 +3,26 @@ import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getSiteSettings } from '@/lib/db'
+import { shortText } from '@/lib/content/article'
+import { safeJsonLd } from '@/lib/content/safe-json'
+import { breadcrumbJsonLd, personJsonLd } from '@/lib/seo/jsonld'
+import { absoluteUrl } from '@/lib/seo/site'
+import { pageMetadata } from '@/lib/seo/metadata'
 import CropFrame from '@/components/CropFrame'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Chi sono',
-  description: "Scopri chi c'è dietro Controluce.",
-  alternates: {
-    canonical: '/about',
-    types: { 'application/rss+xml': '/feed.xml' },
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings().catch(() => null)
+  const name = settings?.authorName?.trim()
+  const bio = shortText(settings?.authorBio, 155)
+  return pageMetadata({
+    title: name ? `Chi sono — ${name}` : 'Chi sono',
+    description: bio || `Scopri chi c'è dietro ${settings?.siteTitle || 'Controluce'}: uno spazio di storie, riflessioni e piccoli rituali di vita quotidiana.`,
+    path: '/about',
+    image: settings?.authorPhoto?.url,
+    imageAlt: settings?.authorPhoto?.alt || undefined,
+  })
 }
 
 export default async function AboutPage() {
@@ -21,6 +30,25 @@ export default async function AboutPage() {
 
   return (
     <section className="about-page py-16 md:py-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'ProfilePage',
+                '@id': absoluteUrl('/about#profile'),
+                url: absoluteUrl('/about'),
+                name: settings?.authorName ? `Chi sono — ${settings.authorName}` : 'Chi sono',
+                inLanguage: 'it-IT',
+                ...(personJsonLd(settings) ? { mainEntity: { '@id': absoluteUrl('/#author') } } : {}),
+              },
+              breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Chi sono', path: '/about' }]),
+            ],
+          }),
+        }}
+      />
       <div className="wrap grid grid-cols-1 items-center gap-12 md:grid-cols-[0.85fr_1.15fr] md:gap-16">
         <div className="editorial-media-frame reveal-on-scroll relative aspect-[4/5] overflow-hidden border border-line bg-gradient-to-br from-ochre to-wine">
           <CropFrame />

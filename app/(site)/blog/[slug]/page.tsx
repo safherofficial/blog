@@ -3,7 +3,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllPosts, getAllPostSlugs, getPostBySlug, getRelatedPosts, getSiteSettings } from '@/lib/db'
-import { getHeadings, readingMinutes } from '@/lib/content/article'
+import { bodyWordCount, getHeadings, readingMinutes } from '@/lib/content/article'
+import { breadcrumbJsonLd, organizationJsonLd } from '@/lib/seo/jsonld'
+import { pageMetadata } from '@/lib/seo/metadata'
+import { getSiteUrl } from '@/lib/seo/site'
 import { imageUrl as getImageUrl } from '@/lib/content/images'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import PostBody from '@/components/PostBody'
@@ -22,25 +25,33 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug)
+  const [post, settings] = await Promise.all([getPostBySlug(params.slug), getSiteSettings().catch(() => null)])
   if (!post) return {}
 
   const title = post.seoTitle || post.title
   const description = post.seoDescription || post.excerpt
   const coverImageUrl = getImageUrl(post.coverImage) || undefined
-
-  return {
+  const author = settings?.authorName?.trim()
+  // Con copertina si usa quella scelta dall'autrice; altrimenti un'anteprima di marca generata dal sito.
+  const base = pageMetadata({
     title,
     description,
-    alternates: { canonical: `/blog/${post.slug}` },
+    path: `/blog/${post.slug}`,
+    image: coverImageUrl || `/blog/${post.slug}/og`,
+    imageAlt: post.coverImage?.alt || post.title,
+  })
+
+  return {
+    ...base,
+    authors: author ? [{ name: author, url: '/about' }] : undefined,
     openGraph: {
+      ...base.openGraph,
       type: 'article',
-      title,
-      description,
-      images: coverImageUrl ? [coverImageUrl] : undefined,
       publishedTime: post.publishedAt,
-    },
-    twitter: { card: 'summary_large_image', title, description },
+      modifiedTime: post.updatedAt || post.publishedAt,
+      section: post.category?.title,
+      authors: author ? [author] : undefined,
+    } as Metadata['openGraph'],
   }
 }
 
@@ -65,28 +76,48 @@ export default async function PostPage({ params }: { params: { slug: string } })
   const position = allPosts.findIndex((candidate) => candidate._id === post._id)
   const newer = position > 0 ? allPosts[position - 1] : null
   const older = position >= 0 && position < allPosts.length - 1 ? allPosts[position + 1] : null
-  const siteUrl = process.env.SITE_URL?.trim() || 'https://controluce.blog'
+  const siteUrl = getSiteUrl()
   const authorName = settings?.authorName?.trim()
+  // Mostriamo l'aggiornamento solo se è davvero successivo alla pubblicazione (oltre un giorno).
+  const updated =
+    post.updatedAt && new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 86_400_000
+      ? new Date(post.updatedAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null
 
   return (
     <article className="article-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: safeJsonLd({
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: post.title,
-            description: post.seoDescription || post.excerpt,
-            datePublished: post.publishedAt,
-            dateModified: post.updatedAt || post.publishedAt,
-            inLanguage: 'it-IT',
-            mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
-            image: coverImageUrl || undefined,
-            articleSection: post.category?.title,
-            author: authorName ? { '@type': 'Person', name: authorName, url: `${siteUrl}/about` } : { '@type': 'Organization', name: settings?.siteTitle || 'Controluce' },
-            publisher: { '@type': 'Organization', name: settings?.siteTitle || 'Controluce' },
-          }),
+          __html: safeJsonLd([
+            {
+              '@context': 'https://schema.org',
+              '@type': 'BlogPosting',
+              '@id': `${siteUrl}/blog/${post.slug}#article`,
+              headline: post.title,
+              description: post.seoDescription || post.excerpt,
+              datePublished: post.publishedAt,
+              dateModified: post.updatedAt || post.publishedAt,
+              inLanguage: 'it-IT',
+              url: `${siteUrl}/blog/${post.slug}`,
+              mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/blog/${post.slug}` },
+              image: coverImageUrl || `${siteUrl}/blog/${post.slug}/og`,
+              articleSection: post.category?.title,
+              wordCount: bodyWordCount(post.body),
+              timeRequired: `PT${minutes}M`,
+              isPartOf: { '@type': 'Blog', '@id': `${siteUrl}/#blog`, name: settings?.siteTitle || 'Controluce' },
+              author: authorName
+                ? { '@type': 'Person', name: authorName, url: `${siteUrl}/about`, ...(settings?.instagramUrl ? { sameAs: [settings.instagramUrl] } : {}) }
+                : { '@type': 'Organization', name: settings?.siteTitle || 'Controluce', url: siteUrl },
+              publisher: organizationJsonLd(settings),
+            },
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Articoli', path: '/articoli' },
+              ...(post.category ? [{ name: post.category.title, path: `/categoria/${post.category.slug}` }] : []),
+              { name: post.title, path: `/blog/${post.slug}` },
+            ]),
+          ]),
         }}
       />
 
@@ -114,7 +145,14 @@ export default async function PostPage({ params }: { params: { slug: string } })
             <time dateTime={post.publishedAt}>{date}</time>
             <span aria-hidden="true">·</span>
             <span>{minutes} min di lettura</span>
+            {updated && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>Aggiornato il <time dateTime={post.updatedAt}>{updated}</time></span>
+              </>
+            )}
           </p>
+          {post.excerpt && <p className="article-standfirst mt-8 max-w-[58ch] font-serif text-xl leading-relaxed text-[#D9C9B7]">{post.excerpt}</p>}
         </div>
       </header>
 

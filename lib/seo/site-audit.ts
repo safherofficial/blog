@@ -33,7 +33,7 @@ export type SiteAuditInput = {
   posts: AuditPostRow[]
   categories: Array<{ id: string; title: string; slug: string }>
   settings: AuditSettingsRow
-  env: { siteUrl: string; siteUrlConfigured: boolean; sessionSecretConfigured: boolean }
+  env: { siteUrl: string; siteUrlConfigured: boolean; sessionSecretConfigured: boolean; indexNowConfigured?: boolean; verificationConfigured?: boolean }
   /** Origine su cui il sito sta rispondendo in questo momento. */
   origin: string
   now?: number
@@ -99,6 +99,12 @@ export function auditSite(input: SiteAuditInput): SiteAudit {
     } else if (siteHost.endsWith('.vercel.app')) {
       add('info', 'env-vercel-domain', 'Il sito usa un dominio vercel.app.', 'Funziona, ma un dominio personalizzato è più affidabile e portabile nel tempo.', 'technical')
     }
+  }
+  if (env.indexNowConfigured === false) {
+    add('info', 'env-indexnow', 'IndexNow non è configurato.', 'Imposta INDEXNOW_KEY (una stringa casuale di 16-64 caratteri alfanumerici): Bing e gli altri motori compatibili saranno avvisati appena pubblichi, senza aspettare la scansione.', 'technical')
+  }
+  if (env.verificationConfigured === false) {
+    add('info', 'env-verification', 'Il sito non è verificato in Google Search Console e Bing Webmaster Tools.', 'Imposta GOOGLE_SITE_VERIFICATION e BING_SITE_VERIFICATION con i codici forniti dai due strumenti: vedrai indicizzazione, errori e query di ricerca.', 'technical')
   }
   if (!env.sessionSecretConfigured) {
     add('warning', 'env-session-secret', 'ADMIN_SESSION_SECRET non è impostata.', 'Le sessioni admin usano la password come chiave di firma. Imposta un segreto casuale distinto.', 'technical')

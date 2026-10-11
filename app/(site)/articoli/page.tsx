@@ -2,17 +2,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import PostCard from '@/components/PostCard'
 import { getAllPosts } from '@/lib/db'
+import { safeJsonLd } from '@/lib/content/safe-json'
+import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
+import { pageMetadata } from '@/lib/seo/metadata'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Tutti gli articoli',
   description: 'L’archivio completo di Controluce: storie, riflessioni e piccoli rituali di vita quotidiana, dal più recente.',
-  alternates: {
-    canonical: '/articoli',
-    types: { 'application/rss+xml': '/feed.xml' },
-  },
-}
+  path: '/articoli',
+})
 
 export default async function ArchivePage() {
   const posts = await getAllPosts().catch(() => [])
@@ -29,6 +29,15 @@ export default async function ArchivePage() {
 
   return (
     <section className="archive-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd([
+            collectionJsonLd({ name: 'Tutti gli articoli', description: 'L’archivio completo di Controluce.', path: '/articoli', items: posts }),
+            breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Articoli', path: '/articoli' }]),
+          ]),
+        }}
+      />
       <div className="category-masthead py-16 md:py-20">
         <div className="wrap reveal-on-scroll">
           <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.27em] text-[#D9B47F]">Archivio</p>

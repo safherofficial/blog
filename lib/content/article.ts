@@ -21,9 +21,12 @@ export function getHeadings(body: PortableTextBlock[] | null | undefined): Headi
   return headings
 }
 
+export function bodyWordCount(body: PortableTextBlock[] | null | undefined): number {
+  return (body || []).filter((b) => b._type === 'block').reduce((sum, b) => sum + countWords(blockText(b)), 0)
+}
+
 export function readingMinutes(body: PortableTextBlock[] | null | undefined): number {
-  const words = (body || []).filter((b) => b._type === 'block').reduce((sum, b) => sum + countWords(blockText(b)), 0)
-  return Math.max(1, Math.round(words / 200))
+  return Math.max(1, Math.round(bodyWordCount(body) / 200))
 }
 
 /** Prima porzione di testo della biografia, tagliata a fine frase quando possibile. */

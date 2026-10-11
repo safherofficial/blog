@@ -1,17 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { headers } from 'next/headers'
+import { pageMetadata } from '@/lib/seo/metadata'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Segui Controluce via RSS',
   description: 'Ricevi i nuovi articoli di Controluce nel tuo lettore RSS, senza registrazione e senza newsletter.',
-  alternates: {
-    canonical: '/rss',
-    types: {
-      'application/rss+xml': '/feed.xml',
-    },
-  },
-}
+  path: '/rss',
+})
 
 export default function RssPage() {
   const requestHeaders = headers()

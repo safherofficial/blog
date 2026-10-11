@@ -3,6 +3,9 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import PostCard from '@/components/PostCard'
 import { getAllCategorySlugs, getCategoryBySlug, getPostsByCategory } from '@/lib/db'
+import { safeJsonLd } from '@/lib/content/safe-json'
+import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
+import { pageMetadata } from '@/lib/seo/metadata'
 
 export const revalidate = 60
 
@@ -14,11 +17,14 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const category = await getCategoryBySlug(params.slug)
   if (!category) return {}
-  return {
+  const posts = await getPostsByCategory(params.slug).catch(() => [])
+  const metadata = pageMetadata({
     title: category.title,
-    description: 'Tutti gli articoli nella categoria ' + category.title + ' su Controluce.',
-    alternates: { canonical: `/categoria/${category.slug}` },
-  }
+    description: `Tutti gli articoli di ${category.title} su Controluce: storie e pensieri raccolti sotto un unico sguardo.`,
+    path: `/categoria/${category.slug}`,
+  })
+  // Una categoria senza articoli è una pagina vuota: meglio che non finisca negli indici.
+  return posts.length === 0 ? { ...metadata, robots: { index: false, follow: true } } : metadata
 }
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
@@ -29,6 +35,15 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
   return (
     <section className="category-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd([
+            collectionJsonLd({ name: category.title, description: `Articoli nella categoria ${category.title}.`, path: `/categoria/${category.slug}`, items: posts }),
+            breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Articoli', path: '/articoli' }, { name: category.title, path: `/categoria/${category.slug}` }]),
+          ]),
+        }}
+      />
       <div className="category-masthead py-16 md:py-20">
         <div className="wrap reveal-on-scroll">
           <Link

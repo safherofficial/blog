@@ -5,6 +5,7 @@ import SiteBar from '@/components/SiteBar'
 import RevealEffects from '@/components/RevealEffects'
 import { getSiteSettings } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
+import { siteGraphJsonLd } from '@/lib/seo/jsonld'
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings().catch(() => null)
@@ -16,12 +17,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: safeJsonLd({
-            '@context': 'https://schema.org',
-            '@type': 'Blog',
-            name: siteTitle,
-            author: settings?.authorName ? { '@type': 'Person', name: settings.authorName } : undefined,
-          }),
+          __html: safeJsonLd(siteGraphJsonLd(settings)),
         }}
       />
       <a href="#contenuto" className="skip-link">Vai al contenuto</a>

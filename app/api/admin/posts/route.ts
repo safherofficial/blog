@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
 import { validatePostInput } from '@/lib/content/post-input'
+import { isPubliclyLive, pingIndexNow, postChangePaths } from '@/lib/seo/indexnow'
 
 export async function GET() {
   if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
@@ -36,6 +37,7 @@ export async function POST(request: Request) {
       )
       RETURNING id
     `
+    await pingIndexNow(postChangePaths({ slug: post.slug, live: isPubliclyLive(post.published, post.publishedAt) }))
     return NextResponse.json({ id: rows[0].id }, { status: 201 })
   } catch (error: any) {
     if (error?.code === '23505') return NextResponse.json({ error: 'Slug già utilizzato.' }, { status: 409 })

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
+import { getIndexNowKey } from '@/lib/seo/indexnow'
 import { auditSite, type AuditPostRow, type AuditSettingsRow } from '@/lib/seo/site-audit'
 
 export const dynamic = 'force-dynamic'
@@ -24,6 +25,8 @@ export async function GET(request: Request) {
         siteUrl: configured || FALLBACK_SITE_URL,
         siteUrlConfigured: Boolean(configured),
         sessionSecretConfigured: Boolean(process.env.ADMIN_SESSION_SECRET),
+        indexNowConfigured: Boolean(getIndexNowKey()),
+        verificationConfigured: Boolean(process.env.GOOGLE_SITE_VERIFICATION?.trim() || process.env.BING_SITE_VERIFICATION?.trim()),
       },
       origin: new URL(request.url).origin,
     })

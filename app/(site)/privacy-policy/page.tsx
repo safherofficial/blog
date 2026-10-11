@@ -1,17 +1,15 @@
 import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo/metadata'
 import Link from 'next/link'
 import { getSiteSettings } from '@/lib/db'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Privacy Policy',
   description: 'Informativa sulla privacy di Controluce.',
-  alternates: {
-    canonical: '/privacy-policy',
-    types: { 'application/rss+xml': '/feed.xml' },
-  },
-}
+  path: '/privacy-policy',
+})
 
 export default async function PrivacyPolicyPage() {
   const settings = await getSiteSettings().catch(() => null)

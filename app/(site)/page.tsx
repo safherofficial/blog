@@ -3,15 +3,17 @@ import Link from 'next/link'
 import Image from 'next/image'
 import PostCard from '@/components/PostCard'
 import { getLatestPosts, getSiteSettings } from '@/lib/db'
+import { pageMetadata } from '@/lib/seo/metadata'
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from '@/lib/seo/site'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: '/',
-    types: { 'application/rss+xml': '/feed.xml' },
-  },
-}
+export const metadata: Metadata = pageMetadata({
+  title: DEFAULT_TITLE,
+  absoluteTitle: true,
+  description: DEFAULT_DESCRIPTION,
+  path: '/',
+})
 
 export default async function HomePage() {
   const [posts, settings] = await Promise.all([
