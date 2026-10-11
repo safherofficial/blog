@@ -17,7 +17,7 @@ const sourceSerif = Source_Serif_4({
 })
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-space-mono' })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
+const siteUrl = process.env.SITE_URL?.trim() || 'https://controluce.blog'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
