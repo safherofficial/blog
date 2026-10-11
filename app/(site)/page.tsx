@@ -108,7 +108,7 @@ export default async function HomePage() {
           <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Resta aggiornato</p>
           <h2 className="mb-4 font-display text-3xl md:text-4xl">Le storie migliori meritano tempo.</h2>
           <p className="mx-auto mb-8 max-w-[58ch] font-serif text-lg leading-relaxed text-ink-soft">
-            Segui il feed RSS per ritrovare i nuovi articoli. Oppure, se c'è qualcosa che vuoi raccontarmi, qui trovi uno spazio per farlo: senza registrazione e senza obbligo di ricevere una risposta.
+            Segui il feed RSS per ritrovare i nuovi articoli. Oppure, se c&apos;è qualcosa che vuoi raccontarmi, qui trovi uno spazio per farlo: senza registrazione e senza obbligo di ricevere una risposta.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link href="/rss" className="editorial-button inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine hover:bg-wine hover:text-bg">

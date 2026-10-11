@@ -111,7 +111,7 @@ export default function ReaderMessageForm() {
           <div className="mt-4">
             <label htmlFor="reader-email" className="mb-2 block text-sm font-medium text-ink">La tua email</label>
             <input id="reader-email" type="email" className={fieldClass} value={email} onChange={(event) => setEmail(event.target.value.slice(0, 254))} maxLength={254} autoComplete="email" required placeholder="nome@esempio.it" />
-            <p className="mt-2 text-xs text-ink-soft">L'email viene usata soltanto per gestire la risposta al tuo messaggio.</p>
+            <p className="mt-2 text-xs text-ink-soft">L&apos;email viene usata soltanto per gestire la risposta al tuo messaggio.</p>
           </div>
         )}
       </div>
@@ -119,7 +119,7 @@ export default function ReaderMessageForm() {
       <div className="mb-6">
         <label className="flex items-start gap-3 text-sm leading-relaxed text-ink" htmlFor="reader-privacy">
           <input id="reader-privacy" type="checkbox" checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} className="mt-1 accent-[#765338]" required />
-          <span>Ho letto l'<Link href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-ochre underline-offset-4 hover:text-wine">informativa sulla privacy</Link> e desidero inviare il messaggio.</span>
+          <span>Ho letto l&apos;<Link href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline decoration-ochre underline-offset-4 hover:text-wine">informativa sulla privacy</Link> e desidero inviare il messaggio.</span>
         </label>
       </div>
 

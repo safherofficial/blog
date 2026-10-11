@@ -32,7 +32,7 @@ export default async function PrivacyPolicyPage() {
             <p>
               Questa informativa descrive il trattamento dei dati personali connesso alla visita del sito Controluce.
               Il sito non offre una newsletter via email; la pagina «Raccontamelo» consente invece di inviare volontariamente
-              un messaggio privato a Lea. L'indirizzo email viene richiesto soltanto se desideri ricevere una risposta.
+              un messaggio privato a Lea. L&apos;indirizzo email viene richiesto soltanto se desideri ricevere una risposta.
             </p>
 
             <div>
@@ -68,10 +68,10 @@ export default async function PrivacyPolicyPage() {
             <div>
               <h2>Messaggi inviati tramite «Raccontamelo»</h2>
               <p>
-                Se invii un messaggio, il sito tratta il testo, l'eventuale nome o nickname, la categoria scelta e,
+                Se invii un messaggio, il sito tratta il testo, l&apos;eventuale nome o nickname, la categoria scelta e,
                 soltanto se chiedi una risposta, il tuo indirizzo email. Questi dati sono utilizzati per leggere e gestire
                 la comunicazione e, quando richiesto e possibile, risponderti. I messaggi sono archiviati nel database
-                del sito e sono accessibili esclusivamente all'amministrazione autorizzata.
+                del sito e sono accessibili esclusivamente all&apos;amministrazione autorizzata.
               </p>
               <p>
                 I messaggi non vengono pubblicati automaticamente né trasformati in articoli. Per utilizzare una storia

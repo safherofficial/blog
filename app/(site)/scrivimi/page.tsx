@@ -18,7 +18,7 @@ export default function ScrivimiPage() {
             Uno spazio per te
           </p>
           <h1 className="mb-6 max-w-[16ch] font-display text-4xl leading-tight tracking-tight md:text-6xl">
-            C'è qualcosa che ti va di raccontare?
+            C&apos;è qualcosa che ti va di raccontare?
           </h1>
           <p className="max-w-[62ch] font-serif text-xl leading-relaxed text-ink-soft">
             A volte abbiamo bisogno di un consiglio, altre volte soltanto di qualcuno a cui raccontare quello che stiamo vivendo.
