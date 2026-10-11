@@ -39,11 +39,11 @@ export default async function HomePage() {
               Diario editoriale · Uno sguardo personale
             </p>
             <h1 className="mb-7 font-display text-5xl leading-[1.02] tracking-tight text-[#FBF4E9] sm:text-6xl lg:text-[3.7rem] xl:text-[4.2rem]">
-              Piccole cose,<br />
-              <em className="font-normal italic text-[#D9B78A] lg:whitespace-nowrap">guardate meglio.</em>
+              Oltre la<br />
+              <em className="font-normal italic text-[#D9B78A] lg:whitespace-nowrap">superficie.</em>
             </h1>
             <p className="mb-9 max-w-[44ch] font-serif text-lg leading-relaxed text-[#F0E5D7] md:text-xl">
-              {settings?.tagline || 'Storie, riflessioni e piccoli rituali di vita quotidiana raccontati con uno sguardo personale.'}
+              Storie, Idee, Curiosità, Punti di vista.
             </p>
             <div className="flex flex-wrap items-center gap-5">
               <Link
