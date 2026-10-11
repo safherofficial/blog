@@ -5,7 +5,7 @@ import { auditSite, type AuditPostRow, type AuditSettingsRow } from '@/lib/seo/s
 
 export const dynamic = 'force-dynamic'
 
-const FALLBACK_SITE_URL = 'https://www.controluce-blog.it'
+const FALLBACK_SITE_URL = 'https://controluce.blog'
 
 export async function GET(request: Request) {
   if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
       sql`SELECT id, title, slug FROM categories ORDER BY title`,
       sql`SELECT site_title, tagline, author_name, author_bio, author_photo_url, author_photo_alt, instagram_url FROM site_settings WHERE id = 1 LIMIT 1`,
     ])
-    const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim()
+    const configured = process.env.SITE_URL?.trim()
     const audit = auditSite({
       posts: posts.rows as unknown as AuditPostRow[],
       categories: categories.rows as Array<{ id: string; title: string; slug: string }>,
