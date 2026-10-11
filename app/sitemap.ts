@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getAllPosts, getAllCategorySlugs } from '@/lib/db'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
+const siteUrl = process.env.SITE_URL?.trim() || 'https://controluce.blog'
 
 // Refresh sitemap entries for newly published and scheduled posts without a new deployment.
 export const revalidate = 300
