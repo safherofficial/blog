@@ -12,7 +12,9 @@ function escapeXml(value: unknown): string {
 }
 
 export async function GET(request: Request) {
-  const origin = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(/\/$/, '')
+  const requestOrigin = new URL(request.url).origin
+  const localRequest = new URL(request.url).hostname === 'localhost' || new URL(request.url).hostname === '127.0.0.1'
+  const origin = (process.env.SITE_URL?.trim() || (localRequest ? requestOrigin : 'https://controluce.blog')).replace(/\/$/, '')
   const [posts, settings] = await Promise.all([
     getAllPosts(),
     getSiteSettings().catch(() => null),
