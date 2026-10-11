@@ -22,8 +22,9 @@ export default function RssPage() {
   ).split(',')[0].trim()
   const forwardedProtocol = requestHeaders.get('x-forwarded-proto')?.split(',')[0].trim()
   const protocol = forwardedProtocol || (host.startsWith('localhost') ? 'http' : 'https')
-  const fallbackOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
-  const origin = host ? `${protocol}://${host}` : fallbackOrigin
+  const requestOrigin = host ? `${protocol}://${host}` : 'https://controluce.blog'
+  const localRequest = host.startsWith('localhost') || host.startsWith('127.0.0.1')
+  const origin = (process.env.SITE_URL?.trim() || (localRequest ? requestOrigin : 'https://controluce.blog')).replace(/\/$/, '')
   const feedUrl = new URL('/feed.xml', origin).toString()
 
   return (
