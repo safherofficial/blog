@@ -10,7 +10,8 @@ function clip(value: string, max: number): string {
 /** Simulazione indicativa del risultato Google: i limiti reali dipendono dai pixel, non dai caratteri. */
 export default function SerpPreview({ title, description, slug }: { title: string; description: string; slug: string }) {
   const [mobile, setMobile] = useState(false)
-  const host = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it').replace(/^https?:\/\//, '').replace(/\/$/, '')
+  // Static display-only host; the configurable site URL remains server-side.
+  const host = 'controluce.blog'
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
