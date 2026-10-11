@@ -13,6 +13,11 @@ POSTGRES_URL=...
 ADMIN_PASSWORD=una-password-lunga-e-casuale
 ADMIN_SESSION_SECRET=una-chiave-casuale-distinta-dalla-password
 SITE_URL=https://controluce.blog
+
+# Facoltative, consigliate per l'indicizzazione
+GOOGLE_SITE_VERIFICATION=codice-da-google-search-console
+BING_SITE_VERIFICATION=codice-da-bing-webmaster-tools
+INDEXNOW_KEY=una-chiave-casuale-di-almeno-16-caratteri
 ```
 
 `ADMIN_SESSION_SECRET` dovrebbe essere un segreto casuale indipendente dalla password amministrativa. Se non è impostato, il codice usa `ADMIN_PASSWORD` come fallback per mantenere la compatibilità con le installazioni esistenti.
@@ -46,6 +51,17 @@ Il pannello include un motore di analisi SEO (`lib/seo/`), pensato per intercett
 - **Scansione del sito pubblicato:** visita le pagine online come un crawler e controlla robots.txt, sitemap, feed, stato HTTP, title, description, canonical, `noindex`, H1, alt delle immagini e tempi di risposta. Interroga solo l'origine corrente.
 - La parola chiave principale serve solo ai controlli e non viene salvata nel database. Le regole sono funzioni pure in `lib/seo/post-analyzer.ts` e `lib/seo/site-audit.ts`.
 - Mentre scrivi, una copia di sicurezza del testo viene conservata nel browser: se la sessione scade o chiudi la scheda, l'editor propone di ripristinarla.
+
+### Indicizzazione e ricerca AI
+
+- **Metadati su ogni pagina:** title, description, canonical, Open Graph e Twitter; direttive `max-image-preview:large` e `max-snippet:-1` per anteprime grandi e snippet completi.
+- **Anteprime social:** `/og` e `/blog/<slug>/og` generano un'immagine 1200×630 di marca, usata quando un articolo non ha la copertina.
+- **Dati strutturati (JSON-LD):** `WebSite`, `Blog`, `Organization` e `Person` collegati; `BlogPosting` con autore, editore, `wordCount` e `timeRequired`; `BreadcrumbList`, `CollectionPage` e `ProfilePage`.
+- **Feed RSS** con il testo completo degli ultimi 20 articoli, e **`/llms.txt`**, un indice in Markdown per assistenti AI.
+- **Sitemap** con `lastmod` reale; le categorie vuote non vengono incluse e sono `noindex`.
+- **IndexNow:** con `INDEXNOW_KEY` impostata, a ogni pubblicazione, modifica o eliminazione Bing e gli altri motori compatibili vengono avvisati. Il file di verifica è servito su `/indexnow.txt`.
+- **Verifica proprietà:** `GOOGLE_SITE_VERIFICATION` e `BING_SITE_VERIFICATION` aggiungono i tag di verifica alle pagine.
+- `/admin` e `/api` non sono mai indicizzabili (header `X-Robots-Tag` e meta `noindex`).
 
 ### Formato del corpo articolo
 
