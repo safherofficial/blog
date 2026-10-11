@@ -220,6 +220,18 @@ export default async function PostPage({ params }: { params: { slug: string } })
           </div>
         </section>
       )}
+      <section className="border-t border-line bg-bg py-14 md:py-18 print:hidden">
+        <div className="wrap max-w-[760px] text-center">
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Dall'altra parte della storia</p>
+          <h2 className="mb-4 font-display text-3xl leading-tight md:text-4xl">Hai qualcosa da raccontarmi?</h2>
+          <p className="mx-auto mb-7 max-w-[55ch] font-serif text-lg leading-relaxed text-ink-soft">
+            Una domanda, un pensiero o un'esperienza da condividere: puoi scrivermi in uno spazio privato, con le tue parole e i tuoi tempi.
+          </p>
+          <Link href="/scrivimi" className="editorial-button inline-flex items-center gap-4 border border-wine bg-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-bg hover:bg-wine-dark">
+            Raccontamelo <span aria-hidden="true" className="text-lg leading-none">→</span>
+          </Link>
+        </div>
+      </section>
     </article>
   )
 }

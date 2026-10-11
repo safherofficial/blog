@@ -5,16 +5,18 @@ import PostEditor from '@/components/admin/PostEditor'
 import PostList from '@/components/admin/PostList'
 import SeoDashboard from '@/components/admin/SeoDashboard'
 import SettingsForm from '@/components/admin/SettingsForm'
+import ReaderMessages from '@/components/admin/ReaderMessages'
 import type { Category, Notify, Post, SiteSettingsRow } from '@/components/admin/types'
 import { Toasts, inputClass, primaryButton, secondaryButton, type ToastItem } from '@/components/admin/ui'
 
-type Tab = 'posts' | 'seo' | 'settings'
+type Tab = 'posts' | 'seo' | 'settings' | 'messages'
 type Selection = { kind: 'new' } | { kind: 'edit'; id: string }
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: 'posts', label: 'Articoli' },
   { id: 'seo', label: 'Salute SEO' },
   { id: 'settings', label: 'Impostazioni' },
+  { id: 'messages', label: 'Messaggi' },
 ]
 
 export default function AdminPage() {
@@ -155,7 +157,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <nav className="mb-8 flex gap-6 border-b border-line" aria-label="Sezioni">
+        <nav className="mb-8 flex flex-wrap gap-x-6 gap-y-3 border-b border-line" aria-label="Sezioni">
           {TABS.map((t) => (
             <button key={t.id} type="button" onClick={() => goTab(t.id)} aria-current={tab === t.id ? 'page' : undefined} className={`-mb-px pb-3 font-mono text-xs uppercase tracking-widest ${tab === t.id ? 'border-b-2 border-wine text-wine' : 'text-ink-soft hover:text-wine'}`}>{t.label}</button>
           ))}
@@ -186,6 +188,7 @@ export default function AdminPage() {
           />
         )}
         {tab === 'settings' && <SettingsForm settings={settings} notify={notify} onSaved={() => void load()} onUnauthorized={onUnauthorized} />}
+        {tab === 'messages' && <ReaderMessages notify={notify} onUnauthorized={onUnauthorized} />}
       </div>
       <Toasts items={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
     </main>

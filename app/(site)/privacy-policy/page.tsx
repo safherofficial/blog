@@ -31,8 +31,8 @@ export default async function PrivacyPolicyPage() {
           <div className="space-y-8 font-serif text-lg leading-relaxed text-ink-soft [&_h2]:mb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:not-italic [&_h2]:text-ink [&_p]:mb-3 [&_a]:underline [&_a]:decoration-ochre/70 [&_a]:underline-offset-4 [&_a]:transition-colors [&_a:hover]:text-wine">
             <p>
               Questa informativa descrive il trattamento dei dati personali connesso alla visita del sito Controluce.
-              La versione attuale del sito non offre un modulo di iscrizione alla newsletter e non raccoglie indirizzi email
-              tramite un form di iscrizione.
+              Il sito non offre una newsletter via email; la pagina «Raccontamelo» consente invece di inviare volontariamente
+              un messaggio privato a Lea. L'indirizzo email viene richiesto soltanto se desideri ricevere una risposta.
             </p>
 
             <div>
@@ -62,6 +62,24 @@ export default async function PrivacyPolicyPage() {
                 del sito, nonché per adempiere agli obblighi di legge applicabili. L&apos;eventuale attivazione futura di newsletter,
                 analytics o strumenti di marketing richiederà l&apos;aggiornamento di questa informativa e l&apos;implementazione degli
                 eventuali consensi necessari prima della raccolta dei relativi dati.
+              </p>
+            </div>
+
+            <div>
+              <h2>Messaggi inviati tramite «Raccontamelo»</h2>
+              <p>
+                Se invii un messaggio, il sito tratta il testo, l'eventuale nome o nickname, la categoria scelta e,
+                soltanto se chiedi una risposta, il tuo indirizzo email. Questi dati sono utilizzati per leggere e gestire
+                la comunicazione e, quando richiesto e possibile, risponderti. I messaggi sono archiviati nel database
+                del sito e sono accessibili esclusivamente all'amministrazione autorizzata.
+              </p>
+              <p>
+                I messaggi non vengono pubblicati automaticamente né trasformati in articoli. Per utilizzare una storia
+                o un estratto in un contenuto pubblico verrà chiesto un consenso separato. Evita di includere password,
+                dati finanziari o informazioni particolarmente delicate che non siano necessarie. I messaggi vengono
+                cancellati quando non sono più necessari alla gestione della comunicazione, fatti salvi eventuali obblighi
+                di legge. Puoi chiedere la cancellazione o esercitare i diritti applicabili utilizzando i recapiti diretti
+                del titolare indicati sul sito.
               </p>
             </div>
 
