@@ -31,15 +31,16 @@ export default async function HomePage() {
           className="home-hero-image object-cover object-[40%_center]"
         />
         <div className="home-hero-overlay absolute inset-0" aria-hidden="true" />
-        <div className="wrap relative z-10 flex w-full items-end py-16 md:items-center md:py-24">
-          <div className="home-hero-copy editorial-reveal w-full max-w-2xl md:ml-auto">
+        <div className="film-grain absolute inset-0" aria-hidden="true" />
+        <div className="wrap relative z-10 flex w-full items-end py-16 lg:items-center lg:py-24">
+          <div className="home-hero-copy editorial-reveal w-full max-w-2xl lg:ml-auto lg:max-w-[34rem]">
             <p className="mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-[#E1BD8D]">
               <span className="inline-block h-px w-9 bg-[#D5AC76]" />
               Diario editoriale · Uno sguardo personale
             </p>
-            <h1 className="mb-7 font-display text-5xl leading-[1.02] tracking-tight text-[#FBF4E9] sm:text-6xl md:text-7xl lg:text-[5.5rem]">
+            <h1 className="mb-7 font-display text-5xl leading-[1.02] tracking-tight text-[#FBF4E9] sm:text-6xl lg:text-[3.7rem] xl:text-[4.2rem]">
               Piccole cose,<br />
-              <em className="font-normal italic text-[#D9B78A]">guardate meglio.</em>
+              <em className="font-normal italic text-[#D9B78A] lg:whitespace-nowrap">guardate meglio.</em>
             </h1>
             <p className="mb-9 max-w-[44ch] font-serif text-lg leading-relaxed text-[#F0E5D7] md:text-xl">
               {settings?.tagline || 'Storie, riflessioni e piccoli rituali di vita quotidiana raccontati con uno sguardo personale.'}
@@ -55,7 +56,7 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-        <div className="pointer-events-none absolute bottom-6 left-8 z-10 hidden font-mono text-[9px] uppercase tracking-[0.25em] text-white/55 md:block">
+        <div className="pointer-events-none absolute bottom-6 left-8 z-10 hidden font-mono text-[9px] uppercase tracking-[0.25em] text-white/55 lg:block">
           Controluce — oltre la superficie
         </div>
         <div className="hero-edge-mark pointer-events-none absolute bottom-0 right-8 z-10 hidden h-20 w-px origin-bottom bg-gradient-to-t from-[#D5B27F]/80 to-transparent md:block" aria-hidden="true" />
@@ -77,6 +78,13 @@ export default async function HomePage() {
           ) : (
             <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-3 md:gap-y-16">
               {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
+            </div>
+          )}
+          {posts.length > 0 && (
+            <div className="reveal-on-scroll mt-16 text-center md:mt-20">
+              <Link href="/articoli" className="editorial-button inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine hover:bg-wine hover:text-bg">
+                Tutti gli articoli <span aria-hidden="true" className="text-lg leading-none">→</span>
+              </Link>
             </div>
           )}
         </div>

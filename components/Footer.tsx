@@ -19,7 +19,7 @@ export default function Footer({ siteTitle = 'Controluce', authorName, instagram
           <p className="mb-1 text-[9px] tracking-[0.25em] text-ochre">Esplora</p>
           <Link href="/" className="footer-link nav-link transition-colors hover:text-ochre">Home</Link>
           <Link href="/about" className="footer-link nav-link transition-colors hover:text-ochre">Chi sono</Link>
-          <Link href="/#articoli" className="footer-link nav-link transition-colors hover:text-ochre">Articoli</Link>
+          <Link href="/articoli" className="footer-link nav-link transition-colors hover:text-ochre">Articoli</Link>
           <Link href="/rss" className="footer-link nav-link transition-colors hover:text-ochre">Feed RSS</Link>
         </nav>
 

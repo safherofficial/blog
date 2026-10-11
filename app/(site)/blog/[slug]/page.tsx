@@ -2,12 +2,17 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { getAllPostSlugs, getPostBySlug, getRelatedPosts } from '@/lib/db'
+import { getAllPosts, getAllPostSlugs, getPostBySlug, getRelatedPosts, getSiteSettings } from '@/lib/db'
+import { getHeadings, readingMinutes } from '@/lib/content/article'
 import { imageUrl as getImageUrl } from '@/lib/content/images'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import PostBody from '@/components/PostBody'
 import PostCard from '@/components/PostCard'
 import CropFrame from '@/components/CropFrame'
+import ArticleToc from '@/components/ArticleToc'
+import ShareButtons from '@/components/ShareButtons'
+import AuthorCard from '@/components/AuthorCard'
+import PostNav from '@/components/PostNav'
 
 export const revalidate = 60
 
@@ -49,8 +54,19 @@ export default async function PostPage({ params }: { params: { slug: string } })
     year: 'numeric',
   })
 
-  const relatedPosts = await getRelatedPosts(post._id, post.category?.slug).catch(() => [])
+  const [relatedPosts, allPosts, settings] = await Promise.all([
+    getRelatedPosts(post._id, post.category?.slug).catch(() => []),
+    getAllPosts().catch(() => []),
+    getSiteSettings().catch(() => null),
+  ])
   const coverImageUrl = getImageUrl(post.coverImage)
+  const headings = getHeadings(post.body)
+  const minutes = readingMinutes(post.body)
+  const position = allPosts.findIndex((candidate) => candidate._id === post._id)
+  const newer = position > 0 ? allPosts[position - 1] : null
+  const older = position >= 0 && position < allPosts.length - 1 ? allPosts[position + 1] : null
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
+  const authorName = settings?.authorName?.trim()
 
   return (
     <article className="article-page">
@@ -61,11 +77,15 @@ export default async function PostPage({ params }: { params: { slug: string } })
             '@context': 'https://schema.org',
             '@type': 'BlogPosting',
             headline: post.title,
-            description: post.excerpt,
+            description: post.seoDescription || post.excerpt,
             datePublished: post.publishedAt,
-            mainEntityOfPage: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'}/blog/${post.slug}`,
+            dateModified: post.updatedAt || post.publishedAt,
+            inLanguage: 'it-IT',
+            mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
             image: coverImageUrl || undefined,
-            author: { '@type': 'Person', name: 'Controluce' },
+            articleSection: post.category?.title,
+            author: authorName ? { '@type': 'Person', name: authorName, url: `${siteUrl}/about` } : { '@type': 'Organization', name: settings?.siteTitle || 'Controluce' },
+            publisher: { '@type': 'Organization', name: settings?.siteTitle || 'Controluce' },
           }),
         }}
       />
@@ -74,7 +94,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
         <div className="article-masthead-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="wrap article-masthead-content relative z-10 reveal-on-scroll">
           <Link
-            href="/#articoli"
+            href="/articoli"
             className="article-back-link nav-link mb-9 inline-block font-mono text-[10px] uppercase tracking-[0.19em]"
           >
             {'← Torna agli articoli'}
@@ -92,6 +112,8 @@ export default async function PostPage({ params }: { params: { slug: string } })
           <p className="article-date mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em]">
             <span className="inline-block h-px w-8 bg-[#C9A879]" />
             <time dateTime={post.publishedAt}>{date}</time>
+            <span aria-hidden="true">·</span>
+            <span>{minutes} min di lettura</span>
           </p>
         </div>
       </header>
@@ -113,12 +135,35 @@ export default async function PostPage({ params }: { params: { slug: string } })
         </div>
       )}
 
-      <div className="wrap mx-auto max-w-[760px] pb-24 pt-8 md:pt-12 reveal-on-scroll">
-        <PostBody value={post.body} />
-        <div className="article-end-mark mt-16 flex items-center justify-center gap-3" aria-hidden="true">
-          <span className="h-px w-12 bg-line" />
-          <span className="font-display text-xl italic text-ochre">C</span>
-          <span className="h-px w-12 bg-line" />
+      <div className="article-shell pb-20 pt-8 md:pt-12">
+        <div className="article-layout">
+          <div className="article-column">
+            {headings.length >= 2 && <ArticleToc items={headings} variant="inline" />}
+            <div data-article-body>
+              <PostBody value={post.body} />
+            </div>
+            <div className="article-end-mark mt-16 flex items-center justify-center gap-3" aria-hidden="true">
+              <span className="h-px w-12 bg-line" />
+              <span className="font-display text-xl italic text-ochre">C</span>
+              <span className="h-px w-12 bg-line" />
+            </div>
+            <div className="mt-12 border-t border-line pt-8 print:hidden">
+              <ShareButtons title={post.title} />
+            </div>
+            <div className="mt-10 print:hidden">
+              <AuthorCard settings={settings} />
+            </div>
+          </div>
+          {headings.length >= 2 && (
+            <aside className="article-toc-rail print:hidden">
+              <div className="sticky top-24">
+                <ArticleToc items={headings} variant="side" />
+              </div>
+            </aside>
+          )}
+        </div>
+        <div className="article-column mt-16 print:hidden">
+          <PostNav newer={newer} older={older} />
         </div>
       </div>
 

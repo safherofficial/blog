@@ -34,7 +34,7 @@ export default function Header({ siteTitle = 'Controluce', instagramUrl }: { sit
         <span aria-hidden="true" className="nav-separator">✳</span>
         <Link href="/about" className="site-nav-link nav-link transition-colors hover:text-wine">Chi sono</Link>
         <span aria-hidden="true" className="nav-separator">✳</span>
-        <Link href="/#articoli" className="site-nav-link nav-link transition-colors hover:text-wine">Articoli</Link>
+        <Link href="/articoli" className="site-nav-link nav-link transition-colors hover:text-wine">Articoli</Link>
       </nav>
     </header>
   )

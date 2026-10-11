@@ -32,7 +32,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
       <div className="category-masthead py-16 md:py-20">
         <div className="wrap reveal-on-scroll">
           <Link
-            href="/#articoli"
+            href="/articoli"
             className="nav-link mb-9 inline-block font-mono text-[10px] uppercase tracking-[0.19em] text-[#D8C3A6] hover:text-[#F5D7A8]"
           >
             {'← Tutti gli articoli'}
@@ -42,6 +42,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="mt-5 max-w-[46ch] font-serif text-lg leading-relaxed text-[#D9C9B7]">
             Storie e pensieri raccolti sotto un unico sguardo.
           </p>
+          {posts.length > 0 && <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-[#C9A879]">{posts.length} {posts.length === 1 ? 'articolo' : 'articoli'}</p>}
         </div>
       </div>
 
