@@ -65,7 +65,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
   const position = allPosts.findIndex((candidate) => candidate._id === post._id)
   const newer = position > 0 ? allPosts[position - 1] : null
   const older = position >= 0 && position < allPosts.length - 1 ? allPosts[position + 1] : null
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.controluce-blog.it'
+  const siteUrl = process.env.SITE_URL?.trim() || 'https://controluce.blog'
   const authorName = settings?.authorName?.trim()
 
   return (
