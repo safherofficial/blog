@@ -6,7 +6,7 @@ import { runLiveCheck } from '@/lib/seo/live-check'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
-const FALLBACK_SITE_URL = 'https://www.controluce-blog.it'
+const FALLBACK_SITE_URL = 'https://controluce.blog'
 
 /** Scansiona il sito pubblicato come farebbe un crawler. Solo same-origin: nessun URL arriva dal client. */
 export async function POST(request: Request) {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     ])
     const result = await runLiveCheck({
       origin: new URL(request.url).origin,
-      siteUrl: process.env.NEXT_PUBLIC_SITE_URL?.trim() || FALLBACK_SITE_URL,
+      siteUrl: process.env.SITE_URL?.trim() || FALLBACK_SITE_URL,
       postSlugs: posts.rows.map((r) => r.slug as string),
       categorySlugs: categories.rows.map((r) => r.slug as string),
     })
