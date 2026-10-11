@@ -19,7 +19,7 @@ const sourceSerif = Source_Serif_4({
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-space-mono' })
 
 const googleVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim()
-const bingVerification = process.env.BING_SITE_VERIFICATION?.trim()
+const bingVerification = process.env.BING_SITE_VERIFICATION?.trim() || 'C2F2AE380902663B014F3BFFD6AF7A93'
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
