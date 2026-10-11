@@ -88,7 +88,7 @@ export function auditSite(input: SiteAuditInput): SiteAudit {
 
   // ---------- Configurazione ----------
   if (!env.siteUrlConfigured) {
-    add('error', 'env-site-url', 'NEXT_PUBLIC_SITE_URL non è configurata.', `Canonical, sitemap, robots, feed RSS e dati strutturati puntano a ${env.siteUrl}, che potrebbe non essere il tuo dominio. Imposta la variabile su Vercel con l’indirizzo reale del sito e rifai il deploy.`, 'technical')
+    add('error', 'env-site-url', 'SITE_URL non è configurata.', `Canonical, sitemap, robots, feed RSS e dati strutturati puntano a ${env.siteUrl}, che potrebbe non essere il tuo dominio. Imposta la variabile su Vercel con l’indirizzo reale del sito e rifai il deploy.`, 'technical')
   } else if (!env.siteUrl.startsWith('https://')) {
     add('error', 'env-site-https', 'L’URL del sito non usa HTTPS.', 'Google privilegia i siti sicuri e segnala quelli senza HTTPS.', 'technical')
   } else {
