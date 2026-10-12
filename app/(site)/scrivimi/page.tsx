@@ -30,7 +30,7 @@ export default function ScrivimiPage() {
           <aside className="reveal-on-scroll">
             <p className="mb-4 font-display text-2xl">Parliamone.</p>
             <div className="space-y-4 font-serif text-base leading-relaxed text-ink-soft">
-              <p>Uno spazio per i tuoi pensieri, i tuoi dubbi, le tue esperienze e quelle domande che magari non hai ancora avuto occasione di condividere.</p>
+              <p>Uno spazio per i tuoi pensieri, le tue emozioni e le esperienze che magari non hai ancora avuto occasione di condividere.</p>
               <p>Puoi raccontarmi un&apos;esperienza, liberare un pensiero che ti accompagna o condividere un tema che vorresti vedere affrontato su Controluce.</p>
               <p>Non devi avere tutto chiaro. Puoi semplicemente cominciare da dove vuoi.</p>
             </div>
