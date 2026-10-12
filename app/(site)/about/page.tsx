@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import { PortableText } from '@portabletext/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getSiteSettings } from '@/lib/db'
-import { shortText } from '@/lib/content/article'
 import { safeJsonLd } from '@/lib/content/safe-json'
-import { breadcrumbJsonLd, personJsonLd } from '@/lib/seo/jsonld'
+import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { absoluteUrl } from '@/lib/seo/site'
 import { pageMetadata } from '@/lib/seo/metadata'
 import CropFrame from '@/components/CropFrame'
@@ -14,11 +12,9 @@ export const revalidate = 60
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings().catch(() => null)
-  const name = settings?.authorName?.trim()
-  const bio = shortText(settings?.authorBio, 155)
   return pageMetadata({
-    title: name ? `Chi sono — ${name}` : 'Chi sono',
-    description: bio || `Sono Lea, e ${settings?.siteTitle || 'Controluce'} è il mio spazio per condividere storie, idee, curiosità e punti di vista sulla vita quotidiana.`,
+    title: 'Chi sono',
+    description: 'Uno spazio personale per condividere storie, idee, curiosità e punti di vista sulla vita quotidiana.',
     path: '/about',
     image: settings?.authorPhoto?.url,
     imageAlt: settings?.authorPhoto?.alt || undefined,
@@ -40,9 +36,9 @@ export default async function AboutPage() {
                 '@type': 'ProfilePage',
                 '@id': absoluteUrl('/about#profile'),
                 url: absoluteUrl('/about'),
-                name: settings?.authorName ? `Chi sono — ${settings.authorName}` : 'Chi sono',
+                name: 'Chi sono',
+                description: 'Uno spazio personale per condividere storie, idee, curiosità e punti di vista.',
                 inLanguage: 'it-IT',
-                ...(personJsonLd(settings) ? { mainEntity: { '@id': absoluteUrl('/#author') } } : {}),
               },
               breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Chi sono', path: '/about' }]),
             ],
@@ -56,7 +52,7 @@ export default async function AboutPage() {
             src={settings?.authorPhoto?.url || '/images/controluce-hero.webp'}
             alt={
               settings?.authorPhoto
-                ? settings.authorPhoto.alt || settings.authorName || 'Foto profilo'
+                ? 'Ritratto personale'
                 : 'Ritratto in controluce di una donna di profilo, con luce ambrata sui capelli'
             }
             fill
@@ -71,17 +67,11 @@ export default async function AboutPage() {
             Chi c&apos;è dietro Controluce
           </p>
           <h1 className="mb-7 max-w-[19ch] font-display text-4xl leading-tight tracking-tight text-ink md:text-5xl">
-            {settings?.authorName ? `Ciao, sono ${settings.authorName}.` : 'Uno sguardo personale, oltre la superficie.'}
+            Uno sguardo personale, oltre la superficie.
           </h1>
-          {settings?.authorBio ? (
-            <div className="mb-9 max-w-[62ch] space-y-5 font-serif text-lg leading-relaxed text-ink-soft [&_p]:mb-5">
-              <PortableText value={settings.authorBio} />
-            </div>
-          ) : (
-            <p className="mb-9 max-w-[54ch] font-serif text-lg leading-relaxed text-ink-soft">
-              Sono Lea, e Controluce è il mio spazio per condividere storie, idee, curiosità e punti di vista sulla vita quotidiana. Un invito a rallentare, guardare le cose da prospettive diverse e scoprire qualcosa di nuovo, anche nei dettagli più semplici.
-            </p>
-          )}
+          <p className="mb-9 max-w-[54ch] font-serif text-lg leading-relaxed text-ink-soft">
+            Dietro Controluce ci sono una curiosità sempre accesa e il desiderio di osservare la vita da prospettive diverse. Questo è uno spazio personale in cui raccolgo storie, idee, scoperte e piccoli dettagli del quotidiano: un invito a rallentare, guardare meglio e magari ritrovarsi in qualcosa di nuovo.
+          </p>
           <Link
             href="/#articoli"
             className="editorial-button inline-flex items-center gap-4 border border-wine bg-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.16em] text-bg hover:border-wine-dark hover:bg-wine-dark"

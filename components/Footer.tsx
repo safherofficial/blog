@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function Footer({ siteTitle = 'Controluce', authorName, instagramUrl }: { siteTitle?: string | null; authorName?: string | null; instagramUrl?: string | null }) {
+export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { siteTitle?: string | null; instagramUrl?: string | null }) {
   return (
     <footer className="site-footer relative overflow-hidden border-t border-[#4A392A] bg-ink text-bg">
       <div className="footer-light" aria-hidden="true" />
@@ -20,7 +20,7 @@ export default function Footer({ siteTitle = 'Controluce', authorName, instagram
           <Link href="/" className="footer-link nav-link transition-colors hover:text-ochre">Home</Link>
           <Link href="/about" className="footer-link nav-link transition-colors hover:text-ochre">Chi sono</Link>
           <Link href="/articoli" className="footer-link nav-link transition-colors hover:text-ochre">Articoli</Link>
-          <Link href="/scrivimi" className="footer-link nav-link transition-colors hover:text-ochre">Raccontamelo</Link>
+          <Link href="/scrivimi" className="footer-link nav-link transition-colors hover:text-ochre">Parliamone</Link>
           <Link href="/rss" className="footer-link nav-link transition-colors hover:text-ochre">Feed RSS</Link>
         </nav>
 
@@ -39,7 +39,7 @@ export default function Footer({ siteTitle = 'Controluce', authorName, instagram
 
       <div className="wrap relative z-10 flex flex-col gap-3 border-t border-[#554435] py-5 text-[11px] text-[#B9A99A] sm:flex-row sm:items-center sm:justify-between">
         <span>
-          &copy; {new Date().getFullYear()} {siteTitle || 'Controluce'}{authorName ? ` — ${authorName}` : ''}. Tutti i diritti riservati.
+          &copy; {new Date().getFullYear()} {siteTitle || 'Controluce'}. Tutti i diritti riservati.
         </span>
         <Link href="/privacy-policy" className="footer-link nav-link w-fit transition-colors hover:text-ochre">Privacy Policy</Link>
       </div>

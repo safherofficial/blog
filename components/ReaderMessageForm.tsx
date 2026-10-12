@@ -5,11 +5,9 @@ import Link from 'next/link'
 
 const fieldClass = 'w-full border border-line bg-white px-4 py-3 text-base text-ink outline-none transition-colors placeholder:text-ink-soft/60 focus:border-wine focus:ring-1 focus:ring-wine/25'
 const categories = [
-  { value: '', label: 'Scegli un argomento (facoltativo)' },
-  { value: 'consiglio', label: 'Vorrei un consiglio' },
-  { value: 'racconto', label: 'Ho qualcosa da raccontare' },
-  { value: 'parere', label: 'Vorrei conoscere il tuo parere' },
-  { value: 'argomento', label: 'Vorrei suggerirti un argomento' },
+  { value: '', label: 'Scegli un tema (facoltativo)' },
+  { value: 'racconto', label: 'Ho qualcosa da condividere' },
+  { value: 'argomento', label: 'Vorrei suggerirti un tema per Controluce' },
   { value: 'altro', label: 'Altro' },
 ]
 
@@ -56,11 +54,11 @@ export default function ReaderMessageForm() {
     return (
       <section className="border border-line bg-bg-soft p-6 md:p-9" aria-live="polite">
         <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Messaggio ricevuto</p>
-        <h2 className="mb-4 font-display text-3xl">Grazie per esserti raccontato.</h2>
+        <h2 className="mb-4 font-display text-3xl">Grazie per aver condiviso i tuoi pensieri.</h2>
         <div className="space-y-4 font-serif text-lg leading-relaxed text-ink-soft">
           <p>Ho ricevuto il tuo messaggio.</p>
-          <p>Leggerò quello che mi hai scritto con attenzione. Non sempre riuscirò a rispondere personalmente a tutti, ma ogni messaggio merita rispetto.</p>
-          <p className="font-display text-xl italic text-wine">A presto, Lea.</p>
+          <p>Leggerò quello che mi hai scritto con attenzione. Non sempre sarà possibile rispondere personalmente, ma ciò che condividi verrà trattato con rispetto.</p>
+          <p className="font-display text-xl italic text-wine">Grazie per la fiducia.</p>
         </div>
         <button type="button" onClick={() => setSubmitted(false)} className="nav-link mt-7 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft hover:text-wine">
           Invia un altro messaggio
@@ -105,7 +103,7 @@ export default function ReaderMessageForm() {
       <div className="mb-7 border-t border-line pt-6">
         <label className="flex items-start gap-3 text-sm leading-relaxed text-ink" htmlFor="reader-wants-reply">
           <input id="reader-wants-reply" type="checkbox" checked={wantsReply} onChange={(event) => { setWantsReply(event.target.checked); if (!event.target.checked) setEmail('') }} className="mt-1 accent-[#765338]" />
-          <span>Mi piacerebbe ricevere una risposta da Lea.</span>
+          <span>Mi piacerebbe ricevere una risposta personale.</span>
         </label>
         {wantsReply && (
           <div className="mt-4">
@@ -130,10 +128,10 @@ export default function ReaderMessageForm() {
 
       {error && <p role="alert" className="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
       <button type="submit" disabled={busy || message.trim().length < 10 || !privacyAccepted || (wantsReply && !email.trim())} className="editorial-button inline-flex w-full items-center justify-center gap-4 border border-wine bg-wine px-6 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-bg hover:bg-wine-dark disabled:cursor-not-allowed disabled:opacity-50">
-        {busy ? 'Invio in corso…' : 'Raccontamelo'}
+        {busy ? 'Invio in corso…' : 'Parliamone'}
         {!busy && <span aria-hidden="true" className="text-lg leading-none">→</span>}
       </button>
-      <p className="mt-4 text-xs leading-relaxed text-ink-soft">Il tuo messaggio non viene pubblicato sul blog. La risposta personale non è garantita: Lea legge i messaggi quando riesce.</p>
+      <p className="mt-4 text-xs leading-relaxed text-ink-soft">Il tuo messaggio non viene pubblicato sul blog. Se chiedi una risposta, farò il possibile per leggere e rispondere quando riesco; la risposta non è garantita.</p>
     </form>
   )
 }

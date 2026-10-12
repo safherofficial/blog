@@ -3,8 +3,8 @@ import ReaderMessageForm from '@/components/ReaderMessageForm'
 import { pageMetadata } from '@/lib/seo/metadata'
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Raccontamelo — Scrivi a Lea',
-  description: 'Uno spazio privato per condividere un pensiero, chiedere un consiglio o suggerire un argomento a Lea di Controluce.',
+  title: 'Parliamone — Uno spazio di condivisione',
+  description: 'Uno spazio privato per dare voce ai pensieri e condividere esperienze, senza giudizi né aspettative di risposta.',
   path: '/scrivimi',
 })
 
@@ -21,20 +21,20 @@ export default function ScrivimiPage() {
             C&apos;è qualcosa che ti va di raccontare?
           </h1>
           <p className="max-w-[62ch] font-serif text-xl leading-relaxed text-ink-soft">
-            A volte abbiamo bisogno di un consiglio, altre volte soltanto di qualcuno a cui raccontare quello che stiamo vivendo.
-            Qui puoi farlo, senza dover trovare per forza le parole perfette.
+            A volte abbiamo solo bisogno di mettere i pensieri in parole e condividerli con qualcuno.
+            Qui puoi raccontare ciò che stai vivendo, senza dover trovare per forza le parole perfette.
           </p>
         </header>
 
         <div className="grid gap-10 md:grid-cols-[0.8fr_1.2fr] md:gap-14">
           <aside className="reveal-on-scroll">
-            <p className="mb-4 font-display text-2xl">Raccontamelo.</p>
+            <p className="mb-4 font-display text-2xl">Parliamone.</p>
             <div className="space-y-4 font-serif text-base leading-relaxed text-ink-soft">
               <p>Uno spazio per i tuoi pensieri, i tuoi dubbi, le tue esperienze e quelle domande che magari non hai ancora avuto occasione di condividere.</p>
-              <p>Puoi chiedermi un parere, raccontarmi qualcosa che ti è successo o suggerirmi un argomento per Controluce.</p>
+              <p>Puoi raccontarmi un&apos;esperienza, liberare un pensiero che ti accompagna o condividere un tema che vorresti vedere affrontato su Controluce.</p>
               <p>Non devi avere tutto chiaro. Puoi semplicemente cominciare da dove vuoi.</p>
             </div>
-            <p className="mt-7 font-display text-xl italic text-wine">Sono Lea. Ti leggo volentieri.</p>
+            <p className="mt-7 font-display text-xl italic text-wine">Dall&apos;altra parte ci sono io. Ti leggo con attenzione.</p>
           </aside>
 
           <div className="reveal-on-scroll">

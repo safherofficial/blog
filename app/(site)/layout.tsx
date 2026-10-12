@@ -24,7 +24,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Header siteTitle={siteTitle} instagramUrl={settings?.instagramUrl} />
       <SiteBar siteTitle={siteTitle} />
       <main id="contenuto" tabIndex={-1} className="site-page-transition">{children}</main>
-      <Footer siteTitle={siteTitle} authorName={settings?.authorName} instagramUrl={settings?.instagramUrl} />
+      <Footer siteTitle={siteTitle} instagramUrl={settings?.instagramUrl} />
       <BackToTop />
     </div>
   )

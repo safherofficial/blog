@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 const LINKS = [
   { href: '/articoli', label: 'Articoli' },
   { href: '/about', label: 'Chi sono' },
-  { href: '/scrivimi', label: 'Raccontamelo' },
+  { href: '/scrivimi', label: 'Parliamone' },
 ]
 
 /** Barra compatta che compare dopo la testata: navigazione sempre a portata di mano. */

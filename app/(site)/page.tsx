@@ -115,7 +115,7 @@ export default async function HomePage() {
               Segui il feed RSS <span aria-hidden="true" className="text-lg leading-none">↗</span>
             </Link>
             <Link href="/scrivimi" className="editorial-button inline-flex items-center gap-4 border border-wine bg-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-bg hover:bg-wine-dark">
-              Raccontamelo <span aria-hidden="true" className="text-lg leading-none">→</span>
+              Parliamone <span aria-hidden="true" className="text-lg leading-none">→</span>
             </Link>
           </div>
         </div>

@@ -107,7 +107,7 @@ export default function ReaderMessages({ notify, onUnauthorized }: { notify: Not
         ) : messages.length === 0 ? (
           <div className="border border-dashed border-line px-5 py-10 text-center">
             <p className="font-display text-2xl">Per ora, nessun messaggio.</p>
-            <p className="mt-2 text-sm text-ink-soft">Quando qualcuno ti scriverà da «Raccontamelo», lo troverai qui.</p>
+            <p className="mt-2 text-sm text-ink-soft">Quando qualcuno ti scriverà da «Parliamone», lo troverai qui.</p>
           </div>
         ) : (
           <div className="space-y-4">

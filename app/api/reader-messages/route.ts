@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { ensureReaderMessagesTable } from '@/lib/db/reader-messages'
 
-const CATEGORIES = ['consiglio', 'racconto', 'parere', 'argomento', 'altro'] as const
+const CATEGORIES = ['racconto', 'argomento', 'altro'] as const
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const SUBMISSION_WINDOW_MS = 15 * 60 * 1000
 const MAX_SUBMISSIONS_PER_WINDOW = 4

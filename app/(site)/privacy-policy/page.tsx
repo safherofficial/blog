@@ -31,8 +31,8 @@ export default async function PrivacyPolicyPage() {
           <div className="space-y-8 font-serif text-lg leading-relaxed text-ink-soft [&_h2]:mb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:not-italic [&_h2]:text-ink [&_p]:mb-3 [&_a]:underline [&_a]:decoration-ochre/70 [&_a]:underline-offset-4 [&_a]:transition-colors [&_a:hover]:text-wine">
             <p>
               Questa informativa descrive il trattamento dei dati personali connesso alla visita del sito Controluce.
-              Il sito non offre una newsletter via email; la pagina «Raccontamelo» consente invece di inviare volontariamente
-              un messaggio privato a Lea. L&apos;indirizzo email viene richiesto soltanto se desideri ricevere una risposta.
+              Il sito non offre una newsletter via email; la pagina «Parliamone» consente invece di inviare volontariamente
+              un messaggio privato per condividere pensieri ed esperienze. L&apos;indirizzo email viene richiesto soltanto se desideri ricevere una risposta.
             </p>
 
             <div>
@@ -66,7 +66,7 @@ export default async function PrivacyPolicyPage() {
             </div>
 
             <div>
-              <h2>Messaggi inviati tramite «Raccontamelo»</h2>
+              <h2>Messaggi inviati tramite «Parliamone»</h2>
               <p>
                 Se invii un messaggio, il sito tratta il testo, l&apos;eventuale nome o nickname, la categoria scelta e,
                 soltanto se chiedi una risposta, il tuo indirizzo email. Questi dati sono utilizzati per leggere e gestire
