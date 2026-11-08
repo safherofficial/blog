@@ -7,7 +7,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ArticleToc from '@/components/ArticleToc'
 import CropFrame from '@/components/CropFrame'
-import { bodyWordCount, getHeadings, readingMinutes, shortText } from '@/lib/content/article'
+import { getHeadings, readingMinutes, shortText } from '@/lib/content/article'
 import { editorTextToPortableText } from '@/lib/content/editor'
 import type { PortableTextBlock } from '@/lib/db'
 import type { SiteSettingsRow } from './types'
@@ -43,7 +43,6 @@ export default function ArticlePreview({
   const body = useMemo(() => editorTextToPortableText(bodyText), [bodyText])
   const headings = useMemo(() => getHeadings(body), [body])
   const minutes = readingMinutes(body)
-  const words = bodyWordCount(body)
   const siteTitle = settings.site_title || 'Controluce'
   const authorName = settings.author_name?.trim() || ''
   const authorBio = shortText(settings.author_bio)
