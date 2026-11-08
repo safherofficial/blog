@@ -13,7 +13,6 @@ import { Card, Counter, Field, IssueGroups, ScoreRing, inputClass, primaryButton
 import { scoreLabel } from '@/lib/seo/types'
 
 const MAX_COVER_UPLOAD_BYTES = 4 * 1024 * 1024
-const COVER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 type FormState = {
   title: string
@@ -122,12 +121,9 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
 
   // ---- Caricamento copertina dal dispositivo ----
   async function uploadCover(file: File) {
+    if (busy || uploadingCover) return
     if (file.size <= 0) return notify('error', 'Il file selezionato è vuoto.')
     if (file.size > MAX_COVER_UPLOAD_BYTES) return notify('error', 'La copertina non può superare 4 MB.')
-    if (file.type && !COVER_MIME_TYPES.includes(file.type)) {
-      return notify('error', 'Formato non supportato. Usa un’immagine JPG, PNG o WebP.')
-    }
-
     setUploadingCover(true)
     try {
       const upload = new FormData()
