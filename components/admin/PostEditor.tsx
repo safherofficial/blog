@@ -83,6 +83,7 @@ export default function PostEditor({ post, posts, categories, settings, notify, 
   const draftKey = `controluce:draft:${post?.id ?? 'new'}`
 
   const set = useCallback(<K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value })), [])
+  const closePreview = useCallback(() => setPreviewOpen(false), [])
   const dirty = isDirty(form, initial)
 
   // ---- Bozza locale: protegge dal lavoro perso se la sessione scade o la scheda si chiude ----
@@ -465,7 +466,7 @@ export default function PostEditor({ post, posts, categories, settings, notify, 
 
       <ArticlePreview
         open={previewOpen}
-        onClose={() => setPreviewOpen(false)}
+        onClose={closePreview}
         title={form.title}
         excerpt={form.excerpt}
         coverImageUrl={form.coverImageUrl}
