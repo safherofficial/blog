@@ -5,12 +5,14 @@ import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import PostCard from '@/components/PostCard'
+import PostNav from '@/components/PostNav'
 import ArticleToc from '@/components/ArticleToc'
 import CropFrame from '@/components/CropFrame'
 import { getHeadings, readingMinutes, shortText } from '@/lib/content/article'
 import { editorTextToPortableText } from '@/lib/content/editor'
 import type { PortableTextBlock } from '@/lib/db'
-import type { SiteSettingsRow } from './types'
+import type { Category, Post, SiteSettingsRow } from './types'
 
 type Props = {
   open: boolean
@@ -22,6 +24,10 @@ type Props = {
   categoryTitle: string | null
   publishedAtLocal: string
   bodyText: string
+  currentPostId: string | null
+  currentCategoryId: string | null
+  posts: Post[]
+  categories: Category[]
   settings: SiteSettingsRow
 }
 
@@ -37,6 +43,10 @@ export default function ArticlePreview({
   categoryTitle,
   publishedAtLocal,
   bodyText,
+  currentPostId,
+  currentCategoryId,
+  posts,
+  categories,
   settings,
 }: Props) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -51,6 +61,56 @@ export default function ArticlePreview({
   const formattedDate = validDate
     ? date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
     : 'Data da impostare'
+
+  const previewId = currentPostId || '__controluce_article_preview__'
+  const previewPost: Post = {
+    id: previewId,
+    title,
+    slug: 'anteprima-articolo',
+    excerpt,
+    cover_image_url: coverImageUrl || null,
+    cover_image_alt: coverImageAlt || null,
+    category_id: currentCategoryId,
+    published_at: validDate ? date.toISOString() : new Date().toISOString(),
+    published: true,
+    body,
+  }
+  const livePosts = posts.filter((item) => {
+    if (item.id === currentPostId || !item.published) return false
+    const publishedAt = new Date(item.published_at).getTime()
+    return !Number.isNaN(publishedAt) && publishedAt <= Date.now()
+  })
+  const timeline = [...livePosts, previewPost].sort(
+    (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+  )
+  const position = timeline.findIndex((item) => item.id === previewId)
+  const category = categories.find((item) => item.id === currentCategoryId)
+  const sameCategory = category
+    ? livePosts.filter((item) => item.category_id === currentCategoryId)
+    : []
+  const selectedSameCategory = sameCategory.slice(0, 3)
+  const excludedRelatedIds = new Set([previewId, ...selectedSameCategory.map((item) => item.id)])
+  const relatedFillers = livePosts
+    .filter((item) => !excludedRelatedIds.has(item.id))
+    .slice(0, Math.max(0, 3 - selectedSameCategory.length))
+  const relatedPosts = [...selectedSameCategory, ...relatedFillers]
+
+  function asPostSummary(item: Post) {
+    const itemCategory = categories.find((entry) => entry.id === item.category_id)
+    return {
+      _id: item.id,
+      title: item.title,
+      slug: item.slug,
+      excerpt: item.excerpt,
+      coverImage: item.cover_image_url ? { url: item.cover_image_url, alt: item.cover_image_alt } : null,
+      publishedAt: item.published_at,
+      category: itemCategory ? { title: itemCategory.title, slug: itemCategory.slug } : null,
+    }
+  }
+
+  const newer = position > 0 ? asPostSummary(timeline[position - 1]) : null
+  const older = position >= 0 && position < timeline.length - 1 ? asPostSummary(timeline[position + 1]) : null
+  const related = relatedPosts.map(asPostSummary)
 
   useEffect(() => {
     if (!open) return
@@ -112,7 +172,14 @@ export default function ArticlePreview({
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
       onClickCapture={(event) => {
         const target = event.target as HTMLElement
-        if (target.closest('a')) event.preventDefault()
+        const link = target.closest('a')
+        if (!link) return
+        event.preventDefault()
+        const href = link.getAttribute('href') || ''
+        if (href.startsWith('#')) {
+          const targetId = decodeURIComponent(href.slice(1))
+          document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
       }}
     >
       <div className="mx-auto flex min-h-full max-w-[1480px] flex-col overflow-hidden border border-[#72583D] bg-bg shadow-2xl">
@@ -224,6 +291,27 @@ export default function ArticlePreview({
                   )}
                 </div>
               </div>
+              {(newer || older) && (
+                <div className="article-column mt-16">
+                  <PostNav newer={newer} older={older} />
+                </div>
+              )}
+
+              {related.length > 0 && (
+                <section className="border-t border-line bg-bg-soft py-20 md:py-24">
+                  <div className="wrap">
+                    <div className="mb-10">
+                      <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">Continua a leggere</p>
+                      <h2 className="font-display text-3xl md:text-4xl">Altri articoli</h2>
+                    </div>
+                    <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
+                      {related.map((relatedPost, index) => (
+                        <PostCard key={relatedPost._id} post={relatedPost} index={index} />
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              )}
 
               <section className="border-t border-line bg-bg py-14 md:py-18">
                 <div className="wrap max-w-[760px] text-center">
