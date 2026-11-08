@@ -8,7 +8,8 @@ import { analyzePost, countBySeverity } from '@/lib/seo/post-analyzer'
 import { slugify } from '@/lib/seo/text'
 import type { PostDraft, SeoIssue } from '@/lib/seo/types'
 import SerpPreview from './SerpPreview'
-import { postStatus, STATUS_LABEL, type Category, type Notify, type Post } from './types'
+import ArticlePreview from './ArticlePreview'
+import { postStatus, STATUS_LABEL, type Category, type Notify, type Post, type SiteSettingsRow } from './types'
 import { Card, Counter, Field, IssueGroups, ScoreRing, inputClass, primaryButton, secondaryButton } from './ui'
 import { scoreLabel } from '@/lib/seo/types'
 
@@ -57,6 +58,7 @@ type Props = {
   post: Post | null
   posts: Post[]
   categories: Category[]
+  settings: SiteSettingsRow
   notify: Notify
   onSaved: (id: string) => void
   onDeleted: () => void
@@ -65,7 +67,7 @@ type Props = {
   onUnauthorized: () => void
 }
 
-export default function PostEditor({ post, posts, categories, notify, onSaved, onDeleted, onDirtyChange, onCategoryCreated, onUnauthorized }: Props) {
+export default function PostEditor({ post, posts, categories, settings, notify, onSaved, onDeleted, onDirtyChange, onCategoryCreated, onUnauthorized }: Props) {
   const initial = useMemo(() => formFromPost(post), [post])
   const [form, setForm] = useState<FormState>(initial)
   const [busy, setBusy] = useState(false)
@@ -73,6 +75,7 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
   const [newCategory, setNewCategory] = useState('')
   const [coverBroken, setCoverBroken] = useState(false)
   const [uploadingCover, setUploadingCover] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [coverDragActive, setCoverDragActive] = useState(false)
   const coverInputRef = useRef<HTMLInputElement>(null)
   const slugTouched = useRef(Boolean(post))
@@ -296,7 +299,10 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
         <h2 className="font-display text-3xl">{post ? 'Modifica articolo' : 'Nuovo articolo'}</h2>
         {status && <span className="border border-line bg-bg-soft px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-ink-soft">{STATUS_LABEL[status]}</span>}
         {dirty && <span className="font-mono text-[11px] text-amber-700">● Modifiche non salvate</span>}
-        {post && status === 'published' && <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="ml-auto font-mono text-xs uppercase tracking-widest text-wine hover:underline">Apri articolo ↗</a>}
+        <button type="button" disabled={uploadingCover} onClick={() => setPreviewOpen(true)} className={secondaryButton + ' ml-auto'} title="Visualizza l'articolo con le modifiche correnti">
+          Anteprima articolo <span aria-hidden="true">↗</span>
+        </button>
+        {post && status === 'published' && <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="font-mono text-xs uppercase tracking-widest text-wine hover:underline">Apri articolo ↗</a>}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
@@ -456,6 +462,19 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
           </div>
         </aside>
       </div>
+
+      <ArticlePreview
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        title={form.title}
+        excerpt={form.excerpt}
+        coverImageUrl={form.coverImageUrl}
+        coverImageAlt={form.coverImageAlt}
+        categoryTitle={categories.find((category) => category.id === form.categoryId)?.title || null}
+        publishedAtLocal={form.publishedAtLocal}
+        bodyText={form.bodyText}
+        settings={settings}
+      />
     </div>
   )
 }
