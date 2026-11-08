@@ -1,4 +1,5 @@
 import { LIMITS, SEVERITY_WEIGHT, TITLE_SUFFIX } from './constants'
+import { isValidCoverImageUrl } from '@/lib/content/images'
 import { countOccurrences, countWords, norm, parseEditorText } from './text'
 import type {
   AnalysisContext,
@@ -165,10 +166,9 @@ export function analyzePost(draft: PostDraft, ctx: AnalysisContext = { others: [
   if (!cover) {
     add('warning', 'images', 'cover-missing', 'Manca l’immagine di copertina.', 'Senza copertina le condivisioni social e Google Discover mostrano un’anteprima povera.', 'coverImageUrl')
   } else {
-    let valid = true
-    try { valid = new URL(cover).protocol === 'https:' } catch { valid = false }
+    const valid = isValidCoverImageUrl(cover)
     if (!valid) {
-      add('error', 'images', 'cover-url', 'L’URL della copertina non è un indirizzo HTTPS valido.', undefined, 'coverImageUrl')
+      add('error', 'images', 'cover-url', 'L’URL della copertina non è valido: usa HTTPS o carica il file dal pannello.', undefined, 'coverImageUrl')
     }
     const coverAlt = draft.coverImageAlt.trim()
     if (!coverAlt) {
