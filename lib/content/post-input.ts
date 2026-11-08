@@ -1,4 +1,5 @@
 import { editorTextToPortableText } from '@/lib/content/editor'
+import { isValidCoverImageUrl } from '@/lib/content/images'
 
 export type NormalizedPostInput = {
   title: string
@@ -23,15 +24,6 @@ function optionalText(value: unknown, maxLength: number): string | null {
   return trimmed.slice(0, maxLength)
 }
 
-function validHttpsUrl(value: string | null): boolean {
-  if (!value) return true
-  try {
-    return new URL(value).protocol === 'https:'
-  } catch {
-    return false
-  }
-}
-
 export function validatePostInput(input: unknown): ValidationResult {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
     return { error: 'Dati articolo non validi.' }
@@ -54,7 +46,7 @@ export function validatePostInput(input: unknown): ValidationResult {
   const coverImageUrl = optionalText(data.coverImageUrl, 2048)
   const coverImageAlt = optionalText(data.coverImageAlt, 300)
   const categoryId = optionalText(data.categoryId, 80)
-  if (!validHttpsUrl(coverImageUrl)) return { error: 'L’immagine di copertina deve usare un URL HTTPS valido.' }
+  if (coverImageUrl && !isValidCoverImageUrl(coverImageUrl)) return { error: 'L’immagine di copertina deve usare un URL HTTPS valido o essere caricata dal pannello.' }
   if (categoryId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(categoryId)) {
     return { error: 'La categoria selezionata non è valida.' }
   }
