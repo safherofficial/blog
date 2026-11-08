@@ -171,6 +171,7 @@ export default function AdminPage() {
               post={selected}
               posts={posts}
               categories={categories}
+              settings={settings}
               notify={notify}
               onSaved={(id) => void reloadAndSelect(id)}
               onDeleted={() => void reloadAndSelect(null)}
