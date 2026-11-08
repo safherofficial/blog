@@ -2,6 +2,7 @@
 
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { portableTextToEditorText } from '@/lib/content/editor'
+import { isValidCoverImageUrl } from '@/lib/content/images'
 import { LIMITS, TITLE_SUFFIX } from '@/lib/seo/constants'
 import { analyzePost, countBySeverity } from '@/lib/seo/post-analyzer'
 import { slugify } from '@/lib/seo/text'
@@ -10,6 +11,9 @@ import SerpPreview from './SerpPreview'
 import { postStatus, STATUS_LABEL, type Category, type Notify, type Post } from './types'
 import { Card, Counter, Field, IssueGroups, ScoreRing, inputClass, primaryButton, secondaryButton } from './ui'
 import { scoreLabel } from '@/lib/seo/types'
+
+const MAX_COVER_UPLOAD_BYTES = 4 * 1024 * 1024
+const COVER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 type FormState = {
   title: string
@@ -69,6 +73,9 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
   const [restorable, setRestorable] = useState<FormState | null>(null)
   const [newCategory, setNewCategory] = useState('')
   const [coverBroken, setCoverBroken] = useState(false)
+  const [uploadingCover, setUploadingCover] = useState(false)
+  const [coverDragActive, setCoverDragActive] = useState(false)
+  const coverInputRef = useRef<HTMLInputElement>(null)
   const slugTouched = useRef(Boolean(post))
   const bodyRef = useRef<HTMLTextAreaElement>(null)
   const draftKey = `controluce:draft:${post?.id ?? 'new'}`
@@ -111,6 +118,40 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
   // Lo slug segue il titolo finché non lo modifichi a mano (solo per i nuovi articoli).
   function onTitleChange(value: string) {
     setForm((prev) => ({ ...prev, title: value, slug: slugTouched.current ? prev.slug : slugify(value) }))
+  }
+
+  // ---- Caricamento copertina dal dispositivo ----
+  async function uploadCover(file: File) {
+    if (file.size <= 0) return notify('error', 'Il file selezionato è vuoto.')
+    if (file.size > MAX_COVER_UPLOAD_BYTES) return notify('error', 'La copertina non può superare 4 MB.')
+    if (file.type && !COVER_MIME_TYPES.includes(file.type)) {
+      return notify('error', 'Formato non supportato. Usa un’immagine JPG, PNG o WebP.')
+    }
+
+    setUploadingCover(true)
+    try {
+      const upload = new FormData()
+      upload.append('file', file)
+      const response = await fetch('/api/admin/covers', { method: 'POST', body: upload })
+      const data = await response.json().catch(() => null) as { url?: unknown; error?: string } | null
+
+      if (response.status === 401) {
+        notify('error', 'Sessione scaduta: accedi di nuovo.')
+        onUnauthorized()
+        return
+      }
+      if (!response.ok || !data || typeof data.url !== 'string' || !isValidCoverImageUrl(data.url)) {
+        notify('error', data?.error || 'Impossibile caricare la copertina.')
+        return
+      }
+
+      set('coverImageUrl', data.url)
+      notify('success', 'Copertina caricata. Salva l’articolo per applicarla.')
+    } catch {
+      notify('error', 'Caricamento non riuscito. Controlla la connessione e riprova.')
+    } finally {
+      setUploadingCover(false)
+    }
   }
 
   // ---- Analisi SEO in tempo reale ----
@@ -241,10 +282,10 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
   const futureDate = form.publishedAtLocal ? new Date(form.publishedAtLocal).getTime() > Date.now() : false
   const serpTitle = (form.seoTitle.trim() || form.title.trim()) + (form.seoTitle.trim() || form.title.trim() ? TITLE_SUFFIX : '')
   const serpDescription = form.seoDescription.trim() || form.excerpt.trim()
-  const coverValid = /^https:\/\//i.test(form.coverImageUrl.trim())
+  const coverValid = isValidCoverImageUrl(form.coverImageUrl)
 
   return (
-    <div onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!busy) void save(live) } }}>
+    <div onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!busy && !uploadingCover) void save(live) } }}>
       {restorable && (
         <div role="status" className="mb-5 flex flex-wrap items-center justify-between gap-3 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <span>Ho trovato modifiche non salvate di una sessione precedente.</span>
@@ -289,8 +330,55 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
           <Card title="Immagine di copertina" description="Appare in testa all’articolo, nelle card e nelle anteprime social.">
             <div className="grid gap-5 md:grid-cols-2">
               <div className="grid content-start gap-5">
-                <Field id="post-coverImageUrl" label="URL immagine (HTTPS)">
-                  <input id="post-coverImageUrl" type="url" value={form.coverImageUrl} onChange={(e) => set('coverImageUrl', e.target.value)} className={inputClass} placeholder="https://…" />
+                <Field id="post-coverImageUpload" label="Carica dal computer" hint="JPG, PNG o WebP · massimo 4 MB. Il file viene salvato nel blog e usato anche nelle anteprime social.">
+                  <div
+                    onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; setCoverDragActive(true) }}
+                    onDragLeave={(event) => {
+                      const nextTarget = event.relatedTarget as Node | null
+                      if (!nextTarget || !event.currentTarget.contains(nextTarget)) setCoverDragActive(false)
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault()
+                      setCoverDragActive(false)
+                      const files = Array.from(event.dataTransfer.files)
+                      if (files.length !== 1) {
+                        notify('error', 'Trascina un solo file alla volta.')
+                        return
+                      }
+                      void uploadCover(files[0])
+                    }}
+                    className={coverDragActive
+                      ? 'border border-dashed border-wine bg-bg-soft px-4 py-5 text-center ring-2 ring-wine/20'
+                      : 'border border-dashed border-line bg-bg-soft px-4 py-5 text-center transition-colors hover:border-wine/60'}
+                  >
+                    <p className="text-sm font-medium text-ink">{coverDragActive ? 'Rilascia qui la copertina' : 'Trascina qui il file della copertina'}</p>
+                    <p className="mt-1 text-xs text-ink-soft">Oppure selezionalo dal tuo dispositivo.</p>
+                    <button
+                      type="button"
+                      disabled={busy || uploadingCover}
+                      onClick={() => coverInputRef.current?.click()}
+                      className={secondaryButton + ' mt-3'}
+                    >
+                      {uploadingCover ? 'Caricamento…' : 'Sfoglia file'}
+                    </button>
+                    <input
+                      ref={coverInputRef}
+                      id="post-coverImageUpload"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="sr-only"
+                      disabled={busy || uploadingCover}
+                      onChange={(event) => {
+                        const file = event.currentTarget.files?.[0]
+                        event.currentTarget.value = ''
+                        if (file) void uploadCover(file)
+                      }}
+                    />
+                  </div>
+                  {uploadingCover && <p role="status" className="mt-2 text-xs text-ink-soft">Caricamento della copertina in corso…</p>}
+                </Field>
+                <Field id="post-coverImageUrl" label="Oppure inserisci un URL HTTPS" hint="Facoltativo: puoi continuare a usare un’immagine già ospitata online.">
+                  <input id="post-coverImageUrl" type="text" value={form.coverImageUrl} onChange={(e) => set('coverImageUrl', e.target.value)} className={inputClass} placeholder="https://…" />
                 </Field>
                 <Field id="post-coverImageAlt" label="Testo alternativo" hint="Descrivi cosa si vede: serve ai non vedenti e a Google Immagini." counter={<Counter value={form.coverImageAlt.length} max={300} />}>
                   <input id="post-coverImageAlt" value={form.coverImageAlt} onChange={(e) => set('coverImageAlt', e.target.value)} maxLength={300} className={inputClass} />
@@ -343,16 +431,16 @@ export default function PostEditor({ post, posts, categories, notify, onSaved, o
           <div className="sticky bottom-0 z-20 -mx-2 flex flex-wrap items-center gap-3 border border-line bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(33,26,21,0.06)] backdrop-blur">
             {live ? (
               <>
-                <button type="button" disabled={busy} onClick={() => void save(true)} className={primaryButton}>{busy ? 'Salvataggio…' : 'Aggiorna'}</button>
-                <button type="button" disabled={busy} onClick={() => void save(false)} className={secondaryButton}>Torna in bozza</button>
+                <button type="button" disabled={busy || uploadingCover} onClick={() => void save(true)} className={primaryButton}>{busy ? 'Salvataggio…' : 'Aggiorna'}</button>
+                <button type="button" disabled={busy || uploadingCover} onClick={() => void save(false)} className={secondaryButton}>Torna in bozza</button>
               </>
             ) : (
               <>
-                <button type="button" disabled={busy} onClick={() => void save(true)} className={primaryButton}>{busy ? 'Salvataggio…' : futureDate ? 'Programma' : 'Pubblica'}</button>
-                <button type="button" disabled={busy} onClick={() => void save(false)} className={secondaryButton}>Salva bozza</button>
+                <button type="button" disabled={busy || uploadingCover} onClick={() => void save(true)} className={primaryButton}>{busy ? 'Salvataggio…' : futureDate ? 'Programma' : 'Pubblica'}</button>
+                <button type="button" disabled={busy || uploadingCover} onClick={() => void save(false)} className={secondaryButton}>Salva bozza</button>
               </>
             )}
-            {post && <button type="button" disabled={busy} onClick={() => void remove()} className="ml-auto px-3 py-2 font-mono text-xs uppercase tracking-widest text-red-800 hover:underline disabled:opacity-50">Elimina</button>}
+            {post && <button type="button" disabled={busy || uploadingCover} onClick={() => void remove()} className="ml-auto px-3 py-2 font-mono text-xs uppercase tracking-widest text-red-800 hover:underline disabled:opacity-50">Elimina</button>}
             <span className="hidden font-mono text-[11px] text-ink-soft md:inline">Ctrl/⌘ + S per salvare</span>
           </div>
         </div>
