@@ -474,6 +474,10 @@ export default function PostEditor({ post, posts, categories, settings, notify, 
         categoryTitle={categories.find((category) => category.id === form.categoryId)?.title || null}
         publishedAtLocal={form.publishedAtLocal}
         bodyText={form.bodyText}
+        currentPostId={post?.id ?? null}
+        currentCategoryId={form.categoryId || null}
+        posts={posts}
+        categories={categories}
         settings={settings}
       />
     </div>
