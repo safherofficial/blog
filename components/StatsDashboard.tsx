@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type Data = {
-  totals: { total: number; today: number; month: number; visitors: number }
+  totals: { total: number; today: number; month: number }
   daily: Array<{ label: string; views: number }>
   sources: Array<{ source: string; views: number; percentage: number }>
   hours: Array<{ hour: number; views: number }>
@@ -67,7 +67,7 @@ export default function StatsDashboard() {
     { label: 'Visite oggi', value: data.totals.today, note: 'Dalle 00:00, ora italiana' },
     { label: 'Visite questo mese', value: data.totals.month, note: 'Mese solare corrente' },
     { label: 'Visite totali', value: data.totals.total, note: 'Dall’attivazione del monitoraggio' },
-    { label: 'Visitatori unici stimati', value: data.totals.visitors, note: 'Browser distinti, stima' },
+    { label: 'Canali attivi', value: data.sources.length, note: 'Origini con almeno una visita' },
   ]
   return <main className="min-h-screen bg-[#F5EFE5] px-4 py-7 text-ink sm:px-7 lg:px-10"><div className="mx-auto max-w-7xl">
     <header className="mb-8 flex flex-wrap items-end justify-between gap-5 border-b border-line pb-6"><div><p className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Controluce · Area riservata</p><h1 className="font-display text-4xl sm:text-5xl">Insights del sito</h1><p className="mt-2 text-sm text-ink-soft">Una lettura chiara di pubblico, provenienza e abitudini di visita.</p></div>
@@ -85,6 +85,6 @@ export default function StatsDashboard() {
       <article className="border border-line bg-white p-5 sm:p-7"><p className="font-mono text-[10px] uppercase tracking-widest text-ochre">Contenuti</p><h2 className="mt-1 font-display text-2xl">Pagine più visitate</h2><p className="mb-5 mt-1 text-xs text-ink-soft">Le pagine che attirano più attenzione.</p>
         {data.pages.length ? <ol className="space-y-3">{data.pages.map((p, i) => <li key={p.path} className="flex items-center justify-between gap-4 border-b border-line/70 pb-3 text-sm"><span className="min-w-0 truncate"><span className="mr-3 font-mono text-[10px] text-ochre">{String(i + 1).padStart(2, '0')}</span>{p.path}</span><strong className="font-mono text-xs">{fmt(p.views)}</strong></li>)}</ol> : <p className="text-sm text-ink-soft">Nessun dato disponibile.</p>}</article>
     </section>
-    <footer className="mt-7 border-t border-line pt-4 text-[11px] leading-5 text-ink-soft">Dati raccolti dal momento dell’attivazione. I visitatori unici sono stimati tramite un identificatore casuale del browser; IP e URL completi di provenienza non vengono salvati. Ad blocker e protezioni anti-tracciamento possono ridurre la rilevazione. Per attribuire correttamente i clic social, usa link con parametri UTM.</footer>
+    <footer className="mt-7 border-t border-line pt-4 text-[11px] leading-5 text-ink-soft">Dati raccolti dal momento dell’attivazione. Il sistema registra visualizzazioni aggregate senza salvare indirizzi IP, identificatori persistenti o URL completi di provenienza. Ad blocker e protezioni anti-tracciamento possono ridurre la rilevazione. Per attribuire correttamente i clic social, usa link con parametri UTM.</footer>
   </div></main>
 }

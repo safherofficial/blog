@@ -1,4 +1,3 @@
-import crypto from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 
@@ -11,8 +10,7 @@ async function ensureTable() {
     tableReady = sql`
       CREATE TABLE IF NOT EXISTS site_analytics_events (
         id BIGSERIAL PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        visitor_hash CHAR(64) NOT NULL, page_path TEXT NOT NULL, source TEXT NOT NULL,
-        medium TEXT, campaign TEXT, referrer_host TEXT
+        page_path TEXT NOT NULL, source TEXT NOT NULL, medium TEXT, campaign TEXT, referrer_host TEXT
       )
     `.catch((error) => { tableReady = null; throw error })
   }
@@ -47,12 +45,11 @@ function classifySource(utmSource: string, referrer: string) {
 export async function POST(request: Request) {
   if (!process.env.POSTGRES_URL) return NextResponse.json({ ok: false }, { status: 503 })
   const body = await request.json().catch(() => null)
-  if (!body || typeof body.path !== 'string' || typeof body.visitorId !== 'string') return NextResponse.json({ ok: false }, { status: 400 })
+  if (!body || typeof body.path !== 'string') return NextResponse.json({ ok: false }, { status: 400 })
   const agent = request.headers.get('user-agent') || ''
   if (/bot|crawler|spider|headless|preview|facebookexternalhit|whatsapp/i.test(agent)) return NextResponse.json({ ok: true, ignored: true })
   const path = body.path.slice(0, 500).split('?')[0]
   if (!path.startsWith('/') || path.startsWith('/stats') || path.startsWith('/api/')) return NextResponse.json({ ok: true, ignored: true })
-  const visitorHash = crypto.createHash('sha256').update(body.visitorId.slice(0, 120)).digest('hex')
   const referrer = typeof body.referrer === 'string' ? body.referrer.slice(0, 1000) : ''
   const utmSource = typeof body.utmSource === 'string' ? body.utmSource.slice(0, 80) : ''
   const medium = typeof body.utmMedium === 'string' ? body.utmMedium.slice(0, 80) : ''
@@ -60,8 +57,8 @@ export async function POST(request: Request) {
   const classified = classifySource(utmSource, referrer)
   try {
     await ensureTable()
-    await sql`INSERT INTO site_analytics_events (visitor_hash, page_path, source, medium, campaign, referrer_host)
-      VALUES (${visitorHash}, ${path}, ${classified.source}, ${medium || null}, ${campaign || null}, ${classified.host || null})`
+    await sql`INSERT INTO site_analytics_events (page_path, source, medium, campaign, referrer_host)
+      VALUES (${path}, ${classified.source}, ${medium || null}, ${campaign || null}, ${classified.host || null})`
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
   } catch { return NextResponse.json({ ok: false }, { status: 503 }) }
 }

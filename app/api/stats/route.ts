@@ -9,8 +9,7 @@ async function ensureTable() {
   if (!tableReady) {
     tableReady = sql`CREATE TABLE IF NOT EXISTS site_analytics_events (
       id BIGSERIAL PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      visitor_hash CHAR(64) NOT NULL, page_path TEXT NOT NULL, source TEXT NOT NULL,
-      medium TEXT, campaign TEXT, referrer_host TEXT
+      page_path TEXT NOT NULL, source TEXT NOT NULL, medium TEXT, campaign TEXT, referrer_host TEXT
     )`.catch((error) => { tableReady = null; throw error })
   }
   await tableReady
@@ -24,8 +23,8 @@ export async function GET() {
     const [totals, daily, sources, hours, pages] = await Promise.all([
       sql`SELECT COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE created_at >= date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome') AT TIME ZONE 'Europe/Rome')::int AS today,
-        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', NOW() AT TIME ZONE 'Europe/Rome') AT TIME ZONE 'Europe/Rome')::int AS month,
-        COUNT(DISTINCT visitor_hash)::int AS visitors FROM site_analytics_events`,
+        COUNT(*) FILTER (WHERE created_at >= date_trunc('month', NOW() AT TIME ZONE 'Europe/Rome') AT TIME ZONE 'Europe/Rome')::int AS month
+        FROM site_analytics_events`,
       sql`SELECT to_char(day, 'DD/MM') AS label, COALESCE(counts.views, 0)::int AS views
         FROM generate_series(date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome') - interval '29 days',
           date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome'), interval '1 day') AS day
@@ -42,8 +41,8 @@ export async function GET() {
         GROUP BY page_path ORDER BY views DESC LIMIT 8`,
     ])
     return NextResponse.json({
-      totals: totals.rows[0] || { total: 0, today: 0, month: 0, visitors: 0 },
-      daily: daily.rows, sources: sources.rows, hours: hours.rows, pages: pages.rows, timezone: 'Europe/Rome',
+      totals: totals.rows[0] || { total: 0, today: 0, month: 0 },
+      daily: daily.rows, sources: sources.rows, hours: hours.rows, pages: pages.rows,
     }, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
   } catch {
     return NextResponse.json({ error: 'Impossibile leggere le statistiche. Verifica la connessione a Vercel Postgres.' }, { status: 503 })
