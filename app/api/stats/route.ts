@@ -30,7 +30,7 @@ export async function GET() {
         FROM site_analytics_events`,
       sql`SELECT to_char(day, 'DD/MM') AS label, COALESCE(counts.views, 0)::int AS views
         FROM generate_series(date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome') - interval '29 days',
-          date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome'), interval '1 day') AS day
+          date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome'), interval '1 day') AS days(day)
         LEFT JOIN (SELECT date_trunc('day', created_at AT TIME ZONE 'Europe/Rome') AS event_day, COUNT(*) AS views
           FROM site_analytics_events
           WHERE created_at >= (date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome') - interval '29 days') AT TIME ZONE 'Europe/Rome'
