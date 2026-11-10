@@ -3,6 +3,7 @@ import Footer from '@/components/Footer'
 import BackToTop from '@/components/BackToTop'
 import SiteBar from '@/components/SiteBar'
 import RevealEffects from '@/components/RevealEffects'
+import StatsTracker from '@/components/StatsTracker'
 import { getSiteSettings } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import { siteGraphJsonLd } from '@/lib/seo/jsonld'
@@ -10,16 +11,11 @@ import { siteGraphJsonLd } from '@/lib/seo/jsonld'
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings().catch(() => null)
   const siteTitle = settings?.siteTitle || 'Controluce'
-
   return (
     <div className="site-shell">
+      <StatsTracker />
       <RevealEffects />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: safeJsonLd(siteGraphJsonLd(settings)),
-        }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(siteGraphJsonLd(settings)) }} />
       <a href="#contenuto" className="skip-link">Vai al contenuto</a>
       <Header siteTitle={siteTitle} instagramUrl={settings?.instagramUrl} />
       <SiteBar siteTitle={siteTitle} />
