@@ -7,12 +7,16 @@ let tableReady: Promise<unknown> | null = null
 
 async function ensureTable() {
   if (!tableReady) {
-    tableReady = sql`
-      CREATE TABLE IF NOT EXISTS site_analytics_events (
-        id BIGSERIAL PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        page_path TEXT NOT NULL, source TEXT NOT NULL, medium TEXT, campaign TEXT, referrer_host TEXT
-      )
-    `.catch((error) => { tableReady = null; throw error })
+    tableReady = (async () => {
+      await sql`
+        CREATE TABLE IF NOT EXISTS site_analytics_events (
+          id BIGSERIAL PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          page_path TEXT NOT NULL, source TEXT NOT NULL, medium TEXT, campaign TEXT, referrer_host TEXT
+        )
+      `
+      // Remove the temporary visitor identifier column from an earlier preview build, if present.
+      await sql`ALTER TABLE site_analytics_events DROP COLUMN IF EXISTS visitor_hash`
+    })().catch((error) => { tableReady = null; throw error })
   }
   await tableReady
 }
@@ -28,7 +32,7 @@ function classifySource(utmSource: string, referrer: string) {
   if (value) return { source: aliases[value] || utmSource.trim().slice(0, 80), host: '' }
   if (!referrer) return { source: 'Diretto', host: '' }
   try {
-    const host = new URL(referrer).hostname.toLowerCase().replace(/^www\\./, '')
+    const host = new URL(referrer).hostname.toLowerCase().replace(/^www\./, '')
     if (host.includes('instagram.com')) return { source: 'Instagram', host }
     if (host.includes('facebook.com')) return { source: 'Facebook', host }
     if (host === 't.co' || host === 'x.com' || host.includes('twitter.com')) return { source: 'X', host }
