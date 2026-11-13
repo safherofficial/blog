@@ -17,16 +17,17 @@ export default function PostCard({ post, index = 0, featured = false }: { post: 
   return (
     <article className={`editorial-card reveal-on-scroll group min-w-0 ${featured ? 'lg:grid lg:grid-cols-12 lg:items-center lg:gap-12' : ''}`} style={{ animationDelay: `${Math.min(index, 4) * 90}ms` }}>
       <Link href={`/blog/${post.slug}`} className={`block ${featured ? 'lg:col-span-7' : ''}`} aria-label={`Leggi: ${post.title}`}>
-        <div className={`editorial-media-frame relative mb-5 ${featured ? 'lg:mb-0 lg:aspect-[16/10]' : ''} aspect-[4/3] overflow-hidden border border-line/70 bg-gradient-to-br ${gradients[index % gradients.length]}`}>
+        <div className={`editorial-media-frame cover-image-frame relative mb-5 ${featured ? 'lg:mb-0' : ''} overflow-hidden border border-line/70 bg-gradient-to-br ${gradients[index % gradients.length]}`}>
           <CropFrame />
           {post.coverImage?.url && (
             <Image
               src={post.coverImage.url}
               alt={post.coverImage.alt || post.title}
-              fill
+              width={1200}
+              height={800}
               sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 33vw"
               unoptimized
-              className="editorial-card-image object-cover"
+              className="editorial-card-image block h-auto w-full object-contain"
             />
           )}
           <span className="pointer-events-none absolute inset-3 border border-white/20 transition-all duration-700 group-hover:inset-5 group-hover:border-white/50" aria-hidden="true" />
