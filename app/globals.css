@@ -1085,3 +1085,14 @@ h2:hover .heading-anchor,
     font-size: 0.8em;
   }
 }
+
+
+/* Cover frames follow each uploaded illustration's natural proportions. */
+.cover-image-frame img,
+.cover-image-frame:hover img {
+  transform: none;
+}
+
+.editorial-card:hover .cover-image-frame .editorial-card-image {
+  transform: none;
+}
