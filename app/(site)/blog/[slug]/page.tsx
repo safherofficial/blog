@@ -158,16 +158,17 @@ export default async function PostPage({ params }: { params: { slug: string } })
 
       {post.coverImage && (
         <div className="wrap">
-          <div className="editorial-media-frame reveal-on-scroll relative my-10 aspect-[21/9] overflow-hidden border border-line md:my-14">
+          <div className="editorial-media-frame cover-image-frame reveal-on-scroll relative my-10 overflow-hidden border border-line md:my-14">
             <CropFrame />
             <Image
               src={post.coverImage.url}
               alt={post.coverImage.alt || post.title}
-              fill
+              width={1600}
+              height={1000}
               priority
               sizes="(max-width: 767px) 100vw, 1160px"
               unoptimized
-              className="object-cover"
+              className="block h-auto w-full object-contain"
             />
           </div>
         </div>
