@@ -17,7 +17,7 @@ export default function PostCard({ post, index = 0, featured = false }: { post: 
   return (
     <article className={`editorial-card reveal-on-scroll group min-w-0 ${featured ? 'lg:grid lg:grid-cols-12 lg:items-center lg:gap-12' : ''}`} style={{ animationDelay: `${Math.min(index, 4) * 90}ms` }}>
       <Link href={`/blog/${post.slug}`} className={`block ${featured ? 'lg:col-span-7' : ''}`} aria-label={`Leggi: ${post.title}`}>
-        <div className={`editorial-media-frame cover-image-frame relative mb-5 ${featured ? 'lg:mb-0' : ''} overflow-hidden border border-line/70 bg-gradient-to-br ${gradients[index % gradients.length]}`}>
+        <div className={`editorial-media-frame cover-image-frame relative mb-5 ${featured ? 'lg:mb-0' : ''} ${post.coverImage?.url ? '' : featured ? 'aspect-[4/3] lg:aspect-[16/10]' : 'aspect-[4/3]'} overflow-hidden border border-line/70 bg-gradient-to-br ${gradients[index % gradients.length]}`}>
           <CropFrame />
           {post.coverImage?.url && (
             <Image
