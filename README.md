@@ -1,6 +1,6 @@
 # Controluce
 
-Blog editoriale realizzato con Next.js 16 (App Router, TypeScript, Tailwind CSS) e Vercel Postgres.
+Blog editoriale realizzato con Next.js 16 (App Router, TypeScript, Tailwind CSS) e Neon Postgres.
 
 Articoli, categorie e impostazioni vengono gestiti dal database PostgreSQL collegato a Vercel.
 
@@ -8,10 +8,13 @@ Articoli, categorie e impostazioni vengono gestiti dal database PostgreSQL colle
 
 Il progetto usa Node.js 26.x LTS (anche su Vercel e nella CI).
 
+L'accesso al database usa il driver serverless ufficiale di Neon tramite richieste HTTP. Per mantenere la compatibilità con gli ambienti già configurati, il codice usa `POSTGRES_URL` quando presente e ripiega su `DATABASE_URL` in sua assenza. Non sono richieste modifiche allo schema né una copia dei dati per questo aggiornamento del driver. Non rimuovere la variabile esistente da Vercel senza aver prima verificato quella effettivamente utilizzata dall'ambiente.
+
 Imposta le seguenti variabili d'ambiente nel progetto Vercel:
 
 ```env
-POSTGRES_URL=...
+POSTGRES_URL=... # connessione già usata dalle installazioni esistenti
+DATABASE_URL=... # fallback per nuove integrazioni Neon su Vercel
 ADMIN_PASSWORD=una-password-lunga-e-casuale
 ADMIN_SESSION_SECRET=una-chiave-casuale-distinta-dalla-password
 SITE_URL=https://controluce.blog
@@ -24,7 +27,7 @@ INDEXNOW_KEY=una-chiave-casuale-di-almeno-16-caratteri
 
 `ADMIN_SESSION_SECRET` dovrebbe essere un segreto casuale indipendente dalla password amministrativa. Se non è impostato, il codice usa `ADMIN_PASSWORD` come fallback per mantenere la compatibilità con le installazioni esistenti.
 
-Esegui integralmente `db/schema.sql` nel SQL editor del database Vercel Postgres. Lo script crea le tabelle `posts`, `categories` e `site_settings`, gli indici e i trigger per `updated_at`.
+Esegui integralmente `db/schema.sql` nel SQL editor del database Neon. Lo script crea le tabelle `posts`, `categories` e `site_settings`, gli indici e i trigger per `updated_at`.
 
 ## Sviluppo, build e controlli
 

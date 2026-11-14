@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { sql } from '@/lib/db'
+import { isDatabaseConfigured, sql } from '@/lib/db'
 import { isStatsRequest } from '@/lib/stats-auth'
 
 export const runtime = 'nodejs'
@@ -20,7 +20,7 @@ async function ensureTable() {
 
 export async function GET() {
   if (!(await isStatsRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
-  if (!process.env.POSTGRES_URL) return NextResponse.json({ error: 'Database non configurato.' }, { status: 503 })
+  if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Database non configurato.' }, { status: 503 })
   try {
     await ensureTable()
     const [totals, daily, sources, hours, pages] = await Promise.all([
@@ -48,6 +48,6 @@ export async function GET() {
       daily: daily.rows, sources: sources.rows, hours: hours.rows, pages: pages.rows,
     }, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
   } catch {
-    return NextResponse.json({ error: 'Impossibile leggere le statistiche. Verifica la connessione a Vercel Postgres.' }, { status: 503 })
+    return NextResponse.json({ error: 'Impossibile leggere le statistiche. Verifica la connessione al database PostgreSQL.' }, { status: 503 })
   }
 }
