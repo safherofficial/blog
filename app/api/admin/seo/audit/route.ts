@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
 import { getIndexNowKey } from '@/lib/seo/indexnow'
-import { FALLBACK_SITE_URL } from '@/lib/seo/site'
+import { getSiteUrl } from '@/lib/seo/site'
 import { auditSite, type AuditPostRow, type AuditSettingsRow } from '@/lib/seo/site-audit'
 
 export const dynamic = 'force-dynamic'
@@ -18,13 +18,13 @@ export async function GET(request: Request) {
       sql`SELECT id, title, slug FROM categories ORDER BY title`,
       sql`SELECT site_title, tagline, author_name, author_bio, author_photo_url, author_photo_alt, instagram_url FROM site_settings WHERE id = 1 LIMIT 1`,
     ])
-    const configured = process.env.SITE_URL?.trim()
+    const configured = process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim()
     const audit = auditSite({
       posts: posts.rows as unknown as AuditPostRow[],
       categories: categories.rows as Array<{ id: string; title: string; slug: string }>,
       settings: (settings.rows[0] as unknown as AuditSettingsRow) ?? null,
       env: {
-        siteUrl: configured || FALLBACK_SITE_URL,
+        siteUrl: getSiteUrl(),
         siteUrlConfigured: Boolean(configured),
         sessionSecretConfigured: Boolean(process.env.ADMIN_SESSION_SECRET?.trim()),
         sessionSecretFallbackAvailable: Boolean(process.env.ADMIN_PASSWORD?.trim()),
