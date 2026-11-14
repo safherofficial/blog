@@ -164,17 +164,17 @@ export async function runLiveCheck(input: LiveCheckInput): Promise<LiveCheck> {
   const staticPaths = ['/', '/articoli', '/about', '/scrivimi', '/privacy-policy', '/rss']
   const postPaths = input.postSlugs.map((slug) => `/blog/${slug}`)
   const categoryPaths = input.categorySlugs.map((slug) => `/categoria/${slug}`)
-  const contentPaths: string[] = []
+  const allPaths = [...new Set([...staticPaths, ...postPaths, ...categoryPaths])]
+  const selectedContentPaths: string[] = []
   const contentLimit = MAX_PAGES - staticPaths.length
 
   // Alterna articoli e categorie: un elenco di articoli molto lungo non esclude tutte le categorie dal campione.
-  for (let index = 0; contentPaths.length < contentLimit && (index < postPaths.length || index < categoryPaths.length); index += 1) {
-    if (postPaths[index]) contentPaths.push(postPaths[index])
-    if (categoryPaths[index] && contentPaths.length < contentLimit) contentPaths.push(categoryPaths[index])
+  for (let index = 0; selectedContentPaths.length < contentLimit && (index < postPaths.length || index < categoryPaths.length); index += 1) {
+    if (postPaths[index]) selectedContentPaths.push(postPaths[index])
+    if (categoryPaths[index] && selectedContentPaths.length < contentLimit) selectedContentPaths.push(categoryPaths[index])
   }
 
-  const allPaths = [...new Set([...staticPaths, ...contentPaths])]
-  const paths = allPaths.slice(0, MAX_PAGES)
+  const paths = [...new Set([...staticPaths, ...selectedContentPaths])].slice(0, MAX_PAGES)
   const global = await checkGlobals(input, paths)
   const pages: LivePage[] = new Array(paths.length)
   let cursor = 0
