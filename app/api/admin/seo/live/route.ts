@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
-import { FALLBACK_SITE_URL } from '@/lib/seo/site'
+import { getSiteUrl } from '@/lib/seo/site'
 import { runLiveCheck } from '@/lib/seo/live-check'
 
 export const dynamic = 'force-dynamic'
@@ -11,7 +11,7 @@ export const maxDuration = 60
 export async function POST() {
   if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
 
-  const configuredSiteUrl = process.env.SITE_URL?.trim() || FALLBACK_SITE_URL
+  const configuredSiteUrl = getSiteUrl()
   let siteUrl: URL
   try {
     siteUrl = new URL(configuredSiteUrl)
