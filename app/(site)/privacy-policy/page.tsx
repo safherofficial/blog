@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMetadata({
 
 export default async function PrivacyPolicyPage() {
   const settings = await getSiteSettings().catch(() => null)
-  const owner = settings?.authorName?.trim() || 'il titolare del sito Controluce'
+  const owner = 'CONTROLUCE'
   const instagramUrl = settings?.instagramUrl
 
   return (
@@ -209,9 +209,8 @@ export default async function PrivacyPolicyPage() {
 
         <p className="reveal-on-scroll mt-8 text-sm leading-relaxed text-ink-soft">
           Questa informativa descrive il funzionamento applicativo osservato al 14 novembre 2026 e non costituisce
-          consulenza legale. Il titolare deve indicare la propria identità legale completa e un recapito diretto per le
-          richieste privacy, verificare la valutazione del legittimo interesse, le regioni dei fornitori e gli accordi
-          effettivamente attivi.
+          consulenza legale. Il titolare deve mantenere aggiornati i recapiti per le richieste privacy, verificare la
+          valutazione del legittimo interesse, le regioni dei fornitori e gli accordi effettivamente attivi.
         </p>
 
         <Link href="/" className="nav-link mt-10 inline-block font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft hover:text-wine">
