@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import PostEditor from '@/components/admin/PostEditor'
 import PostList from '@/components/admin/PostList'
@@ -152,7 +153,7 @@ export default function AdminPage() {
             <h1 className="font-display text-4xl">Pannello editoriale</h1>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/" target="_blank" rel="noopener noreferrer" className="font-mono text-xs uppercase tracking-widest text-ink-soft hover:text-wine">Vedi sito ↗</a>
+            <Link href="/" target="_blank" rel="noopener noreferrer" className="font-mono text-xs uppercase tracking-widest text-ink-soft hover:text-wine">Vedi sito ↗</Link>
             <button type="button" onClick={() => void logout()} disabled={busy} className={secondaryButton}>Esci</button>
           </div>
         </div>
