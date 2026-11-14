@@ -3,7 +3,7 @@ import { inspectHtml, type PageFacts } from './html-inspect'
 import type { SeoIssue } from './types'
 
 export type LiveCheckInput = {
-  /** Origine su cui interrogare il sito (quella della richiesta corrente). */
+  /** Origine canonica da interrogare, ricavata da SITE_URL. */
   origin: string
   /** URL canonico configurato (SITE_URL o il valore di ripiego). */
   siteUrl: string
@@ -150,7 +150,7 @@ async function checkGlobals(input: LiveCheckInput, expectedPaths: string[]): Pro
       }))
       const missing = expectedPaths.filter((path) => path.startsWith('/blog/') && !present.has(trimSlash(path)))
       if (missing.length > 0) add('warning', 'sitemap-missing-posts', `${missing.length} articol${missing.length === 1 ? 'o pubblico manca' : 'i pubblici mancano'} nella sitemap.`, 'La sitemap si aggiorna ogni 5 minuti: se è un articolo appena pubblicato, ricontrolla più tardi.')
-      else add('good', 'sitemap-ok', `Sitemap raggiungibile con ${locs.length} URL.`)
+      else if (foreign.length === 0) add('good', 'sitemap-ok', `Sitemap raggiungibile con ${locs.length} URL.`)
     }
   }
 
