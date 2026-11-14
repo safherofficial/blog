@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { sql } from '@/lib/db'
+import { isDatabaseConfigured, sql } from '@/lib/db'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -47,7 +47,7 @@ function classifySource(utmSource: string, referrer: string) {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.POSTGRES_URL) return NextResponse.json({ ok: false }, { status: 503 })
+  if (!isDatabaseConfigured()) return NextResponse.json({ ok: false }, { status: 503 })
   const body = await request.json().catch(() => null)
   if (!body || typeof body.path !== 'string') return NextResponse.json({ ok: false }, { status: 400 })
   const agent = request.headers.get('user-agent') || ''

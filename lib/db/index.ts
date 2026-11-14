@@ -1,6 +1,55 @@
-import { sql } from '@vercel/postgres'
+import { neon } from '@neondatabase/serverless'
 
-export { sql }
+type NeonQueryResult<Row> = {
+  rows: Row[]
+  rowCount: number | null
+  command: string
+  fields: unknown[]
+  rowAsArray: boolean
+}
+
+type SqlTag = <Row = Record<string, any>>(
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+) => Promise<NeonQueryResult<Row>>
+
+let neonClient: ReturnType<typeof neon> | null = null
+let activeConnectionString: string | null = null
+
+/**
+ * Prefer the connection string already used by existing Vercel deployments.
+ * DATABASE_URL is the fallback used by newer Neon Marketplace integrations.
+ *
+ * The client is initialized lazily so builds can run without database secrets.
+ * fullResults preserves the { rows, rowCount, ... } contract used throughout
+ * the application with @vercel/postgres.
+ */
+function getNeonClient(): ReturnType<typeof neon> {
+  const connectionString =
+    process.env.POSTGRES_URL?.trim() ||
+    process.env.DATABASE_URL?.trim()
+
+  if (!connectionString) {
+    throw new Error('Database non configurato: imposta POSTGRES_URL o DATABASE_URL.')
+  }
+
+  if (!neonClient || activeConnectionString !== connectionString) {
+    neonClient = neon(connectionString, { fullResults: true })
+    activeConnectionString = connectionString
+  }
+
+  return neonClient
+}
+
+export function isDatabaseConfigured(): boolean {
+  return Boolean(process.env.POSTGRES_URL?.trim() || process.env.DATABASE_URL?.trim())
+}
+
+/** Tagged SQL wrapper: keeps the existing call sites and result shape unchanged. */
+export const sql: SqlTag = <Row = Record<string, any>>(
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+) => getNeonClient()(strings, ...values) as unknown as Promise<NeonQueryResult<Row>>
 
 export type CoverImage = {
   url: string
