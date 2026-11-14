@@ -6,7 +6,7 @@ import { Pool } from '@neondatabase/serverless'
 
 const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const migrationsDirectory = resolve(projectRoot, 'db', 'migrations')
-const migrationFilenamePattern = /^(\\d{4})_([a-z0-9_]+)\\.sql$/
+const migrationFilenamePattern = /^([0-9]{4})_([a-z0-9_]+)[.]sql$/
 const lockName = 'controluce.schema_migrations'
 
 async function loadMigrations() {
