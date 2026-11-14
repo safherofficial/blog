@@ -6,7 +6,7 @@ Articoli, categorie e impostazioni vengono gestiti dal database PostgreSQL colle
 
 ## Configurazione
 
-Il progetto usa Node.js 26.x LTS (anche su Vercel e nella CI).
+Il progetto usa Node.js 26.13.1 e npm 11.20.0. La versione Node locale è indicata in `.nvmrc`, mentre `package.json` dichiara il package manager npm richiesto. La CI verifica entrambe le versioni e installa le dipendenze esclusivamente dal lockfile con `npm ci`.
 
 L'accesso al database usa il driver serverless ufficiale di Neon tramite richieste HTTP. Per mantenere la compatibilità con gli ambienti già configurati, il codice usa `POSTGRES_URL` quando presente e ripiega su `DATABASE_URL` in sua assenza. Non sono richieste modifiche allo schema né una copia dei dati per questo aggiornamento del driver. Non rimuovere la variabile esistente da Vercel senza aver prima verificato quella effettivamente utilizzata dall'ambiente.
 
@@ -32,14 +32,14 @@ Esegui integralmente `db/schema.sql` nel SQL editor del database Neon. Lo script
 ## Sviluppo, build e controlli
 
 ```bash
-npm install
+npm ci
 npm run dev
 npm run lint
 npm run typecheck
 npm run build
 ```
 
-La GitHub Action esegue lint, controllo TypeScript e build su push e pull request. Il repository dovrebbe versionare anche il lockfile npm generato dal team per rendere riproducibili le installazioni.
+La GitHub Action esegue `npm ci`, lint, controllo TypeScript e build su push e pull request. `package-lock.json` deve restare versionato: aggiorna le dipendenze intenzionalmente con npm 11.20.0 e committa insieme `package.json` il lockfile risultante.
 
 ## Pannello editoriale
 
