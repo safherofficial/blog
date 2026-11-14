@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { ensureReaderMessagesTable } from '@/lib/db/reader-messages'
@@ -13,7 +14,8 @@ const submissionWindows = new Map<string, RateWindow>()
 function limited(request: Request): boolean {
   const now = Date.now()
   const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-  const key = request.headers.get('x-real-ip')?.trim() || forwarded || 'unknown'
+  const clientIp = request.headers.get('x-real-ip')?.trim() || forwarded || 'unknown'
+  const key = crypto.createHash('sha256').update(clientIp).digest('hex')
   if (submissionWindows.size > 1000) {
     for (const [ip, window] of submissionWindows) {
       if (window.resetAt <= now) submissionWindows.delete(ip)
