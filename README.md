@@ -90,7 +90,7 @@ Le immagini sono salvate come URL, non come file binari.
 - Sitemap: `/sitemap.xml`
 - Robots: `/robots.txt`
 
-La newsletter email non è attiva: la homepage propone il feed RSS, senza raccogliere indirizzi email. Il sito utilizza statistiche proprietarie di prima parte sulle visualizzazioni: registra percorso, timestamp, sorgente, eventuali UTM e hostname del referrer, senza IP, cookie analytics o identificatori persistenti nella tabella statistica. Gli eventi vengono eliminati oltre 12 mesi. I dettagli sono descritti nella Privacy Policy. Prima di introdurre newsletter, pubblicità, profilazione o strumenti di analytics di terze parti, aggiorna l’informativa e valuta gli eventuali consensi necessari.
+La newsletter email non è attiva: la homepage propone il feed RSS, senza raccogliere indirizzi email. Il sito utilizza statistiche proprietarie di prima parte sulle visualizzazioni: registra percorso, timestamp, sorgente, eventuali UTM e hostname del referrer, senza IP, cookie analytics o identificatori persistenti nella tabella statistica. Il periodo di conservazione previsto è di 12 mesi; la pulizia viene eseguita durante le chiamate alle API analytics/statistiche e può quindi slittare se non ci sono richieste. I dettagli sono descritti nella Privacy Policy. Prima di introdurre newsletter, pubblicità, profilazione o strumenti di analytics di terze parti, aggiorna l’informativa e valuta gli eventuali consensi necessari.
 
 ## Struttura
 

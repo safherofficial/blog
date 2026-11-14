@@ -24,7 +24,7 @@ export default function StatsTracker() {
         utmSource: params.get('utm_source') || '', utmMedium: params.get('utm_medium') || '',
         utmCampaign: params.get('utm_campaign') || '',
       }),
-      keepalive: true, credentials: 'omit',
+      keepalive: true, credentials: 'omit', referrerPolicy: 'no-referrer',
     }).catch(() => {})
   }, [pathname])
   return null

@@ -6,9 +6,9 @@ let lastCleanupAt = 0
 let cleanupInFlight: Promise<void> | null = null
 
 /**
- * Retains first-party page-view events for at most 12 months.
+ * Removes first-party page-view events older than 12 months.
  * Runs at most once per day in each warm serverless runtime; a new runtime
- * performs the cleanup on its first analytics or statistics request.
+ * attempts cleanup on its first analytics or statistics API request.
  */
 export async function cleanupOldAnalyticsEvents(): Promise<void> {
   if (Date.now() - lastCleanupAt < CLEANUP_INTERVAL_MS) return

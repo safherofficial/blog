@@ -77,7 +77,8 @@ export default async function PrivacyPolicyPage() {
               </p>
               <p>
                 A ogni navigazione pubblica il browser invia al sito il percorso della pagina, l’eventuale sorgente,
-                mezzo e campagna indicati nei parametri UTM e il solo nome host del sito di provenienza. Il sistema
+                mezzo e campagna indicati nei parametri UTM e il solo nome host del sito di provenienza. Non inserire
+                dati personali o identificativi nei parametri UTM. Il sistema
                 registra la data e l’ora e una riga per ciascuna visualizzazione. Il percorso è registrato senza la
                 stringa di query; l’URL completo di provenienza non viene inviato né conservato.
               </p>
@@ -89,8 +90,10 @@ export default async function PrivacyPolicyPage() {
                 tra sessioni.
               </p>
               <p>
-                Gli eventi statistici sono conservati per un massimo di 12 mesi. La pulizia automatica elimina gli eventi
-                più vecchi durante l’utilizzo periodico delle API di analytics e statistiche. Le protezioni del browser,
+                Il periodo di conservazione previsto per gli eventi statistici è di 12 mesi. La procedura di pulizia viene
+                eseguita durante le chiamate alle API di analytics o statistiche e rimuove gli eventi più vecchi di 12 mesi.
+                Se per un periodo non arrivano richieste a queste API, la cancellazione avviene alla prima chiamata successiva;
+                il periodo effettivo può quindi superare la finestra prevista in assenza di richieste. Le protezioni del browser,
                 gli ad blocker e le impostazioni di privacy possono impedire la registrazione di alcune visualizzazioni.
               </p>
             </div>
@@ -191,8 +194,9 @@ export default async function PrivacyPolicyPage() {
               <h2>Diritti dell’interessato</h2>
               <p>
                 Nei casi previsti dal Regolamento (UE) 2016/679 puoi chiedere accesso ai dati, rettifica, cancellazione,
-                limitazione del trattamento e opporti ai trattamenti basati sul legittimo interesse. Puoi inoltre
-                proporre reclamo al Garante per la protezione dei dati personali. Per esercitare i tuoi diritti,
+                limitazione del trattamento e opporti ai trattamenti basati sul legittimo interesse. Puoi chiedere
+                la portabilità dei dati nei casi previsti dal Regolamento e proporre reclamo al Garante per la protezione
+                dei dati personali. Per esercitare i tuoi diritti,
                 utilizza la <Link href="/scrivimi">pagina Parliamone</Link> indicando chiaramente la natura della richiesta.
               </p>
               <p>
@@ -205,8 +209,9 @@ export default async function PrivacyPolicyPage() {
 
         <p className="reveal-on-scroll mt-8 text-sm leading-relaxed text-ink-soft">
           Questa informativa descrive il funzionamento applicativo osservato al 14 novembre 2026 e non costituisce
-          consulenza legale. Il titolare deve verificare e completare la propria identità, i recapiti, la valutazione
-          del legittimo interesse, le regioni dei fornitori e gli accordi effettivamente attivi.
+          consulenza legale. Il titolare deve indicare la propria identità legale completa e un recapito diretto per le
+          richieste privacy, verificare la valutazione del legittimo interesse, le regioni dei fornitori e gli accordi
+          effettivamente attivi.
         </p>
 
         <Link href="/" className="nav-link mt-10 inline-block font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft hover:text-wine">
