@@ -1,10 +1,12 @@
 # Controluce
 
-Blog editoriale realizzato con Next.js 14 (App Router, TypeScript, Tailwind CSS) e Vercel Postgres.
+Blog editoriale realizzato con Next.js 16 (App Router, TypeScript, Tailwind CSS) e Vercel Postgres.
 
 Articoli, categorie e impostazioni vengono gestiti dal database PostgreSQL collegato a Vercel.
 
 ## Configurazione
+
+Il progetto usa Node.js 26.x LTS (anche su Vercel e nella CI).
 
 Imposta le seguenti variabili d'ambiente nel progetto Vercel:
 

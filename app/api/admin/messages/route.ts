@@ -4,7 +4,7 @@ import { isAdminRequest } from '@/lib/admin-auth'
 import { ensureReaderMessagesTable } from '@/lib/db/reader-messages'
 
 export async function GET() {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
   try {
     await ensureReaderMessagesTable()
     const { rows } = await sql`

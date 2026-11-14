@@ -22,10 +22,11 @@ export function adminToken(): string {
   return `${payload}.${signature}`
 }
 
-export function isAdminRequest(): boolean {
+export async function isAdminRequest(): Promise<boolean> {
   if (!process.env.ADMIN_PASSWORD) return false
 
-  const value = cookies().get(COOKIE_NAME)?.value
+  const cookieStore = await cookies()
+  const value = cookieStore.get(COOKIE_NAME)?.value
   if (!value) return false
 
   const parts = value.split('.')

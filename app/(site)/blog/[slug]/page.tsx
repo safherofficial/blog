@@ -19,13 +19,16 @@ import PostNav from '@/components/PostNav'
 
 export const revalidate = 60
 
+type PostRouteProps = { params: Promise<{ slug: string }> }
+
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs().catch(() => [])
   return slugs.map((slug) => ({ slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const [post, settings] = await Promise.all([getPostBySlug(params.slug), getSiteSettings().catch(() => null)])
+export async function generateMetadata({ params }: PostRouteProps): Promise<Metadata> {
+  const { slug } = await params
+  const [post, settings] = await Promise.all([getPostBySlug(slug), getSiteSettings().catch(() => null)])
   if (!post) return {}
 
   const title = post.seoTitle || post.title
@@ -55,8 +58,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug)
+export default async function PostPage({ params }: PostRouteProps) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
   if (!post) notFound()
 
   const date = new Date(post.publishedAt).toLocaleDateString('it-IT', {

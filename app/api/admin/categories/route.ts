@@ -3,13 +3,13 @@ import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
 
 export async function GET() {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
   const { rows } = await sql`SELECT id, title, slug FROM categories ORDER BY title`
   return NextResponse.json(rows)
 }
 
 export async function POST(request: Request) {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
   const data = await request.json().catch(() => null)
   const title = typeof data?.title === 'string' ? data.title.trim() : ''
   const slug = typeof data?.slug === 'string' ? data.slug.trim().toLowerCase() : ''

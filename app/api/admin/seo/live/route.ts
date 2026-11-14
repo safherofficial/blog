@@ -9,7 +9,7 @@ export const maxDuration = 60
 
 /** Scansiona il dominio canonico configurato; nessun URL arriva dal client. */
 export async function POST() {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
 
   const configuredSiteUrl = getSiteUrl()
   let siteUrl: URL
