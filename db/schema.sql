@@ -37,6 +37,20 @@ CREATE INDEX IF NOT EXISTS idx_posts_published_at ON posts(published_at DESC);
 CREATE INDEX IF NOT EXISTS idx_posts_category_id ON posts(category_id);
 CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published);
 
+-- Statistiche proprietarie di prima parte.
+CREATE TABLE IF NOT EXISTS site_analytics_events (
+  id BIGSERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  page_path TEXT NOT NULL,
+  source TEXT NOT NULL,
+  medium TEXT,
+  campaign TEXT,
+  referrer_host TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_analytics_events_created_at
+  ON site_analytics_events(created_at);
+
 CREATE TABLE IF NOT EXISTS site_settings (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   site_title TEXT NOT NULL DEFAULT 'Controluce',
@@ -82,3 +96,5 @@ CREATE TRIGGER posts_set_updated_at BEFORE UPDATE ON posts FOR EACH ROW EXECUTE 
 
 DROP TRIGGER IF EXISTS site_settings_set_updated_at ON site_settings;
 CREATE TRIGGER site_settings_set_updated_at BEFORE UPDATE ON site_settings FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- La colonna legacy visitor_hash è rimossa dalla migrazione 0002.

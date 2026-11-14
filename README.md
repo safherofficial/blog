@@ -8,7 +8,7 @@ Articoli, categorie e impostazioni vengono gestiti dal database PostgreSQL colle
 
 Il progetto usa Node.js 26.13.1 e npm 11.20.0. La versione Node locale è indicata in `.nvmrc`, mentre `package.json` dichiara il package manager npm richiesto. La CI verifica entrambe le versioni e installa le dipendenze esclusivamente dal lockfile con `npm ci`.
 
-L'accesso al database usa il driver serverless ufficiale di Neon tramite richieste HTTP. Per mantenere la compatibilità con gli ambienti già configurati, il codice usa `POSTGRES_URL` quando presente e ripiega su `DATABASE_URL` in sua assenza. Non sono richieste modifiche allo schema né una copia dei dati per questo aggiornamento del driver. Non rimuovere la variabile esistente da Vercel senza aver prima verificato quella effettivamente utilizzata dall'ambiente.
+L'accesso al database usa il driver serverless ufficiale di Neon tramite richieste HTTP. Per mantenere la compatibilità con gli ambienti già configurati, il codice usa `POSTGRES_URL` quando presente e ripiega su `DATABASE_URL` in sua assenza. Non rimuovere la variabile esistente da Vercel senza aver prima verificato quella effettivamente utilizzata dall'ambiente.
 
 Imposta le seguenti variabili d'ambiente nel progetto Vercel:
 
@@ -27,19 +27,47 @@ INDEXNOW_KEY=una-chiave-casuale-di-almeno-16-caratteri
 
 `ADMIN_SESSION_SECRET` dovrebbe essere un segreto casuale indipendente dalla password amministrativa. Se non è impostato, il codice usa `ADMIN_PASSWORD` come fallback per mantenere la compatibilità con le installazioni esistenti.
 
-Esegui integralmente `db/schema.sql` nel SQL editor del database Neon. Lo script crea le tabelle `posts`, `categories` e `site_settings`, gli indici e i trigger per `updated_at`.
+## Schema e migrazioni database
+
+Le modifiche allo schema PostgreSQL sono versionate in `db/migrations/`. Il runner crea la tabella `controluce_schema_migrations` e registra per ogni migrazione versione, nome, checksum SHA-256 e data di applicazione.
+
+Per eseguire le migrazioni sul database scelto:
+
+```bash
+npm run db:migrations:check
+npm run db:migrate
+```
+
+Il comando usa `POSTGRES_URL` (preferita) oppure `DATABASE_URL`; legge anche `.env.local` quando presente. Non aggiunge nuove variabili richieste rispetto alla configurazione database esistente.
+
+Il runner:
+- applica le migrazioni in ordine di versione;
+- esegue ogni file in una transazione PostgreSQL separata;
+- usa un advisory lock per impedire due esecuzioni concorrenti;
+- registra una migrazione solo dopo il completamento della relativa transazione;
+- verifica il checksum delle migrazioni già applicate e si arresta se un file storico è stato modificato o rimosso;
+- non esegue automaticamente migrazioni durante build, deploy o richieste del sito.
+
+**Regola:** non modificare mai un file SQL già applicato. Per ogni modifica successiva crea un nuovo file, con il successivo numero progressivo, ad esempio `0003_add_example_field.sql`. Verifica prima la migrazione su un database di prova e conserva un backup prima delle modifiche che possono alterare o eliminare dati.
+
+La migrazione `0001_initial_schema.sql` riproduce lo schema corrente con istruzioni `IF NOT EXISTS`, così può inizializzare un database vuoto o stabilire la baseline su un database già creato con il precedente `db/schema.sql`. La migrazione `0002_remove_legacy_analytics_visitor_hash.sql` rimuove soltanto la vecchia colonna identificativa non più usata dalle statistiche. Le migrazioni sono transazionali e il runner non riscrive i record già registrati.
+
+`db/schema.sql` resta disponibile come schema di bootstrap e riferimento leggibile; per i nuovi ambienti è preferibile usare il runner, in modo che anche il registro delle migrazioni venga creato e mantenuto.
+
+**Nota operativa:** il repository non contiene credenziali di database e il runner non viene eseguito da Vercel. Dopo aver configurato localmente la connessione al database corretto, esegui `npm run db:migrate` una sola volta per registrare la baseline e applicare le migrazioni pendenti. Le API mantengono temporaneamente le protezioni di inizializzazione compatibili con i database già esistenti; la loro rimozione sarà possibile dopo aver verificato l'applicazione delle migrazioni sul database effettivo.
 
 ## Sviluppo, build e controlli
 
 ```bash
 npm ci
 npm run dev
+npm run db:migrations:check
 npm run lint
 npm run typecheck
 npm run build
 ```
 
-La GitHub Action esegue `npm ci`, lint, controllo TypeScript e build su push e pull request. `package-lock.json` deve restare versionato: aggiorna le dipendenze intenzionalmente con npm 11.20.0 e committa insieme `package.json` il lockfile risultante.
+La GitHub Action esegue `npm ci`, controllo dei file di migrazione, lint, controllo TypeScript e build. `package-lock.json` deve restare versionato: aggiorna le dipendenze intenzionalmente con npm 11.20.0 e committa insieme `package.json` il lockfile risultante.
 
 ## Pannello editoriale
 
@@ -105,5 +133,7 @@ components/        → componenti UI
 lib/db/            → accesso Postgres e query contenuti
 lib/content/       → editor, validazione e contenuti
 lib/admin-auth.ts  → sessione amministrativa
-db/schema.sql      → schema database
+db/schema.sql      → schema database di bootstrap
+db/migrations/     → migrazioni PostgreSQL versionate
+scripts/migrate.mjs → runner per applicarle
 ```
