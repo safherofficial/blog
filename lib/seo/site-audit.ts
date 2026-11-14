@@ -33,7 +33,15 @@ export type SiteAuditInput = {
   posts: AuditPostRow[]
   categories: Array<{ id: string; title: string; slug: string }>
   settings: AuditSettingsRow
-  env: { siteUrl: string; siteUrlConfigured: boolean; sessionSecretConfigured: boolean; indexNowConfigured?: boolean; verificationConfigured?: boolean }
+  env: {
+    siteUrl: string
+    siteUrlConfigured: boolean
+    sessionSecretConfigured: boolean
+    sessionSecretFallbackAvailable?: boolean
+    indexNowConfigured?: boolean
+    googleVerificationConfigured?: boolean
+    bingVerificationConfigured?: boolean
+  }
   /** Origine su cui il sito sta rispondendo in questo momento. */
   origin: string
   now?: number
@@ -75,10 +83,6 @@ function toDraft(row: AuditPostRow): PostDraft {
   }
 }
 
-const hostOf = (url: string): string => {
-  try { return new URL(url).host } catch { return '' }
-}
-
 export function auditSite(input: SiteAuditInput): SiteAudit {
   const now = input.now ?? Date.now()
   const { env, settings } = input
@@ -87,27 +91,51 @@ export function auditSite(input: SiteAuditInput): SiteAudit {
     siteIssues.push({ id, severity, category, message, hint })
 
   // ---------- Configurazione ----------
+  let parsedSiteUrl: URL | null = null
   if (!env.siteUrlConfigured) {
-    add('error', 'env-site-url', 'SITE_URL non è configurata.', `Canonical, sitemap, robots, feed RSS e dati strutturati puntano a ${env.siteUrl}, che potrebbe non essere il tuo dominio. Imposta la variabile su Vercel con l’indirizzo reale del sito e rifai il deploy.`, 'technical')
-  } else if (!env.siteUrl.startsWith('https://')) {
-    add('error', 'env-site-https', 'L’URL del sito non usa HTTPS.', 'Google privilegia i siti sicuri e segnala quelli senza HTTPS.', 'technical')
+    add('error', 'env-site-url', 'SITE_URL non è configurata.', `Il sito usa temporaneamente ${env.siteUrl} come ripiego. Imposta SITE_URL su Vercel con il dominio canonico reale e rifai il deploy.`, 'technical')
   } else {
-    const originHost = hostOf(input.origin)
-    const siteHost = hostOf(env.siteUrl)
-    if (originHost && siteHost && originHost !== siteHost) {
-      add('warning', 'env-host-mismatch', `Il sito risponde su ${originHost} ma l’URL canonico configurato è ${siteHost}.`, 'Se entrambi gli indirizzi sono pubblici Google può vedere contenuti duplicati. Imposta un redirect 301 verso il dominio principale.', 'technical')
-    } else if (siteHost.endsWith('.vercel.app')) {
-      add('info', 'env-vercel-domain', 'Il sito usa un dominio vercel.app.', 'Funziona, ma un dominio personalizzato è più affidabile e portabile nel tempo.', 'technical')
+    try {
+      const parsed = new URL(env.siteUrl)
+      if (!['https:', 'http:'].includes(parsed.protocol) || !parsed.hostname || parsed.pathname !== '/' || parsed.search || parsed.hash || parsed.username || parsed.password) {
+        throw new Error('Formato SITE_URL non valido')
+      }
+      parsedSiteUrl = parsed
+    } catch {
+      add('error', 'env-site-url-invalid', 'SITE_URL non è un URL valido del dominio.', 'Usa un URL assoluto come https://controluce.blog, senza percorsi, parametri o frammenti.', 'technical')
     }
   }
-  if (env.indexNowConfigured === false) {
-    add('info', 'env-indexnow', 'IndexNow non è configurato.', 'Imposta INDEXNOW_KEY (una stringa casuale di 16-64 caratteri alfanumerici): Bing e gli altri motori compatibili saranno avvisati appena pubblichi, senza aspettare la scansione.', 'technical')
+
+  if (parsedSiteUrl) {
+    if (parsedSiteUrl.protocol !== 'https:') {
+      add('error', 'env-site-https', 'L’URL del sito non usa HTTPS.', 'Imposta SITE_URL con https:// e verifica che il certificato SSL del dominio sia attivo.', 'technical')
+    } else {
+      let originHost = ''
+      try { originHost = new URL(input.origin).host } catch { /* l'origine della richiesta è fornita dal server */ }
+      const siteHost = parsedSiteUrl.host
+      if (originHost && siteHost && originHost !== siteHost) {
+        add('warning', 'env-host-mismatch', `Il pannello risponde su ${originHost} ma il dominio canonico configurato è ${siteHost}.`, 'Apri l’amministrazione dal dominio principale e configura un redirect 301 dagli eventuali domini alternativi.', 'technical')
+      } else if (siteHost.endsWith('.vercel.app')) {
+        add('info', 'env-vercel-domain', 'Il sito usa un dominio vercel.app.', 'Funziona, ma è preferibile usare il dominio personalizzato definitivo.', 'technical')
+      }
+    }
   }
-  if (env.verificationConfigured === false) {
-    add('info', 'env-verification', 'Il sito non è verificato in Google Search Console e Bing Webmaster Tools.', 'Imposta GOOGLE_SITE_VERIFICATION e BING_SITE_VERIFICATION con i codici forniti dai due strumenti: vedrai indicizzazione, errori e query di ricerca.', 'technical')
+
+  if (env.indexNowConfigured === false) {
+    add('info', 'env-indexnow', 'IndexNow non è configurato.', 'Imposta INDEXNOW_KEY con la chiave generata da Bing e verifica che /indexnow.txt restituisca esattamente la stessa chiave.', 'technical')
+  }
+  if (env.googleVerificationConfigured === false) {
+    add('info', 'env-google-verification', 'Non è configurato un token meta di Google Search Console.', 'Imposta GOOGLE_SITE_VERIFICATION solo se usi la verifica tramite tag HTML. Se la proprietà è stata verificata tramite DNS TXT, questo controllo non può rilevarlo: conferma lo stato direttamente in Search Console.', 'technical')
+  }
+  if (env.bingVerificationConfigured === false) {
+    add('info', 'env-bing-verification', 'Non è disponibile un token meta di Bing Webmaster Tools.', 'Imposta BING_SITE_VERIFICATION con il codice fornito da Bing oppure verifica la proprietà tramite DNS. La presenza del token non dimostra da sola che la proprietà sia stata verificata.', 'technical')
   }
   if (!env.sessionSecretConfigured) {
-    add('warning', 'env-session-secret', 'ADMIN_SESSION_SECRET non è impostata.', 'Le sessioni admin usano la password come chiave di firma. Imposta un segreto casuale distinto.', 'technical')
+    if (env.sessionSecretFallbackAvailable) {
+      add('info', 'env-session-secret-recommended', 'ADMIN_SESSION_SECRET non è impostata: la sessione admin usa ADMIN_PASSWORD come chiave di ripiego.', 'L’accesso continua a funzionare, ma è preferibile impostare un segreto casuale distinto dalla password amministrativa.', 'technical')
+    } else {
+      add('error', 'env-session-secret-missing', 'Non risulta configurata una chiave per firmare le sessioni admin.', 'Imposta ADMIN_PASSWORD e un ADMIN_SESSION_SECRET casuale e distinto su Vercel.', 'technical')
+    }
   }
 
   // ---------- Articoli ----------
@@ -145,11 +173,11 @@ export function auditSite(input: SiteAuditInput): SiteAudit {
     }
   }
 
-  // Categorie vuote: finiscono in sitemap ma non hanno contenuti.
+  // Le categorie vuote sono escluse dalla sitemap e le relative pagine sono noindex.
   const publicCategoryIds = new Set(input.posts.filter((p) => p.published && new Date(p.published_at).getTime() <= now).map((p) => p.category_id))
   const emptyCategories = input.categories.filter((c) => !publicCategoryIds.has(c.id))
   if (emptyCategories.length > 0) {
-    add('warning', 'empty-categories', `${emptyCategories.length} categori${emptyCategories.length === 1 ? 'a è vuota' : 'e sono vuote'}: ${emptyCategories.map((c) => c.title).join(', ')}.`, 'Le pagine categoria senza articoli sono nella sitemap ma non hanno contenuto: Google le tratta come pagine di scarso valore. Assegna articoli o elimina la categoria.', 'content')
+    add('info', 'empty-categories', `${emptyCategories.length} categori${emptyCategories.length === 1 ? 'a è vuota' : 'e sono vuote'}: ${emptyCategories.map((c) => c.title).join(', ')}.`, 'Le pagine categoria senza articoli sono impostate noindex e non vengono inserite nella sitemap. Non sono un errore tecnico; aggiungi contenuti quando vuoi renderle utili ai lettori.', 'content')
   }
 
   // ---------- Impostazioni del sito ----------

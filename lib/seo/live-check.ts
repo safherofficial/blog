@@ -3,7 +3,7 @@ import { inspectHtml, type PageFacts } from './html-inspect'
 import type { SeoIssue } from './types'
 
 export type LiveCheckInput = {
-  /** Origine su cui interrogare il sito (quella della richiesta corrente). */
+  /** Origine canonica da interrogare, ricavata da SITE_URL. */
   origin: string
   /** URL canonico configurato (SITE_URL o il valore di ripiego). */
   siteUrl: string
@@ -25,12 +25,20 @@ export type LiveCheck = {
   score: number
   global: SeoIssue[]
   pages: LivePage[]
-  summary: { pages: number; errors: number; warnings: number; averageMs: number | null }
+  summary: {
+    pages: number
+    totalAvailablePages: number
+    truncated: boolean
+    errors: number
+    warnings: number
+    averageMs: number | null
+  }
 }
 
-const MAX_PAGES = 40
+const MAX_PAGES = 32
 const CONCURRENCY = 4
-const TIMEOUT_MS = 8000
+// 8 ondate di 4 pagine da 5s = massimo circa 40s, più i controlli globali in parallelo.
+const TIMEOUT_MS = 5000
 
 async function get(url: string): Promise<{ status: number; ms: number; headers: Headers; body: string }> {
   const started = Date.now()
@@ -105,50 +113,68 @@ async function checkGlobals(input: LiveCheckInput, expectedPaths: string[]): Pro
     issues.push({ id, severity, category: 'technical', message, hint })
   const siteHost = new URL(input.siteUrl).host
 
-  try {
-    const robots = await get(input.origin + '/robots.txt')
-    if (robots.status !== 200) add('error', 'robots-missing', `robots.txt risponde ${robots.status}.`)
-    else {
-      if (/^\s*Disallow:\s*\/\s*$/im.test(robots.body)) add('error', 'robots-blocks-all', 'robots.txt blocca l’intero sito (Disallow: /).', 'Google non scansionerà nessuna pagina.')
-      if (!/^\s*Sitemap:/im.test(robots.body)) add('warning', 'robots-no-sitemap', 'robots.txt non indica la sitemap.')
-      else add('good', 'robots-ok', 'robots.txt raggiungibile e con riferimento alla sitemap.')
-    }
-  } catch { add('error', 'robots-unreachable', 'robots.txt non raggiungibile.') }
+  // I tre controlli indipendenti vengono eseguiti in parallelo per rispettare il limite della funzione Vercel.
+  const [robots, sitemap, feed] = await Promise.all([
+    get(input.origin + '/robots.txt').catch(() => null),
+    get(input.origin + '/sitemap.xml').catch(() => null),
+    get(input.origin + '/feed.xml').catch(() => null),
+  ])
 
-  try {
-    const sitemap = await get(input.origin + '/sitemap.xml')
-    if (sitemap.status !== 200) add('error', 'sitemap-missing', `sitemap.xml risponde ${sitemap.status}.`, 'Senza sitemap Google scopre i nuovi articoli più lentamente.')
-    else {
-      const locs = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim())
-      if (locs.length === 0) add('error', 'sitemap-empty', 'La sitemap è vuota.')
-      else {
-        const foreign = locs.filter((loc) => { try { return new URL(loc).host !== new URL(input.origin).host } catch { return true } })
-        if (foreign.length > 0 && siteHost !== new URL(input.origin).host) {
-          add('error', 'sitemap-host', `La sitemap elenca ${foreign.length} URL su ${siteHost}, ma il sito risponde su ${new URL(input.origin).host}.`, 'Google scarterà quegli URL: correggi SITE_URL.')
-        }
-        const present = new Set(locs.map((l) => { try { return trimSlash(new URL(l).pathname) } catch { return l } }))
-        const missing = expectedPaths.filter((p) => p.startsWith('/blog/') && !present.has(trimSlash(p)))
-        if (missing.length > 0) add('warning', 'sitemap-missing-posts', `${missing.length} articol${missing.length === 1 ? 'o pubblico manca' : 'i pubblici mancano'} nella sitemap.`, 'La sitemap si aggiorna ogni 5 minuti: se è un articolo appena pubblicato, ricontrolla più tardi.')
-        else add('good', 'sitemap-ok', `Sitemap raggiungibile con ${locs.length} URL.`)
+  if (!robots) {
+    add('error', 'robots-unreachable', 'robots.txt non raggiungibile.')
+  } else if (robots.status !== 200) {
+    add('error', 'robots-missing', `robots.txt risponde ${robots.status}.`)
+  } else {
+    if (/^\s*Disallow:\s*\/\s*$/im.test(robots.body)) add('error', 'robots-blocks-all', 'robots.txt blocca l’intero sito (Disallow: /).', 'Google non scansionerà nessuna pagina.')
+    if (!/^\s*Sitemap:/im.test(robots.body)) add('warning', 'robots-no-sitemap', 'robots.txt non indica la sitemap.')
+    else add('good', 'robots-ok', 'robots.txt raggiungibile e con riferimento alla sitemap.')
+  }
+
+  if (!sitemap) {
+    add('error', 'sitemap-unreachable', 'sitemap.xml non raggiungibile.')
+  } else if (sitemap.status !== 200) {
+    add('error', 'sitemap-missing', `sitemap.xml risponde ${sitemap.status}.`, 'Senza sitemap Google scopre i nuovi articoli più lentamente.')
+  } else {
+    const locs = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim())
+    if (locs.length === 0) {
+      add('error', 'sitemap-empty', 'La sitemap è vuota.')
+    } else {
+      const foreign = locs.filter((loc) => {
+        try { return new URL(loc).host !== siteHost } catch { return true }
+      })
+      if (foreign.length > 0) {
+        add('error', 'sitemap-host', `La sitemap contiene ${foreign.length} URL su un host diverso dal dominio canonico ${siteHost}.`, 'Verifica SITE_URL e assicurati che tutte le voci della sitemap puntino al dominio principale.')
       }
+      const present = new Set(locs.map((loc) => {
+        try { return trimSlash(new URL(loc).pathname) } catch { return loc }
+      }))
+      const missing = expectedPaths.filter((path) => path.startsWith('/blog/') && !present.has(trimSlash(path)))
+      if (missing.length > 0) add('warning', 'sitemap-missing-posts', `${missing.length} articol${missing.length === 1 ? 'o pubblico manca' : 'i pubblici mancano'} nella sitemap.`, 'La sitemap si aggiorna ogni 5 minuti: se è un articolo appena pubblicato, ricontrolla più tardi.')
+      else if (foreign.length === 0) add('good', 'sitemap-ok', `Sitemap raggiungibile con ${locs.length} URL.`)
     }
-  } catch { add('error', 'sitemap-unreachable', 'sitemap.xml non raggiungibile.') }
+  }
 
-  try {
-    const feed = await get(input.origin + '/feed.xml')
-    if (feed.status !== 200) add('warning', 'feed-missing', `Il feed RSS risponde ${feed.status}.`)
-  } catch { add('warning', 'feed-unreachable', 'Il feed RSS non è raggiungibile.') }
+  if (!feed) add('warning', 'feed-unreachable', 'Il feed RSS non è raggiungibile.')
+  else if (feed.status !== 200) add('warning', 'feed-missing', `Il feed RSS risponde ${feed.status}.`)
 
   return issues
 }
 
 export async function runLiveCheck(input: LiveCheckInput): Promise<LiveCheck> {
-  const paths = [
-    '/', '/about', '/privacy-policy',
-    ...input.postSlugs.map((s) => `/blog/${s}`),
-    ...input.categorySlugs.map((s) => `/categoria/${s}`),
-  ].slice(0, MAX_PAGES)
+  const staticPaths = ['/', '/articoli', '/about', '/scrivimi', '/privacy-policy', '/rss']
+  const postPaths = input.postSlugs.map((slug) => `/blog/${slug}`)
+  const categoryPaths = input.categorySlugs.map((slug) => `/categoria/${slug}`)
+  const allPaths = [...new Set([...staticPaths, ...postPaths, ...categoryPaths])]
+  const selectedContentPaths: string[] = []
+  const contentLimit = MAX_PAGES - staticPaths.length
 
+  // Alterna articoli e categorie: un elenco di articoli molto lungo non esclude tutte le categorie dal campione.
+  for (let index = 0; selectedContentPaths.length < contentLimit && (index < postPaths.length || index < categoryPaths.length); index += 1) {
+    if (postPaths[index]) selectedContentPaths.push(postPaths[index])
+    if (categoryPaths[index] && selectedContentPaths.length < contentLimit) selectedContentPaths.push(categoryPaths[index])
+  }
+
+  const paths = [...new Set([...staticPaths, ...selectedContentPaths])].slice(0, MAX_PAGES)
   const global = await checkGlobals(input, paths)
   const pages: LivePage[] = new Array(paths.length)
   let cursor = 0
@@ -159,11 +185,11 @@ export async function runLiveCheck(input: LiveCheckInput): Promise<LiveCheck> {
     }
   }))
 
-  const all = [...global, ...pages.flatMap((p) => p.issues)]
-  const errors = all.filter((i) => i.severity === 'error').length
-  const warnings = all.filter((i) => i.severity === 'warning').length
-  const timings = pages.map((p) => p.ms).filter((ms): ms is number => typeof ms === 'number')
-  const penalty = all.reduce((sum, i) => sum + SEVERITY_WEIGHT[i.severity], 0)
+  const all = [...global, ...pages.flatMap((page) => page.issues)]
+  const errors = all.filter((issue) => issue.severity === 'error').length
+  const warnings = all.filter((issue) => issue.severity === 'warning').length
+  const timings = pages.map((page) => page.ms).filter((ms): ms is number => typeof ms === 'number')
+  const penalty = all.reduce((sum, issue) => sum + SEVERITY_WEIGHT[issue.severity], 0)
 
   return {
     checkedAt: new Date().toISOString(),
@@ -171,6 +197,13 @@ export async function runLiveCheck(input: LiveCheckInput): Promise<LiveCheck> {
     score: Math.max(0, 100 - Math.round(penalty / Math.max(1, Math.sqrt(pages.length)))),
     global,
     pages,
-    summary: { pages: pages.length, errors, warnings, averageMs: timings.length ? Math.round(timings.reduce((a, b) => a + b, 0) / timings.length) : null },
+    summary: {
+      pages: pages.length,
+      totalAvailablePages: allPaths.length,
+      truncated: allPaths.length > pages.length,
+      errors,
+      warnings,
+      averageMs: timings.length ? Math.round(timings.reduce((a, b) => a + b, 0) / timings.length) : null,
+    },
   }
 }
