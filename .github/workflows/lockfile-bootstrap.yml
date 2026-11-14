@@ -5,7 +5,7 @@ on:
     branches: ["fix/u4-lockfile"]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate-lockfile:
@@ -28,6 +28,17 @@ jobs:
             node --version
             npm --version
           } > lock-artifact/toolchain.txt
+      - name: Commit generated lockfile to the working branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "package-lock.json is already up to date"
+          else
+            git commit -m "Add npm lockfile generated with Node 26.13.1 and npm 11.20.0"
+            git push origin HEAD:fix/u4-lockfile
+          fi
       - name: Upload generated lockfile
         uses: actions/upload-artifact@v4
         with:
