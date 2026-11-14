@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { isDatabaseConfigured, sql } from '@/lib/db'
+import { cleanupOldAnalyticsEvents } from '@/lib/analytics-retention'
 import { isStatsRequest } from '@/lib/stats-auth'
 
 export const runtime = 'nodejs'
@@ -12,6 +13,7 @@ async function ensureTable() {
         id BIGSERIAL PRIMARY KEY, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         page_path TEXT NOT NULL, source TEXT NOT NULL, medium TEXT, campaign TEXT, referrer_host TEXT
       )`
+      await sql`CREATE INDEX IF NOT EXISTS idx_site_analytics_events_created_at ON site_analytics_events(created_at)`
       await sql`ALTER TABLE site_analytics_events DROP COLUMN IF EXISTS visitor_hash`
     })().catch((error) => { tableReady = null; throw error })
   }
@@ -23,6 +25,7 @@ export async function GET() {
   if (!isDatabaseConfigured()) return NextResponse.json({ error: 'Database non configurato.' }, { status: 503 })
   try {
     await ensureTable()
+    await cleanupOldAnalyticsEvents()
     const [totals, daily, sources, hours, pages] = await Promise.all([
       sql`SELECT COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE created_at >= date_trunc('day', NOW() AT TIME ZONE 'Europe/Rome') AT TIME ZONE 'Europe/Rome')::int AS today,
