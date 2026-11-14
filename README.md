@@ -47,8 +47,10 @@ Il pannello permette di creare, modificare e cancellare articoli, salvare le boz
 Il pannello include un motore di analisi SEO (`lib/seo/`), pensato per intercettare gli errori che penalizzano il posizionamento su Google, Bing e altri motori.
 
 - **Editor articolo:** punteggio 0-100 in tempo reale, anteprima del risultato Google (desktop e mobile), contatori di lunghezza e un elenco di problemi cliccabili (titolo e descrizione fuori misura, duplicati, slug, thin content, sottotitoli, alt mancanti, immagini `http://`, leggibilità, parola chiave principale). Se cambi lo slug di un articolo già pubblico ricevi un avviso, perché il sito non crea redirect automatici.
-- **Salute SEO:** analisi di tutti gli articoli e della configurazione (`SITE_URL`, dominio canonico, categorie vuote in sitemap, pagina «Chi sono», segreto di sessione).
-- **Scansione del sito pubblicato:** visita le pagine online come un crawler e controlla robots.txt, sitemap, feed, stato HTTP, title, description, canonical, `noindex`, H1, alt delle immagini e tempi di risposta. Interroga solo l'origine corrente.
+- **Salute SEO:** analisi degli articoli e della configurazione (`SITE_URL`, dominio canonico, categorie vuote, pagina «Chi sono», credenziali di sessione). Le categorie vuote sono escluse dalla sitemap e impostate `noindex`.
+- **Scansione del sito pubblicato:** controlla `robots.txt`, sitemap, feed e un campione fino a 32 pagine pubbliche. Scansiona il dominio canonico definito in `SITE_URL`, non necessariamente l'host da cui è stato aperto il pannello; controlla stato HTTP, title, description, canonical, `noindex`, H1, alt delle immagini e tempi di risposta.
+- La presenza di un token meta non certifica che la proprietà sia stata verificata nei servizi esterni. La verifica via DNS TXT non è rilevabile dal pannello.
+- Il pannello non legge impression, clic, query o posizioni medie di Google Search Console: per questi dati occorre consultare Search Console o integrare separatamente la sua API.
 - La parola chiave principale serve solo ai controlli e non viene salvata nel database. Le regole sono funzioni pure in `lib/seo/post-analyzer.ts` e `lib/seo/site-audit.ts`.
 - Mentre scrivi, una copia di sicurezza del testo viene conservata nel browser: se la sessione scade o chiudi la scheda, l'editor propone di ripristinarla.
 
@@ -60,7 +62,7 @@ Il pannello include un motore di analisi SEO (`lib/seo/`), pensato per intercett
 - **Feed RSS** con il testo completo degli ultimi 20 articoli, e **`/llms.txt`**, un indice in Markdown per assistenti AI.
 - **Sitemap** con `lastmod` reale; le categorie vuote non vengono incluse e sono `noindex`.
 - **IndexNow:** con `INDEXNOW_KEY` impostata, a ogni pubblicazione, modifica o eliminazione Bing e gli altri motori compatibili vengono avvisati. Il file di verifica è servito su `/indexnow.txt`.
-- **Verifica proprietà:** `GOOGLE_SITE_VERIFICATION` e `BING_SITE_VERIFICATION` aggiungono i tag di verifica alle pagine.
+- **Verifica proprietà:** `GOOGLE_SITE_VERIFICATION` e `BING_SITE_VERIFICATION` aggiungono i tag di verifica alle pagine. Non sostituiscono la verifica effettiva nel pannello Google/Bing.
 - `/admin` e `/api` non sono mai indicizzabili (header `X-Robots-Tag` e meta `noindex`).
 
 ### Formato del corpo articolo
