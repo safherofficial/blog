@@ -121,22 +121,23 @@ export default function SeoDashboard({ onEditPost, notify, onUnauthorized }: { o
 
       <Card
         title="Scansione del sito pubblicato"
-        description="Visita il sito online come farebbe un crawler: controlla robots.txt, sitemap, feed e ogni pagina (stato HTTP, title, description, canonical, noindex, H1, immagini, velocità)."
+        description="Controlla robots.txt, sitemap, feed e un campione fino a 32 pagine pubbliche sul dominio canonico (stato HTTP, title, description, canonical, noindex, H1, immagini e velocità)."
         action={<button type="button" onClick={() => void scan()} disabled={scanning} className={primaryButton}>{scanning ? 'Scansione in corso…' : live ? 'Scansiona di nuovo' : 'Avvia scansione'}</button>}
       >
-        {!live && !scanning && <p className="text-sm text-ink-soft">Può richiedere fino a un minuto con molti articoli. Non modifica nulla.</p>}
-        {scanning && <p role="status" className="text-sm text-ink-soft">Sto visitando le pagine del sito…</p>}
+        {!live && !scanning && <p className="text-sm text-ink-soft">La scansione usa il dominio definito in SITE_URL e visita fino a 32 pagine per restare entro il limite della funzione server. Non modifica nulla.</p>}
+        {scanning && <p role="status" className="text-sm text-ink-soft">Sto visitando le pagine del dominio canonico…</p>}
         {live && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-6">
               <ScoreRing score={live.score} />
               <div className="grid flex-1 grid-cols-3 gap-3">
-                <Stat label="Pagine" value={live.summary.pages} />
+                <Stat label="Pagine verificate" value={live.summary.truncated ? `${live.summary.pages}/${live.summary.totalAvailablePages}` : live.summary.pages} />
                 <Stat label="Errori" value={live.summary.errors} tone={live.summary.errors ? 'text-red-800' : 'text-emerald-800'} />
                 <Stat label="Avvisi" value={live.summary.warnings} tone={live.summary.warnings ? 'text-amber-800' : 'text-emerald-800'} />
               </div>
             </div>
-            <p className="text-xs text-ink-soft">Origine analizzata: {live.origin}{live.summary.averageMs !== null && ` · risposta media ${live.summary.averageMs} ms`}</p>
+            {live.summary.truncated && <p className="text-xs text-ink-soft">È stato analizzato un campione di {live.summary.pages} pagine su {live.summary.totalAvailablePages}. Il controllo include pagine statiche e alterna articoli e categorie; non sostituisce i dati di copertura e rendimento di Search Console.</p>}
+            <p className="text-xs text-ink-soft">Dominio analizzato: {live.origin}{live.summary.averageMs !== null && ` · risposta media ${live.summary.averageMs} ms`}</p>
             {live.global.length > 0 && <div><h3 className="mb-1 font-display text-lg">File del sito</h3><ul className="divide-y divide-line/70">{live.global.map((i) => <IssueRow key={i.id} issue={i} />)}</ul></div>}
             <div>
               <h3 className="mb-2 font-display text-lg">Pagine</h3>
