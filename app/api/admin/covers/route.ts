@@ -50,7 +50,7 @@ function detectImageContentType(bytes: Buffer): 'image/jpeg' | 'image/png' | 'im
 }
 
 export async function POST(request: Request) {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
 
   let formData: FormData
   try {

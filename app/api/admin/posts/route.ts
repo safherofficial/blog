@@ -5,7 +5,7 @@ import { validatePostInput } from '@/lib/content/post-input'
 import { isPubliclyLive, pingIndexNow, postChangePaths } from '@/lib/seo/indexnow'
 
 export async function GET() {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
   const { rows } = await sql`
     SELECT p.id, p.title, p.slug, p.excerpt, p.cover_image_url, p.cover_image_alt,
            p.category_id, p.published_at, p.published, p.body, p.seo_title, p.seo_description,
@@ -17,7 +17,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
 
   const data = await request.json().catch(() => null)
   const parsed = validatePostInput(data)

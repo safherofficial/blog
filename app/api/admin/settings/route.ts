@@ -20,13 +20,13 @@ function text(value: unknown, max: number): string | null {
 }
 
 export async function GET() {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
   const { rows } = await sql`SELECT * FROM site_settings WHERE id=1 LIMIT 1`
   return NextResponse.json(rows[0] || null)
 }
 
 export async function PUT(request: Request) {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
   const data = await request.json().catch(() => null)
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return NextResponse.json({ error: 'Impostazioni non valide.' }, { status: 400 })

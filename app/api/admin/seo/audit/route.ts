@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 const DEFAULT_BING_VERIFICATION = 'C2F2AE380902663B014F3BFFD6AF7A93'
 
 export async function GET(request: Request) {
-  if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+  if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
   try {
     const [posts, categories, settings] = await Promise.all([
       sql`SELECT id, title, slug, excerpt, cover_image_url, cover_image_alt, category_id, published_at, published, body, seo_title, seo_description FROM posts`,

@@ -9,8 +9,8 @@ export const metadata: Metadata = pageMetadata({
   path: '/rss',
 })
 
-export default function RssPage() {
-  const requestHeaders = headers()
+export default async function RssPage() {
+  const requestHeaders = await headers()
   const host = (
     requestHeaders.get('x-forwarded-host') ||
     requestHeaders.get('host') ||

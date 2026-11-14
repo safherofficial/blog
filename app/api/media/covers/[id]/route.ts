@@ -18,8 +18,9 @@ const EXTENSIONS: Record<string, string> = {
   'image/webp': 'webp',
 }
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
-  if (!UUID_PATTERN.test(params.id)) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  if (!UUID_PATTERN.test(id)) {
     return NextResponse.json({ error: 'Immagine non trovata.' }, { status: 404 })
   }
 
@@ -27,7 +28,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     const { rows } = await sql`
       SELECT content_type, encode(data, 'base64') AS data_base64, size_bytes
       FROM controluce_media_assets
-      WHERE id = ${params.id}
+      WHERE id = ${id}
       LIMIT 1
     `
     const asset = rows[0] as CoverAssetRow | undefined
@@ -45,7 +46,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       headers: {
         'Content-Type': asset.content_type,
         'Content-Length': String(image.byteLength),
-        'Content-Disposition': 'inline; filename="controluce-cover-' + params.id + '.' + extension + '"',
+        'Content-Disposition': 'inline; filename="controluce-cover-' + id + '.' + extension + '"',
         'Cache-Control': 'public, max-age=31536000, immutable',
         'X-Content-Type-Options': 'nosniff',
       },

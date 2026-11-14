@@ -19,7 +19,7 @@ async function ensureTable() {
 }
 
 export async function GET() {
-  if (!isStatsRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
+  if (!(await isStatsRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
   if (!process.env.POSTGRES_URL) return NextResponse.json({ error: 'Database non configurato.' }, { status: 503 })
   try {
     await ensureTable()

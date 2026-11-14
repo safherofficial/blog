@@ -9,15 +9,18 @@ import { pageMetadata } from '@/lib/seo/metadata'
 
 export const revalidate = 60
 
+type CategoryRouteProps = { params: Promise<{ slug: string }> }
+
 export async function generateStaticParams() {
   const slugs = await getAllCategorySlugs().catch(() => [])
   return slugs.map((slug) => ({ slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const category = await getCategoryBySlug(params.slug)
+export async function generateMetadata({ params }: CategoryRouteProps): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategoryBySlug(slug)
   if (!category) return {}
-  const posts = await getPostsByCategory(params.slug).catch(() => [])
+  const posts = await getPostsByCategory(slug).catch(() => [])
   const metadata = pageMetadata({
     title: category.title,
     description: `Tutti gli articoli di ${category.title} su Controluce: storie e pensieri raccolti sotto un unico sguardo.`,
@@ -27,11 +30,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return posts.length === 0 ? { ...metadata, robots: { index: false, follow: true } } : metadata
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const category = await getCategoryBySlug(params.slug)
+export default async function CategoryPage({ params }: CategoryRouteProps) {
+  const { slug } = await params
+  const category = await getCategoryBySlug(slug)
   if (!category) notFound()
 
-  const posts = await getPostsByCategory(params.slug).catch(() => [])
+  const posts = await getPostsByCategory(slug).catch(() => [])
 
   return (
     <section className="category-page">

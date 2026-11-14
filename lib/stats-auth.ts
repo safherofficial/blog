@@ -18,9 +18,10 @@ export function createStatsToken(): string {
   return `${payload}.${signature}`
 }
 
-export function isStatsRequest(): boolean {
+export async function isStatsRequest(): Promise<boolean> {
   if (!process.env.STATS_PASSWORD) return false
-  const token = cookies().get(statsCookieName)?.value
+  const cookieStore = await cookies()
+  const token = cookieStore.get(statsCookieName)?.value
   if (!token) return false
   const parts = token.split('.')
   if (parts.length !== 3) return false

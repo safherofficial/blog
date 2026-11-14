@@ -1,4 +1,6 @@
 'use client'
+
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type Data = {
@@ -59,7 +61,7 @@ export default function StatsDashboard() {
     <label htmlFor="stats-password" className="mb-2 block text-xs font-medium">Password di accesso</label>
     <input id="stats-password" type="password" autoComplete="current-password" autoFocus required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-line bg-bg px-4 py-3 text-sm outline-none focus:border-ochre" />
     <button disabled={busy} className="mt-4 w-full bg-wine px-5 py-3 font-mono text-xs uppercase tracking-widest text-white hover:bg-wine-dark disabled:opacity-60">{busy ? 'Accesso…' : 'Accedi'}</button>
-    {error && <p role="alert" className="mt-4 text-sm text-red-800">{error}</p>}<a href="/" className="mt-6 inline-block text-xs text-ink-soft hover:text-wine">← Torna al sito</a>
+    {error && <p role="alert" className="mt-4 text-sm text-red-800">{error}</p>}<Link href="/" className="mt-6 inline-block text-xs text-ink-soft hover:text-wine">← Torna al sito</Link>
   </form></main>
   if (!data) return <main className="min-h-screen bg-bg p-8"><p role="alert">{error || 'Statistiche non disponibili.'}</p><button onClick={() => void load()} className="mt-4 underline">Riprova</button></main>
 
