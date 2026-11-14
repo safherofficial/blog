@@ -1,29 +1,45 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
+import { FALLBACK_SITE_URL } from '@/lib/seo/site'
 import { runLiveCheck } from '@/lib/seo/live-check'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
-const FALLBACK_SITE_URL = 'https://controluce.blog'
-
-/** Scansiona il sito pubblicato come farebbe un crawler. Solo same-origin: nessun URL arriva dal client. */
-export async function POST(request: Request) {
+/** Scansiona il dominio canonico configurato; nessun URL arriva dal client. */
+export async function POST() {
   if (!isAdminRequest()) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
+
+  const configuredSiteUrl = process.env.SITE_URL?.trim() || FALLBACK_SITE_URL
+  let siteUrl: URL
+  try {
+    siteUrl = new URL(configuredSiteUrl)
+    if (!['https:', 'http:'].includes(siteUrl.protocol) || !siteUrl.hostname || siteUrl.pathname !== '/' || siteUrl.search || siteUrl.hash) {
+      throw new Error('SITE_URL deve essere un URL assoluto del dominio, senza percorsi o parametri.')
+    }
+  } catch (error) {
+    console.error('[SEO live] SITE_URL non valida:', error)
+    return NextResponse.json({
+      error: 'SITE_URL non è valida. In Vercel imposta l’indirizzo completo del dominio canonico, ad esempio https://controluce.blog.',
+    }, { status: 500 })
+  }
+
   try {
     const [posts, categories] = await Promise.all([
       sql`SELECT slug FROM posts WHERE published = TRUE AND published_at <= NOW() ORDER BY published_at DESC`,
       sql`SELECT slug FROM categories ORDER BY title`,
     ])
+    const origin = siteUrl.origin
     const result = await runLiveCheck({
-      origin: new URL(request.url).origin,
-      siteUrl: process.env.SITE_URL?.trim() || FALLBACK_SITE_URL,
+      origin,
+      siteUrl: origin,
       postSlugs: posts.rows.map((r) => r.slug as string),
       categorySlugs: categories.rows.map((r) => r.slug as string),
     })
     return NextResponse.json(result)
-  } catch {
-    return NextResponse.json({ error: 'Impossibile completare la scansione del sito.' }, { status: 500 })
+  } catch (error) {
+    console.error('[SEO live] Scansione non riuscita:', error)
+    return NextResponse.json({ error: 'Impossibile completare la scansione del sito. Controlla i log della funzione su Vercel.' }, { status: 500 })
   }
 }
