@@ -28,7 +28,7 @@ export async function POST() {
   try {
     const [posts, categories] = await Promise.all([
       sql`SELECT slug FROM posts WHERE published = TRUE AND published_at <= NOW() ORDER BY published_at DESC`,
-      sql`SELECT slug FROM categories ORDER BY title`,
+      sql`SELECT c.slug FROM categories c WHERE EXISTS (SELECT 1 FROM posts p WHERE p.category_id = c.id AND p.published = TRUE AND p.published_at <= NOW()) ORDER BY c.title`,
     ])
     const origin = siteUrl.origin
     const result = await runLiveCheck({
