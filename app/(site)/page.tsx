@@ -6,6 +6,7 @@ import { getLatestPosts, getPublishedCategories, getSiteSettings } from '@/lib/d
 import { pageMetadata } from '@/lib/seo/metadata'
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from '@/lib/seo/site'
 import { AUTHOR_PEN_NAME } from '@/lib/author'
+import { getCategoryEditorialInfo } from '@/lib/seo/categories'
 
 export const revalidate = 60
 
@@ -92,7 +93,7 @@ export default async function HomePage() {
                   <span className="mr-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Esplora per tema</span>
                   {categories.map((category) => (
                     <Link key={category.slug} href={`/categoria/${category.slug}`} className="border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft transition-colors hover:border-ochre hover:bg-bg-soft hover:text-wine">
-                      {category.title} <span className="text-ochre">{category.count}</span>
+                      {getCategoryEditorialInfo(category.slug, category.title).label} <span className="text-ochre">{category.count}</span>
                     </Link>
                   ))}
                 </nav>

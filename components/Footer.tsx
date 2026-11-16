@@ -1,6 +1,9 @@
 import Link from 'next/link'
+import { getCategoryEditorialInfo } from '@/lib/seo/categories'
 
-export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { siteTitle?: string | null; instagramUrl?: string | null }) {
+type FooterCategory = { title: string; slug: string; count: number }
+
+export default function Footer({ siteTitle = 'Controluce', instagramUrl, categories = [] }: { siteTitle?: string | null; instagramUrl?: string | null; categories?: FooterCategory[] }) {
   return (
     <footer className="site-footer relative overflow-hidden border-t border-[#4A392A] bg-ink text-bg">
       <div className="footer-light" aria-hidden="true" />
@@ -24,6 +27,18 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
         </nav>
 
         <div className="md:text-right">
+          {categories.length > 0 && (
+            <nav aria-label="Categorie del blog" className="mb-8">
+              <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-[#D5B27F]">Esplora per tema</p>
+              <div className="flex flex-wrap gap-x-4 gap-y-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#D5C7B7] md:justify-end">
+                {categories.map((category) => (
+                  <Link key={category.slug} href={`/categoria/${category.slug}`} className="footer-link nav-link transition-colors hover:text-[#D5B27F]">
+                    {getCategoryEditorialInfo(category.slug, category.title).label} ({category.count})
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          )}
           <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-[#D5B27F]">Segui e partecipa</p>
           <p className="mb-5 max-w-[34ch] font-serif leading-relaxed text-[#D5C7B7] md:ml-auto">
             Puoi seguire i nuovi articoli tramite il feed RSS{instagramUrl ? ' e trovare gli aggiornamenti anche su Instagram' : ''}. Per condividere un pensiero o suggerire un tema, c&apos;è lo spazio Parliamone.

@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless'
+import { getRelatedCategorySlugs } from '@/lib/seo/categories'
 
 type NeonQueryResult<Row> = {
   rows: Row[]
@@ -274,37 +275,7 @@ export async function getPostsByCategory(slug: string): Promise<PostSummary[]> {
 
 export async function getRelatedPosts(currentId: string, categorySlug?: string | null, limit = 3): Promise<PostSummary[]> {
   const safeLimit = Math.max(1, Math.min(limit, 20))
-  if (categorySlug) {
-    const { rows: sameCategory } = await sql<PostSummary>`
-      SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
-             CASE WHEN p.cover_image_url IS NULL THEN NULL
-                  ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-             p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
-             json_build_object('title', c.title, 'slug', c.slug) AS category
-      FROM posts p
-      INNER JOIN categories c ON c.id = p.category_id
-      WHERE p.id <> ${currentId} AND p.published = TRUE AND p.published_at <= NOW() AND c.slug = ${categorySlug}
-      ORDER BY p.published_at DESC LIMIT ${safeLimit}
-    `
-    if (sameCategory.length >= safeLimit) return sameCategory
-
-    const excludeIds = [currentId, ...sameCategory.map((p) => p._id)]
-    const excludeIdsLiteral = `{${excludeIds.join(',')}}`
-    const { rows: fillers } = await sql<PostSummary>`
-      SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
-             CASE WHEN p.cover_image_url IS NULL THEN NULL
-                  ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
-             p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
-             CASE WHEN c.id IS NULL THEN NULL
-                  ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
-      FROM posts p
-      LEFT JOIN categories c ON c.id = p.category_id
-      WHERE p.published = TRUE AND p.published_at <= NOW() AND NOT (p.id = ANY(${excludeIdsLiteral}::uuid[]))
-      ORDER BY p.published_at DESC LIMIT ${safeLimit - sameCategory.length}
-    `
-    return [...sameCategory, ...fillers]
-  }
-
+  const relatedSlugs = categorySlug ? getRelatedCategorySlugs(categorySlug) : []
   const { rows } = await sql<PostSummary>`
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
            CASE WHEN p.cover_image_url IS NULL THEN NULL
@@ -315,7 +286,17 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
     WHERE p.id <> ${currentId} AND p.published = TRUE AND p.published_at <= NOW()
-    ORDER BY p.published_at DESC LIMIT ${safeLimit}
+    ORDER BY
+      CASE
+        WHEN c.slug = ${categorySlug} THEN 0
+        WHEN c.slug = ${relatedSlugs[0] || null}
+          OR c.slug = ${relatedSlugs[1] || null}
+          OR c.slug = ${relatedSlugs[2] || null} THEN 1
+        ELSE 2
+      END ASC,
+      p.published_at DESC,
+      p.id ASC
+    LIMIT ${safeLimit}
   `
   return rows
 }

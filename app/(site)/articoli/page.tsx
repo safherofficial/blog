@@ -6,6 +6,7 @@ import type { ArchiveSort } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
+import { getCategoryEditorialInfo } from '@/lib/seo/categories'
 
 export const revalidate = 60
 
@@ -42,6 +43,7 @@ export default async function ArchivePage({
   const categorySlug = categories.some((category) => category.slug === requestedCategory)
     ? requestedCategory
     : ''
+  const selectedCategory = categories.find((category) => category.slug === categorySlug)
 
   const filters = {
     query,
@@ -77,13 +79,8 @@ export default async function ArchivePage({
     return encoded ? `/articoli?${encoded}` : '/articoli'
   }
 
-  const categoryUrl = (slug: string) => {
-    const next = new URLSearchParams()
-    if (query) next.set('q', query)
-    next.set('categoria', slug)
-    if (sort !== 'newest') next.set('ordine', sort)
-    return `/articoli?${next.toString()}`
-  }
+  // Le categorie hanno archivi canonici autonomi: i link tematici puntano direttamente a quelle pagine.
+  const categoryUrl = (slug: string) => `/categoria/${slug}`
 
   return (
     <section className="archive-page">
@@ -138,7 +135,7 @@ export default async function ArchivePage({
               >
                 <option value="">Tutte le categorie</option>
                 {categories.map((category) => (
-                  <option key={category.slug} value={category.slug}>{category.title} ({category.count})</option>
+                  <option key={category.slug} value={category.slug}>{getCategoryEditorialInfo(category.slug, category.title).label} ({category.count})</option>
                 ))}
               </select>
             </div>
@@ -164,7 +161,7 @@ export default async function ArchivePage({
           {(query || categorySlug || sort !== 'newest') && (
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
               <p className="text-sm text-ink-soft">
-                Filtri attivi{query ? <> · ricerca: <strong className="font-medium text-ink">“{query}”</strong></> : null}{categorySlug ? <> · {categories.find((category) => category.slug === categorySlug)?.title}</> : null}{sort === 'oldest' ? ' · dal meno recente' : ''}
+                Filtri attivi{query ? <> · ricerca: <strong className="font-medium text-ink">“{query}”</strong></> : null}{categorySlug ? <> · {selectedCategory ? getCategoryEditorialInfo(categorySlug, selectedCategory.title).label : ''}</> : null}{sort === 'oldest' ? ' · dal meno recente' : ''}
               </p>
               <Link href="/articoli" className="nav-link font-mono text-[10px] uppercase tracking-[0.16em] text-wine">Azzera filtri ↗</Link>
             </div>
@@ -181,7 +178,7 @@ export default async function ArchivePage({
                 aria-current={categorySlug === category.slug ? 'true' : undefined}
                 className={`border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors ${categorySlug === category.slug ? 'border-wine bg-wine text-bg' : 'border-line text-ink-soft hover:border-ochre hover:bg-bg-soft hover:text-wine'}`}
               >
-                {category.title} <span className="opacity-75">{category.count}</span>
+                {getCategoryEditorialInfo(category.slug, category.title).label} <span className="opacity-75">{category.count}</span>
               </Link>
             ))}
           </nav>

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import CropFrame from './CropFrame'
 import type { PostSummary } from '@/lib/db'
 import { isUploadedCoverImageUrl } from '@/lib/content/images'
+import { getCategoryEditorialInfo } from '@/lib/seo/categories'
 
 const gradients = [
   'from-[#8D6E47] to-[#35241B]',
@@ -40,7 +41,7 @@ export default function PostCard({ post, index = 0, featured = false, headingLev
       <div className={featured ? 'lg:col-span-5' : ''}>
       <p className="mb-3 flex flex-wrap items-center gap-x-2 font-mono text-[10px] uppercase tracking-[0.13em] text-ink-soft">
         {post.category ? (
-          <Link href={`/categoria/${post.category.slug}`} className="nav-link text-wine transition-colors hover:text-ochre">{post.category.title}</Link>
+          <Link href={`/categoria/${post.category.slug}`} className="nav-link text-wine transition-colors hover:text-ochre">{getCategoryEditorialInfo(post.category.slug, post.category.title).label}</Link>
         ) : 'Blog'}
         <span aria-hidden="true" className="text-ochre">/</span>
         <time dateTime={post.publishedAt}>{date}</time>

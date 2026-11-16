@@ -17,6 +17,7 @@ import ShareButtons from '@/components/ShareButtons'
 import AuthorCard from '@/components/AuthorCard'
 import PostNav from '@/components/PostNav'
 import { AUTHOR_PEN_NAME } from '@/lib/author'
+import { getCategoryEditorialInfo } from '@/lib/seo/categories'
 
 export const revalidate = 60
 
@@ -107,7 +108,7 @@ export default async function PostPage({ params }: PostRouteProps) {
               url: `${siteUrl}/blog/${post.slug}`,
               mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/blog/${post.slug}` },
               image: coverImageUrl || `${siteUrl}/blog/${post.slug}/og`,
-              articleSection: post.category?.title,
+              articleSection: post.category ? getCategoryEditorialInfo(post.category.slug, post.category.title).label : undefined,
               wordCount: bodyWordCount(post.body),
               timeRequired: `PT${minutes}M`,
               isPartOf: { '@type': 'Blog', '@id': `${siteUrl}/#blog`, name: settings?.siteTitle || 'Controluce' },
@@ -119,7 +120,7 @@ export default async function PostPage({ params }: PostRouteProps) {
             breadcrumbJsonLd([
               { name: 'Home', path: '/' },
               { name: 'Articoli', path: '/articoli' },
-              ...(post.category ? [{ name: post.category.title, path: `/categoria/${post.category.slug}` }] : []),
+              ...(post.category ? [{ name: getCategoryEditorialInfo(post.category.slug, post.category.title).label, path: `/categoria/${post.category.slug}` }] : []),
               { name: post.title, path: `/blog/${post.slug}` },
             ]),
           ]),
@@ -138,7 +139,7 @@ export default async function PostPage({ params }: PostRouteProps) {
           <p className="article-category mb-5 font-mono text-[10px] uppercase tracking-[0.26em]">
             {post.category ? (
               <Link href={`/categoria/${post.category.slug}`} className="nav-link">
-                {post.category.title}
+                {getCategoryEditorialInfo(post.category.slug, post.category.title).label}
               </Link>
             ) : (
               'Dal diario'
