@@ -1,4 +1,4 @@
-import { shortText } from '@/lib/content/article'
+import { AUTHOR_DESCRIPTION, AUTHOR_PEN_NAME } from '@/lib/author'
 import type { SiteSettings } from '@/lib/db'
 import { absoluteUrl, DEFAULT_DESCRIPTION, getSiteUrl, SITE_NAME } from './site'
 
@@ -19,17 +19,13 @@ export function organizationJsonLd(settings: SiteSettings | null): Json {
   }
 }
 
-export function personJsonLd(settings: SiteSettings | null): Json | undefined {
-  const name = settings?.authorName?.trim()
-  if (!name) return undefined
-  const description = shortText(settings?.authorBio, 300)
+export function personJsonLd(settings: SiteSettings | null): Json {
   return {
     '@type': 'Person',
     '@id': `${getSiteUrl()}/#author`,
-    name,
+    name: AUTHOR_PEN_NAME,
     url: absoluteUrl('/about'),
-    ...(settings?.authorPhoto?.url ? { image: settings.authorPhoto.url } : {}),
-    ...(description ? { description } : {}),
+    description: AUTHOR_DESCRIPTION,
     ...(settings?.instagramUrl ? { sameAs: [settings.instagramUrl] } : {}),
     worksFor: { '@id': `${getSiteUrl()}/#organization` },
   }

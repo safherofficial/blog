@@ -1,6 +1,7 @@
 import { getAllPosts, getPostBySlug, getSiteSettings } from '@/lib/db'
 import { portableTextToHtml } from '@/lib/content/html'
 import { getSiteUrl } from '@/lib/seo/site'
+import { AUTHOR_PEN_NAME } from '@/lib/author'
 
 export const revalidate = 600
 
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
   const [posts, settings] = await Promise.all([getAllPosts(), getSiteSettings().catch(() => null)])
   const title = settings?.siteTitle || 'Controluce'
   const description = settings?.tagline || 'Storie e riflessioni di vita quotidiana.'
-  const author = settings?.authorName?.trim()
+  const author = AUTHOR_PEN_NAME
 
   // Testo completo per gli articoli più recenti: lettori RSS e sistemi AI non devono tornare sul sito per leggerli.
   const latest = posts.slice(0, FULL_TEXT_ITEMS)

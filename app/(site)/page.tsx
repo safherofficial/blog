@@ -5,6 +5,7 @@ import PostCard from '@/components/PostCard'
 import { getLatestPosts, getPublishedCategories, getSiteSettings } from '@/lib/db'
 import { pageMetadata } from '@/lib/seo/metadata'
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from '@/lib/seo/site'
+import { AUTHOR_PEN_NAME } from '@/lib/author'
 
 export const revalidate = 60
 
@@ -123,7 +124,7 @@ export default async function HomePage() {
           <div className="wrap relative max-w-[860px] text-center">
             <p className="mb-2 font-display text-7xl leading-none italic text-ochre" aria-hidden="true">&ldquo;</p>
             <p className="mb-8 font-display text-2xl italic leading-relaxed text-[#F4E9DB] md:text-4xl md:leading-snug">{settings.signatureQuote}</p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#C9A879]">— {settings.authorName || settings.siteTitle || 'Controluce'}</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#C9A879]">— {AUTHOR_PEN_NAME}</p>
           </div>
         </section>
       )}

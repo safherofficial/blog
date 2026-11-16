@@ -1,6 +1,6 @@
-import { shortText } from '@/lib/content/article'
 import { getAllPosts, getSiteSettings } from '@/lib/db'
 import { absoluteUrl, DEFAULT_DESCRIPTION } from '@/lib/seo/site'
+import { AUTHOR_DESCRIPTION, AUTHOR_PEN_NAME } from '@/lib/author'
 
 export const revalidate = 600
 
@@ -12,8 +12,8 @@ export async function GET() {
   const [posts, settings] = await Promise.all([getAllPosts().catch(() => []), getSiteSettings().catch(() => null)])
   const name = settings?.siteTitle || 'Controluce'
   const description = settings?.tagline || DEFAULT_DESCRIPTION
-  const author = settings?.authorName?.trim()
-  const bio = shortText(settings?.authorBio, 400)
+  const author = AUTHOR_PEN_NAME
+  const bio = AUTHOR_DESCRIPTION
   const oneLine = (value: string) => value.replace(/\s+/g, ' ').trim()
 
   const lines = [
@@ -21,7 +21,7 @@ export async function GET() {
     '',
     `> ${oneLine(description)}`,
     '',
-    `${name} è un blog in lingua italiana${author ? ` scritto da ${author}` : ''}. Gli articoli sono testi originali di lifestyle e vita quotidiana.`,
+    `${name} è un blog in lingua italiana, firmato con lo pseudonimo ${author}. Gli articoli sono testi originali di approfondimento, storie e vita quotidiana.`,
     ...(bio ? ['', bio] : []),
     '',
     '## Pagine principali',

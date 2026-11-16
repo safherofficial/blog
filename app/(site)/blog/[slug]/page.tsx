@@ -16,6 +16,7 @@ import ArticleToc from '@/components/ArticleToc'
 import ShareButtons from '@/components/ShareButtons'
 import AuthorCard from '@/components/AuthorCard'
 import PostNav from '@/components/PostNav'
+import { AUTHOR_PEN_NAME } from '@/lib/author'
 
 export const revalidate = 60
 
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: PostRouteProps): Promise<Meta
   const title = post.seoTitle || post.title
   const description = post.seoDescription || post.excerpt
   const coverImageUrl = getImageUrl(post.coverImage) || undefined
-  const author = settings?.authorName?.trim()
+  const author = AUTHOR_PEN_NAME
   // Con copertina si usa quella scelta dall'autrice; altrimenti un'anteprima di marca generata dal sito.
   const base = pageMetadata({
     title,
@@ -81,7 +82,7 @@ export default async function PostPage({ params }: PostRouteProps) {
   const newer = position > 0 ? allPosts[position - 1] : null
   const older = position >= 0 && position < allPosts.length - 1 ? allPosts[position + 1] : null
   const siteUrl = getSiteUrl()
-  const authorName = settings?.authorName?.trim()
+  const authorName = AUTHOR_PEN_NAME
   // Mostriamo l'aggiornamento solo se è davvero successivo alla pubblicazione (oltre un giorno).
   const updated =
     post.updatedAt && new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 86_400_000
@@ -194,7 +195,7 @@ export default async function PostPage({ params }: PostRouteProps) {
               <ShareButtons title={post.title} />
             </div>
             <div className="mt-10 print:hidden">
-              <AuthorCard settings={settings} />
+              <AuthorCard />
             </div>
           </div>
           {headings.length >= 2 && (
