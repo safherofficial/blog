@@ -9,7 +9,8 @@ const gradients = [
   'from-[#C09B69] to-[#4A3024]',
 ]
 
-export default function PostCard({ post, index = 0, featured = false }: { post: PostSummary; index?: number; featured?: boolean }) {
+export default function PostCard({ post, index = 0, featured = false, headingLevel = 3 }: { post: PostSummary; index?: number; featured?: boolean; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3'
   const date = new Date(post.publishedAt).toLocaleDateString('it-IT', {
     day: 'numeric', month: 'long', year: 'numeric',
   })
@@ -43,7 +44,7 @@ export default function PostCard({ post, index = 0, featured = false }: { post: 
         <time dateTime={post.publishedAt}>{date}</time>
       </p>
       <Link href={`/blog/${post.slug}`} className="post-title-link block">
-        <h3 className={`mb-3 font-display leading-snug tracking-tight text-ink transition-colors duration-300 group-hover:text-wine ${featured ? 'text-3xl lg:text-4xl' : 'text-2xl'}`}>{post.title}</h3>
+        <Heading className={`mb-3 font-display leading-snug tracking-tight text-ink transition-colors duration-300 group-hover:text-wine ${featured ? 'text-3xl lg:text-4xl' : 'text-2xl'}`}>{post.title}</Heading>
         <p className="text-[15px] leading-relaxed text-ink-soft">{post.excerpt}</p>
         <span className="post-read-more mt-5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-wine transition-all duration-300 group-hover:gap-4">
           Continua a leggere <span aria-hidden="true">↗</span>

@@ -29,7 +29,7 @@ export default async function NotFound() {
       </div>
       {posts.length > 0 && (
         <div className="wrap py-16 md:py-24">
-          <p className="mb-8 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Forse cercavi uno di questi</p>
+          <h2 className="mb-8 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Forse cercavi uno di questi</h2>
           <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-3">
             {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
           </div>

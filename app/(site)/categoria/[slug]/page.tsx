@@ -70,7 +70,7 @@ export default async function CategoryPage({ params }: CategoryRouteProps) {
           <p className="reveal-on-scroll border-l border-ochre py-2 pl-5 text-ink-soft">Nessun articolo ancora in questa categoria.</p>
         ) : (
           <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
-            {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
+            {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} headingLevel={2} />)}
           </div>
         )}
       </div>
