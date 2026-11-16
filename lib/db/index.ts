@@ -52,6 +52,38 @@ export const sql: SqlTag = <Row = Record<string, any>>(
   ...values: unknown[]
 ) => getNeonClient()(strings, ...values) as unknown as Promise<NeonQueryResult<Row>>
 
+// Schema guard for deployments whose existing site_settings table predates
+// author_photo_alt. Cache it per configured database connection, not globally.
+let siteSettingsSchemaConnection: string | null = null
+let siteSettingsSchemaPromise: Promise<void> | null = null
+
+export async function ensureSiteSettingsSchema(): Promise<void> {
+  const connectionString = process.env.POSTGRES_URL?.trim() || process.env.DATABASE_URL?.trim()
+  if (!connectionString) {
+    throw new Error('Database non configurato: imposta POSTGRES_URL o DATABASE_URL.')
+  }
+
+  if (siteSettingsSchemaConnection !== connectionString) {
+    siteSettingsSchemaConnection = connectionString
+    siteSettingsSchemaPromise = null
+  }
+
+  if (!siteSettingsSchemaPromise) {
+    siteSettingsSchemaPromise = sql`
+      ALTER TABLE site_settings
+      ADD COLUMN IF NOT EXISTS author_photo_alt TEXT
+    `
+      .then(() => undefined)
+      .catch((error) => {
+        siteSettingsSchemaConnection = null
+        siteSettingsSchemaPromise = null
+        throw error
+      })
+  }
+
+  await siteSettingsSchemaPromise
+}
+
 export type CoverImage = {
   url: string
   alt?: string | null
@@ -235,6 +267,7 @@ export async function getAllPostSlugs(): Promise<string[]> {
 }
 
 export async function getSiteSettings(): Promise<SiteSettings | null> {
+  await ensureSiteSettingsSchema()
   const { rows } = await sql<SiteSettings>`
     SELECT site_title AS "siteTitle", tagline, author_name AS "authorName",
            author_bio AS "authorBio",

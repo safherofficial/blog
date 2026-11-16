@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { sql } from '@/lib/db'
+import { ensureSiteSettingsSchema, sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
 import { editorTextToPortableText } from '@/lib/content/editor'
 
@@ -21,8 +21,14 @@ function text(value: unknown, max: number): string | null {
 
 export async function GET() {
   if (!(await isAdminRequest())) return NextResponse.json({ error: 'Non autorizzato.' }, { status: 401 })
-  const { rows } = await sql`SELECT * FROM site_settings WHERE id=1 LIMIT 1`
-  return NextResponse.json(rows[0] || null)
+  try {
+    await ensureSiteSettingsSchema()
+    const { rows } = await sql`SELECT * FROM site_settings WHERE id=1 LIMIT 1`
+    return NextResponse.json(rows[0] || null)
+  } catch (error) {
+    console.error('[admin settings] Lettura non riuscita:', error)
+    return NextResponse.json({ error: 'Impossibile caricare le impostazioni.' }, { status: 500 })
+  }
 }
 
 export async function PUT(request: Request) {
@@ -42,6 +48,7 @@ export async function PUT(request: Request) {
   const bio = editorTextToPortableText(authorBioText)
 
   try {
+    await ensureSiteSettingsSchema()
     await sql`
       INSERT INTO site_settings (id, site_title, tagline, author_name, author_bio, author_photo_url, author_photo_alt, instagram_url, signature_quote)
       VALUES (
@@ -56,7 +63,8 @@ export async function PUT(request: Request) {
         signature_quote=EXCLUDED.signature_quote
     `
     return NextResponse.json({ ok: true })
-  } catch {
+  } catch (error) {
+    console.error('[admin settings] Salvataggio non riuscito:', error)
     return NextResponse.json({ error: 'Impossibile salvare le impostazioni.' }, { status: 500 })
   }
 }
