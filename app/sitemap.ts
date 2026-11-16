@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getAllPosts, getAllCategorySlugs, getPostsByCategory } from '@/lib/db'
+import { getAllPosts } from '@/lib/db'
 import { absoluteUrl } from '@/lib/seo/site'
 
 // Refresh sitemap entries for newly published and scheduled posts without a new deployment.
@@ -8,10 +8,7 @@ export const revalidate = 300
 const time = (value?: string) => (value ? new Date(value).getTime() : 0)
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, categorySlugs] = await Promise.all([
-    getAllPosts().catch(() => []),
-    getAllCategorySlugs().catch(() => []),
-  ])
+  const posts = await getAllPosts().catch(() => [])
 
   const lastChange = (list: typeof posts) => {
     const latest = list.reduce((max, post) => Math.max(max, time(post.updatedAt || post.publishedAt)), 0)
@@ -25,18 +22,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // Solo le categorie con articoli pubblici: le pagine vuote sono contenuto di scarso valore per i motori.
-  const categories = await Promise.all(
-    categorySlugs.map(async (slug) => ({ slug, posts: await getPostsByCategory(slug).catch(() => []) })),
-  )
-  const categoryEntries: MetadataRoute.Sitemap = categories
-    .filter((category) => category.posts.length > 0)
-    .map((category) => ({
-      url: absoluteUrl(`/categoria/${category.slug}`),
-      lastModified: lastChange(category.posts),
-      changeFrequency: 'weekly',
-      priority: 0.5,
-    }))
+  // Derive populated categories from the already-fetched public posts.
+  // This avoids one additional database query per category while excluding empty archives.
+  const postsByCategory = new Map<string, typeof posts>()
+  for (const post of posts) {
+    const slug = post.category?.slug
+    if (!slug) continue
+    const categoryPosts = postsByCategory.get(slug)
+    if (categoryPosts) categoryPosts.push(post)
+    else postsByCategory.set(slug, [post])
+  }
+
+  const categoryEntries: MetadataRoute.Sitemap = [...postsByCategory.entries()].map(([slug, categoryPosts]) => ({
+    url: absoluteUrl(`/categoria/${slug}`),
+    lastModified: lastChange(categoryPosts),
+    changeFrequency: 'weekly',
+    priority: 0.5,
+  }))
 
   const latest = lastChange(posts)
   return [

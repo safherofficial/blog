@@ -10,12 +10,6 @@ import { getCategoryEditorialInfo } from '@/lib/seo/categories'
 
 export const revalidate = 60
 
-export const metadata: Metadata = pageMetadata({
-  title: 'Tutti gli articoli',
-  description: 'L’archivio completo di Controluce: cerca tra gli articoli, esplora gli argomenti e ritrova le storie dal più recente.',
-  path: '/articoli',
-})
-
 type ArchiveSearchParams = {
   q?: string | string[]
   categoria?: string | string[]
@@ -26,6 +20,38 @@ type ArchiveSearchParams = {
 const PAGE_SIZE = 12
 const firstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] || '' : value || ''
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<ArchiveSearchParams>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const query = firstValue(params.q).trim().slice(0, 100)
+  const category = firstValue(params.categoria).trim().slice(0, 120)
+  const sort = firstValue(params.ordine) === 'oldest' ? 'oldest' : 'newest'
+  const requestedPage = Number.parseInt(firstValue(params.pagina), 10)
+  const page = Number.isFinite(requestedPage) ? Math.max(1, Math.min(requestedPage, 1000)) : 1
+
+  // Search, category filters and alternate sorting are useful to readers but
+  // create overlapping archive variants: keep them crawlable, not indexable.
+  const hasFilters = Boolean(query || category || sort === 'oldest')
+  const canonicalParams = new URLSearchParams()
+  if (query) canonicalParams.set('q', query)
+  if (category) canonicalParams.set('categoria', category)
+  if (sort === 'oldest') canonicalParams.set('ordine', sort)
+  if (page > 1) canonicalParams.set('pagina', String(page))
+  const queryString = canonicalParams.toString()
+  const canonicalPath = queryString ? `/articoli?${queryString}` : '/articoli'
+
+  const metadata = pageMetadata({
+    title: 'Tutti gli articoli',
+    description: 'L’archivio completo di Controluce: cerca tra gli articoli, esplora gli argomenti e ritrova le storie dal più recente.',
+    path: canonicalPath,
+  })
+
+  return hasFilters ? { ...metadata, robots: { index: false, follow: true } } : metadata
+}
 
 export default async function ArchivePage({
   searchParams,
@@ -210,9 +236,16 @@ export default async function ArchivePage({
             {totalPages > 1 && (
               <nav aria-label="Paginazione articoli" className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-7">
                 {currentPage > 1 ? (
-                  <Link href={archiveUrl(currentPage - 1)} rel="prev" className="editorial-button inline-flex items-center gap-3 border border-wine px-5 py-3 font-mono text-[10px] uppercase tracking-[0.15em] text-wine hover:bg-wine hover:text-bg">
-                    <span aria-hidden="true">←</span> Precedenti
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {currentPage > 2 && (
+                      <Link href="/articoli" className="nav-link font-mono text-[10px] uppercase tracking-[0.15em] text-wine">
+                        Prima pagina
+                      </Link>
+                    )}
+                    <Link href={archiveUrl(currentPage - 1)} rel="prev" className="editorial-button inline-flex items-center gap-3 border border-wine px-5 py-3 font-mono text-[10px] uppercase tracking-[0.15em] text-wine hover:bg-wine hover:text-bg">
+                      <span aria-hidden="true">←</span> Precedenti
+                    </Link>
+                  </div>
                 ) : <span />}
                 <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-ink-soft">{currentPage} / {totalPages}</span>
                 {currentPage < totalPages ? (
