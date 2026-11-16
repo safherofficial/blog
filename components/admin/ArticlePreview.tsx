@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import Image from 'next/image'
+import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import PostCard from '@/components/PostCard'
@@ -221,7 +222,7 @@ export default function ArticlePreview({
                     <span>{minutes} min di lettura</span>
                     <span aria-hidden="true">·</span>
                     <span>A cura di{' '}
-                      <a href="/about" className="nav-link font-semibold text-[#E8CEAA]">{AUTHOR_PEN_NAME}</a>
+                      <Link href="/about" className="nav-link font-semibold text-[#E8CEAA]">{AUTHOR_PEN_NAME}</Link>
                     </span>
                   </div>
                   {excerpt.trim() && <p className="article-standfirst mt-8 max-w-[58ch] font-serif text-xl leading-relaxed text-[#D9C9B7]">{excerpt}</p>}
