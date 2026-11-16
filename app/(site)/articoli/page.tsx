@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import PostCard from '@/components/PostCard'
 import { getArchivePosts, getPublishedCategories } from '@/lib/db'
+import type { ArchiveSort } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
@@ -33,7 +34,7 @@ export default async function ArchivePage({
   const params = await searchParams
   const query = firstValue(params.q).trim().slice(0, 100)
   const requestedCategory = firstValue(params.categoria).trim().slice(0, 120)
-  const sort = firstValue(params.ordine) === 'oldest' ? 'oldest' : 'newest'
+  const sort: ArchiveSort = firstValue(params.ordine) === 'oldest' ? 'oldest' : 'newest'
   const requestedPage = Number.parseInt(firstValue(params.pagina), 10)
   const page = Number.isFinite(requestedPage) ? Math.max(1, Math.min(requestedPage, 1000)) : 1
 
