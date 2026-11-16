@@ -24,7 +24,7 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
         </nav>
 
         <div className="md:text-right">
-          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-ochre">Segui e partecipa</p>
+          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-[#D5B27F]">Segui e partecipa</p>
           <p className="mb-5 max-w-[34ch] font-serif leading-relaxed text-[#D5C7B7] md:ml-auto">
             Puoi seguire i nuovi articoli tramite il feed RSS{instagramUrl ? ' e trovare gli aggiornamenti anche su Instagram' : ''}. Per condividere un pensiero o suggerire un tema, c&apos;è lo spazio Parliamone.
           </p>

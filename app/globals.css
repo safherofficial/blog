@@ -1116,7 +1116,7 @@ h2:hover .heading-anchor,
 
 /* U6-A: accessible text contrast and visible skip-link destination. */
 .text-ochre,
-.hover\\:text-ochre:hover {
+[class~="hover:text-ochre"]:hover {
   color: #795832;
 }
 
