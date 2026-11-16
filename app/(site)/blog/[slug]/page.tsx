@@ -225,7 +225,7 @@ export default async function PostPage({ params }: PostRouteProps) {
           <div className="wrap">
             <div className="reveal-on-scroll mb-10">
               <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">Continua a leggere</p>
-              <h2 className="font-display text-3xl md:text-4xl">Altri articoli</h2>
+              <h2 className="font-display text-3xl md:text-4xl">Articoli collegati</h2>
             </div>
             <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
               {relatedPosts.map((relatedPost, i) => (

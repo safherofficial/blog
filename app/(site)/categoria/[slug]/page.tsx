@@ -68,7 +68,7 @@ export default async function CategoryPage({ params }: CategoryRouteProps) {
           </Link>
           <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.27em] text-[#D9B47F]">Esplora per tema</p>
           <h1 className="max-w-[20ch] font-display text-4xl leading-tight tracking-tight text-[#F5EFE5] sm:text-5xl md:text-6xl">{info.label}</h1>
-          <p className="mt-5 max-w-[62ch] font-serif text-lg leading-relaxed text-[#D9C9B7]">{info.description}</p>
+          <p className="mt-5 max-w-[62ch] font-serif text-lg leading-relaxed text-[#D9C9B7]">{info.intro}</p>
           {posts.length > 0 && <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-[#C9A879]">{posts.length} {posts.length === 1 ? 'articolo' : 'articoli'}</p>}
         </div>
       </div>
