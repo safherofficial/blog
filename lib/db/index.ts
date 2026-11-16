@@ -111,6 +111,69 @@ export async function getPublishedCategories(): Promise<Array<{ title: string; s
   return rows
 }
 
+export type ArchiveSort = 'newest' | 'oldest'
+
+export type ArchivePostsResult = {
+  posts: PostSummary[]
+  total: number
+}
+
+export async function getArchivePosts(input: {
+  query?: string
+  categorySlug?: string | null
+  sort?: ArchiveSort
+  page?: number
+  pageSize?: number
+}): Promise<ArchivePostsResult> {
+  const query = input.query?.trim().slice(0, 100) || ''
+  const searchPattern = query ? `%${query}%` : null
+  const categorySlug = input.categorySlug?.trim().slice(0, 120) || null
+  const sort: ArchiveSort = input.sort === 'oldest' ? 'oldest' : 'newest'
+  const pageSize = Math.max(1, Math.min(Math.trunc(input.pageSize || 12), 36))
+  const page = Math.max(1, Math.min(Math.trunc(input.page || 1), 1000))
+  const offset = (page - 1) * pageSize
+
+  const [postsResult, countResult] = await Promise.all([
+    sql<PostSummary>`
+      SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
+             CASE WHEN p.cover_image_url IS NULL THEN NULL
+                  ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt) END AS "coverImage",
+             p.published_at AS "publishedAt", p.updated_at AS "updatedAt",
+             CASE WHEN c.id IS NULL THEN NULL
+                  ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
+      FROM posts p
+      LEFT JOIN categories c ON c.id = p.category_id
+      WHERE p.slug IS NOT NULL AND p.published = TRUE AND p.published_at <= NOW()
+        AND (${searchPattern}::text IS NULL
+          OR p.title ILIKE ${searchPattern}
+          OR p.excerpt ILIKE ${searchPattern}
+          OR p.body::text ILIKE ${searchPattern})
+        AND (${categorySlug}::text IS NULL OR c.slug = ${categorySlug})
+      ORDER BY
+        CASE WHEN ${sort} = 'oldest' THEN p.published_at END ASC,
+        CASE WHEN ${sort} = 'newest' THEN p.published_at END DESC,
+        p.id ASC
+      LIMIT ${pageSize} OFFSET ${offset}
+    `,
+    sql<{ total: number }>`
+      SELECT COUNT(*)::int AS total
+      FROM posts p
+      LEFT JOIN categories c ON c.id = p.category_id
+      WHERE p.slug IS NOT NULL AND p.published = TRUE AND p.published_at <= NOW()
+        AND (${searchPattern}::text IS NULL
+          OR p.title ILIKE ${searchPattern}
+          OR p.excerpt ILIKE ${searchPattern}
+          OR p.body::text ILIKE ${searchPattern})
+        AND (${categorySlug}::text IS NULL OR c.slug = ${categorySlug})
+    `,
+  ])
+
+  return {
+    posts: postsResult.rows,
+    total: countResult.rows[0]?.total || 0,
+  }
+}
+
 export async function getAllPosts(): Promise<PostSummary[]> {
   const { rows } = await sql<PostSummary>`
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
