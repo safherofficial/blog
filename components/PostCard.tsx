@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import CropFrame from './CropFrame'
 import type { PostSummary } from '@/lib/db'
+import { isUploadedCoverImageUrl } from '@/lib/content/images'
 
 const gradients = [
   'from-[#8D6E47] to-[#35241B]',
@@ -27,7 +28,8 @@ export default function PostCard({ post, index = 0, featured = false, headingLev
               width={1200}
               height={800}
               sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 33vw"
-              unoptimized
+              quality={90}
+              unoptimized={!isUploadedCoverImageUrl(post.coverImage.url)}
               className="editorial-card-image block h-auto w-full object-contain"
             />
           )}

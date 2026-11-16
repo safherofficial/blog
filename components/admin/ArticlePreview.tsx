@@ -11,6 +11,7 @@ import PostNav from '@/components/PostNav'
 import ArticleToc from '@/components/ArticleToc'
 import CropFrame from '@/components/CropFrame'
 import { getHeadings, readingMinutes } from '@/lib/content/article'
+import { isUploadedCoverImageUrl } from '@/lib/content/images'
 import { editorTextToPortableText } from '@/lib/content/editor'
 import type { PortableTextBlock } from '@/lib/db'
 import AuthorCard from '@/components/AuthorCard'
@@ -157,7 +158,7 @@ export default function ArticlePreview({
       image: ({ value: image }) => (
         <figure className="article-figure editorial-media-frame reveal-on-scroll relative my-14 aspect-video overflow-hidden border border-line">
           <CropFrame />
-          <Image src={image.url} alt={image.alt || ''} fill unoptimized sizes="(max-width: 760px) 100vw, 860px" className="object-cover" />
+          <Image src={image.url} alt={image.alt || ''} fill quality={90} unoptimized={!isUploadedCoverImageUrl(image.url)} sizes="(max-width: 760px) 100vw, 860px" className="object-cover" />
           {image.alt && <figcaption className="absolute bottom-4 left-4 z-10 max-w-[80%] bg-ink/75 px-3 py-2 font-mono text-[10px] tracking-wide text-bg">{image.alt}</figcaption>}
         </figure>
       ),
@@ -240,7 +241,8 @@ export default function ArticlePreview({
                       height={1000}
                       priority
                       sizes="(max-width: 767px) 100vw, 1160px"
-                      unoptimized
+                      quality={90}
+                      unoptimized={!isUploadedCoverImageUrl(coverImageUrl.trim())}
                       className="block h-auto w-full object-contain"
                     />
                   </div>

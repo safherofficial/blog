@@ -31,6 +31,7 @@ export default async function HomePage() {
           alt=""
           fill
           priority
+          unoptimized
           sizes="100vw"
           className="home-hero-image object-cover object-[40%_center]"
         />

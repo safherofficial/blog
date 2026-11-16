@@ -65,6 +65,7 @@ export default function AboutPage() {
               alt="Figura femminile in controluce, immagine simbolica dell’identità editoriale di Controluce"
               fill
               priority
+              unoptimized
               sizes="(max-width: 767px) 100vw, 42vw"
               className="object-cover object-[14%_center]"
             />

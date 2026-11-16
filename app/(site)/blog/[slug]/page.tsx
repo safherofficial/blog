@@ -7,7 +7,7 @@ import { bodyWordCount, getHeadings, readingMinutes } from '@/lib/content/articl
 import { breadcrumbJsonLd, organizationJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
 import { getSiteUrl } from '@/lib/seo/site'
-import { imageUrl as getImageUrl } from '@/lib/content/images'
+import { imageUrl as getImageUrl, isUploadedCoverImageUrl } from '@/lib/content/images'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import PostBody from '@/components/PostBody'
 import PostCard from '@/components/PostCard'
@@ -179,7 +179,8 @@ export default async function PostPage({ params }: PostRouteProps) {
               height={1000}
               priority
               sizes="(max-width: 767px) 100vw, 1160px"
-              unoptimized
+              quality={90}
+              unoptimized={!isUploadedCoverImageUrl(post.coverImage.url)}
               className="block h-auto w-full object-contain"
             />
           </div>

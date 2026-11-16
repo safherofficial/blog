@@ -1,9 +1,13 @@
 const UPLOADED_COVER_PATH = /^\/api\/media\/covers\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+export function isUploadedCoverImageUrl(value: string): boolean {
+  return UPLOADED_COVER_PATH.test(value.trim())
+}
+
 export function isValidCoverImageUrl(value: string): boolean {
   const url = value.trim()
   if (!url) return false
-  if (UPLOADED_COVER_PATH.test(url)) return true
+  if (isUploadedCoverImageUrl(url)) return true
   try {
     return new URL(url).protocol === 'https:'
   } catch {
