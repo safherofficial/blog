@@ -29,7 +29,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PostRouteProps): Promise<Metadata> {
   const { slug } = await params
-  const [post, settings] = await Promise.all([getPostBySlug(slug), getSiteSettings().catch(() => null)])
+  const post = await getPostBySlug(slug)
   if (!post) return {}
 
   const title = post.seoTitle || post.title
@@ -145,18 +145,25 @@ export default async function PostPage({ params }: PostRouteProps) {
             )}
           </p>
           <h1 className="max-w-[22ch] font-display text-4xl leading-[1.08] tracking-tight text-[#F5EFE5] sm:text-5xl md:text-6xl lg:text-7xl">{post.title}</h1>
-          <p className="article-date mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em]">
+          <div role="group" aria-label="Informazioni sull’articolo" className="article-date mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.16em]">
             <span className="inline-block h-px w-8 bg-[#C9A879]" />
-            <time dateTime={post.publishedAt}>{date}</time>
+            <span>Pubblicato il <time dateTime={post.publishedAt}>{date}</time></span>
             <span aria-hidden="true">·</span>
             <span>{minutes} min di lettura</span>
+            <span aria-hidden="true">·</span>
+            <span>
+              A cura di{' '}
+              <Link href="/about" className="nav-link font-semibold text-[#E8CEAA] transition-colors hover:text-[#F5D7A8]">
+                {AUTHOR_PEN_NAME}
+              </Link>
+            </span>
             {updated && (
               <>
                 <span aria-hidden="true">·</span>
                 <span>Aggiornato il <time dateTime={post.updatedAt}>{updated}</time></span>
               </>
             )}
-          </p>
+          </div>
           {post.excerpt && <p className="article-standfirst mt-8 max-w-[58ch] font-serif text-xl leading-relaxed text-[#D9C9B7]">{post.excerpt}</p>}
         </div>
       </header>

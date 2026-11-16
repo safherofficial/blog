@@ -39,14 +39,20 @@ export default function ArticleToc({ items, variant }: { items: Heading[]; varia
   if (variant === 'inline') {
     return (
       <details className="toc-inline mb-10 border border-line bg-bg-soft/60 px-5 py-4">
-        <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">In questo articolo</summary>
-        <nav aria-label="Indice dell’articolo" className="mt-4">{list}</nav>
+        <summary className="flex cursor-pointer items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">
+          <span>In questo articolo</span>
+          <span className="text-ink-soft">{items.length} {items.length === 1 ? 'sezione' : 'sezioni'}</span>
+        </summary>
+        <nav aria-label={`Indice dell’articolo: ${items.length} ${items.length === 1 ? 'sezione' : 'sezioni'}`} className="mt-4">{list}</nav>
       </details>
     )
   }
   return (
-    <nav aria-label="Indice dell’articolo" className="toc-side">
-      <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">In questo articolo</p>
+    <nav aria-label={`Indice dell’articolo: ${items.length} ${items.length === 1 ? 'sezione' : 'sezioni'}`} className="toc-side">
+      <p className="mb-4 flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">
+        <span>In questo articolo</span>
+        <span className="text-ink-soft">{items.length}</span>
+      </p>
       {list}
     </nav>
   )

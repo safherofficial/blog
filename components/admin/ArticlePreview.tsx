@@ -9,9 +9,11 @@ import PostCard from '@/components/PostCard'
 import PostNav from '@/components/PostNav'
 import ArticleToc from '@/components/ArticleToc'
 import CropFrame from '@/components/CropFrame'
-import { getHeadings, readingMinutes, shortText } from '@/lib/content/article'
+import { getHeadings, readingMinutes } from '@/lib/content/article'
 import { editorTextToPortableText } from '@/lib/content/editor'
 import type { PortableTextBlock } from '@/lib/db'
+import AuthorCard from '@/components/AuthorCard'
+import { AUTHOR_PEN_NAME } from '@/lib/author'
 import type { Category, Post, SiteSettingsRow } from './types'
 
 type Props = {
@@ -54,8 +56,7 @@ export default function ArticlePreview({
   const headings = useMemo(() => getHeadings(body), [body])
   const minutes = readingMinutes(body)
   const siteTitle = settings.site_title || 'Controluce'
-  const authorName = settings.author_name?.trim() || ''
-  const authorBio = shortText(settings.author_bio)
+  const authorName = AUTHOR_PEN_NAME
   const date = publishedAtLocal ? new Date(publishedAtLocal) : new Date()
   const validDate = !Number.isNaN(date.getTime())
   const formattedDate = validDate
@@ -214,12 +215,16 @@ export default function ArticlePreview({
                   <h1 className="max-w-[22ch] font-display text-4xl leading-[1.08] tracking-tight text-[#F5EFE5] sm:text-5xl md:text-6xl lg:text-7xl">
                     {title || 'Titolo dell’articolo'}
                   </h1>
-                  <p className="article-date mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em]">
+                  <div role="group" aria-label="Informazioni sull’articolo" className="article-date mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.16em]">
                     <span className="inline-block h-px w-8 bg-[#C9A879]" />
-                    <time dateTime={validDate ? date.toISOString() : undefined}>{formattedDate}</time>
+                    <span>Pubblicato il <time dateTime={validDate ? date.toISOString() : undefined}>{formattedDate}</time></span>
                     <span aria-hidden="true">·</span>
                     <span>{minutes} min di lettura</span>
-                  </p>
+                    <span aria-hidden="true">·</span>
+                    <span>A cura di{' '}
+                      <a href="/about" className="nav-link font-semibold text-[#E8CEAA]">Controluce</a>
+                    </span>
+                  </div>
                   {excerpt.trim() && <p className="article-standfirst mt-8 max-w-[58ch] font-serif text-xl leading-relaxed text-[#D9C9B7]">{excerpt}</p>}
                 </div>
               </header>
@@ -263,25 +268,9 @@ export default function ArticlePreview({
                         <span className={shareButtonClass}>WhatsApp <span aria-hidden="true">↗</span></span>
                       </div>
                     </div>
-                    {authorName && (
-                      <div className="mt-10">
-                        <aside aria-label="L’autrice" className="author-card flex flex-col gap-5 border border-line bg-bg-soft/50 p-6 sm:flex-row sm:items-center">
-                          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-ochre/50 bg-ink">
-                            {settings.author_photo_url ? (
-                              <Image src={settings.author_photo_url} alt={settings.author_photo_alt || authorName} fill unoptimized sizes="80px" className="object-cover" />
-                            ) : (
-                              <span className="flex h-full w-full items-center justify-center font-display text-3xl italic text-[#D5B27F]" aria-hidden="true">{authorName.charAt(0).toUpperCase()}</span>
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Scritto da</p>
-                            <p className="font-display text-2xl leading-tight">{authorName}</p>
-                            {authorBio && <p className="mt-2 max-w-[56ch] text-[15px] leading-relaxed text-ink-soft">{authorBio}</p>}
-                            <span className="nav-link mt-3 inline-block font-mono text-[10px] uppercase tracking-[0.18em] text-wine">Scopri di più ↗</span>
-                          </div>
-                        </aside>
-                      </div>
-                    )}
+                    <div className="mt-10">
+                      <AuthorCard />
+                    </div>
                   </div>
                   {headings.length >= 2 && (
                     <aside className="article-toc-rail">

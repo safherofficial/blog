@@ -37,7 +37,7 @@ export default function PostBody({ value }: { value: PortableTextBlock[] }) {
   }
 
   return (
-    <div className="article-prose font-serif text-[19px] leading-[1.85] text-ink">
+    <div className="article-prose font-serif text-[18px] leading-[1.9] text-ink sm:text-[19px]">
       <PortableText value={value as any} components={components} />
     </div>
   )
