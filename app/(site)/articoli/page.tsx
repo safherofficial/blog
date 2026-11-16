@@ -207,7 +207,7 @@ export default async function ArchivePage({
             </div>
 
             <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-2 lg:grid-cols-3 md:gap-y-16">
-              {posts.map((post, index) => <PostCard key={post._id} post={post} index={index} headingLevel={2} />)}
+              {posts.map((post, index) => <PostCard key={post._id} post={post} index={index} headingLevel={2} imageSizes="(max-width: 640px) calc(100vw - 46px), (max-width: 767px) calc(100vw - 66px), (max-width: 1023px) calc((100vw - 100px) / 2), (max-width: 1375px) calc((min(100vw, 1240px) - 136px) / 3), 368px" />)}
             </div>
 
             {totalPages > 1 && (
