@@ -56,7 +56,6 @@ export default function ArticlePreview({
   const headings = useMemo(() => getHeadings(body), [body])
   const minutes = readingMinutes(body)
   const siteTitle = settings.site_title || 'Controluce'
-  const authorName = AUTHOR_PEN_NAME
   const date = publishedAtLocal ? new Date(publishedAtLocal) : new Date()
   const validDate = !Number.isNaN(date.getTime())
   const formattedDate = validDate
@@ -222,7 +221,7 @@ export default function ArticlePreview({
                     <span>{minutes} min di lettura</span>
                     <span aria-hidden="true">·</span>
                     <span>A cura di{' '}
-                      <a href="/about" className="nav-link font-semibold text-[#E8CEAA]">Controluce</a>
+                      <a href="/about" className="nav-link font-semibold text-[#E8CEAA]">{AUTHOR_PEN_NAME}</a>
                     </span>
                   </div>
                   {excerpt.trim() && <p className="article-standfirst mt-8 max-w-[58ch] font-serif text-xl leading-relaxed text-[#D9C9B7]">{excerpt}</p>}
