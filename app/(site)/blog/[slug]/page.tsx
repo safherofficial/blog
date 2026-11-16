@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllPosts, getAllPostSlugs, getPostBySlug, getRelatedPosts, getSiteSettings } from '@/lib/db'
 import { bodyWordCount, getHeadings, readingMinutes } from '@/lib/content/article'
-import { breadcrumbJsonLd, organizationJsonLd } from '@/lib/seo/jsonld'
+import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
 import { getSiteUrl } from '@/lib/seo/site'
 import { imageUrl as getImageUrl, isUploadedCoverImageUrl } from '@/lib/content/images'
@@ -83,7 +83,6 @@ export default async function PostPage({ params }: PostRouteProps) {
   const newer = position > 0 ? allPosts[position - 1] : null
   const older = position >= 0 && position < allPosts.length - 1 ? allPosts[position + 1] : null
   const siteUrl = getSiteUrl()
-  const authorName = AUTHOR_PEN_NAME
   // Mostriamo l'aggiornamento solo se è davvero successivo alla pubblicazione (oltre un giorno).
   const updated =
     post.updatedAt && new Date(post.updatedAt).getTime() - new Date(post.publishedAt).getTime() > 86_400_000
@@ -112,10 +111,10 @@ export default async function PostPage({ params }: PostRouteProps) {
               wordCount: bodyWordCount(post.body),
               timeRequired: `PT${minutes}M`,
               isPartOf: { '@type': 'Blog', '@id': `${siteUrl}/#blog`, name: settings?.siteTitle || 'Controluce' },
-              author: authorName
-                ? { '@type': 'Person', name: authorName, url: `${siteUrl}/about`, ...(settings?.instagramUrl ? { sameAs: [settings.instagramUrl] } : {}) }
-                : { '@type': 'Organization', name: settings?.siteTitle || 'Controluce', url: siteUrl },
-              publisher: organizationJsonLd(settings),
+              // Reference the canonical Person and Organization nodes emitted by the site-wide graph.
+              // This keeps the public pen name and its Instagram sameAs link consistent on every article.
+              author: { '@id': `${siteUrl}/#author` },
+              publisher: { '@id': `${siteUrl}/#organization` },
             },
             breadcrumbJsonLd([
               { name: 'Home', path: '/' },
