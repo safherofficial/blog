@@ -818,6 +818,10 @@ button {
     font-size: 9px;
     letter-spacing: 0.08em;
   }
+  
+  .site-bar nav {
+    min-width: 0;
+  }
 
   .home-hero {
     min-height: clamp(500px, 72svh, 600px);
@@ -1127,4 +1131,16 @@ h2:hover .heading-anchor,
 main:focus-visible {
   outline: 2px solid #9D7440;
   outline-offset: 4px;
+}
+
+
+/* Keep the primary navigation readable on the narrowest phone viewports. */
+@media (max-width: 360px) {
+  .site-nav {
+    gap: 8px;
+  }
+
+  .site-nav .nav-separator {
+    display: none;
+  }
 }
