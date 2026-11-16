@@ -84,7 +84,7 @@ export default async function HomePage() {
           ) : (
             <>
               <div className="reveal-on-scroll mb-14 md:mb-16">
-                <PostCard post={posts[0]} index={0} featured />
+                <PostCard post={posts[0]} index={0} featured imageSizes="(max-width: 640px) calc(100vw - 46px), (max-width: 1023px) calc(100vw - 66px), (max-width: 1375px) calc((min(100vw, 1240px) - 592px) * 7 / 12 + 288px), 665px" />
               </div>
 
               {categories.length > 0 && (
@@ -104,7 +104,7 @@ export default async function HomePage() {
                     <h2 className="font-display text-3xl leading-tight tracking-tight md:text-4xl">Altre storie recenti</h2>
                   </div>
                   <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-2 md:gap-y-16">
-                    {posts.slice(1).map((post, i) => <PostCard key={post._id} post={post} index={i + 1} />)}
+                    {posts.slice(1).map((post, i) => <PostCard key={post._id} post={post} index={i + 1} imageSizes="(max-width: 640px) calc(100vw - 46px), (max-width: 767px) calc(100vw - 66px), (max-width: 1023px) calc((100vw - 100px) / 2), (max-width: 1375px) calc((min(100vw, 1240px) - 100px) / 2), 570px" />)}
                   </div>
                 </>
               )}
