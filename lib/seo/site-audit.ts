@@ -1,6 +1,5 @@
 import { LIMITS, SEVERITY_WEIGHT } from './constants'
 import { portableTextToEditorText } from '@/lib/content/editor'
-import type { PortableTextBlock } from '@/lib/db'
 import { analyzePost, countBySeverity } from './post-analyzer'
 import type { OtherPost, PostDraft, SeoIssue } from './types'
 
@@ -14,7 +13,7 @@ export type AuditPostRow = {
   category_id: string | null
   published_at: string | Date
   published: boolean
-  body: PortableTextBlock[] | null
+  body: unknown
   seo_title: string | null
   seo_description: string | null
 }
@@ -23,7 +22,7 @@ export type AuditSettingsRow = {
   site_title?: string | null
   tagline?: string | null
   author_name?: string | null
-  author_bio?: PortableTextBlock[] | null
+  author_bio?: unknown
   author_photo_url?: string | null
   author_photo_alt?: string | null
   instagram_url?: string | null
@@ -184,7 +183,8 @@ export function auditSite(input: SiteAuditInput): SiteAudit {
   if (!settings?.author_name?.trim()) {
     add('warning', 'author-name', 'Nome dell’autrice/autore non impostato.', 'La pagina «Chi sono» mostra un titolo generico. Un autore riconoscibile rafforza la fiducia (E-E-A-T).', 'site')
   }
-  const bioWords = (settings?.author_bio || []).map((b) => (b.children || []).map((c) => c.text).join(' ')).join(' ').trim()
+  // Normalize legacy JSON strings and object-shaped rich text just like article bodies.
+  const bioWords = portableTextToEditorText(settings?.author_bio).trim()
   if (!bioWords) {
     add('warning', 'author-bio', 'La biografia è vuota.', 'La pagina «Chi sono» ha un testo di default generico: scrivi una bio vera.', 'site')
   }
