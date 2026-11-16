@@ -168,7 +168,7 @@ export function auditSite(input: SiteAuditInput): SiteAudit {
     const latest = Math.max(...input.posts.filter((p) => p.published && Date.parse(new Date(p.published_at).toISOString()) <= now).map((p) => new Date(p.published_at).getTime()))
     const days = Math.floor((now - latest) / 86_400_000)
     if (days > LIMITS.staleDays) {
-      add('info', 'stale', `L’ultimo articolo risale a ${days} giorni fa.`, 'Aggiornare con regolarità segnala a Google che il sito è attivo.', 'content')
+      add('info', 'stale', `L’ultimo articolo risale a ${days} giorni fa.`, 'È un promemoria editoriale, non una penalità SEO: pubblica o aggiorna quando hai contenuti realmente utili da condividere, non solo per mostrare attività.', 'content')
     }
   }
 

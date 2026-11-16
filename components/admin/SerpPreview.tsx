@@ -1,17 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { LIMITS } from '@/lib/seo/constants'
 
-function clip(value: string, max: number): string {
-  return value.length > max ? value.slice(0, max - 1).trimEnd() + '…' : value
-}
-
-/** Simulazione indicativa del risultato Google: i limiti reali dipendono dai pixel, non dai caratteri. */
+/** Anteprima visiva indicativa: Google adatta titolo e snippet alla larghezza disponibile. */
 export default function SerpPreview({ title, description, slug }: { title: string; description: string; slug: string }) {
   const [mobile, setMobile] = useState(false)
   // Static display-only host; the configurable site URL remains server-side.
   const host = 'controluce.blog'
+  const clampStyle = {
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical' as const,
+    WebkitLineClamp: 2,
+    overflow: 'hidden',
+  }
+
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
@@ -26,9 +28,10 @@ export default function SerpPreview({ title, description, slug }: { title: strin
       </div>
       <div className={`border border-line bg-white p-4 ${mobile ? 'max-w-[360px]' : ''}`}>
         <p className="truncate text-xs text-[#4d5156]">{host} › blog › {slug || 'slug-articolo'}</p>
-        <p className="mt-1 text-xl leading-snug text-[#1a0dab]">{clip(title || 'Titolo dell’articolo', LIMITS.titleMax)}</p>
-        <p className="mt-1 text-sm leading-snug text-[#4d5156]">{clip(description || 'La descrizione dell’articolo apparirà qui sotto il titolo.', LIMITS.descriptionMax)}</p>
+        <p className="mt-1 text-xl leading-snug text-[#1a0dab]" style={clampStyle}>{title || 'Titolo dell’articolo'}</p>
+        <p className="mt-1 text-sm leading-snug text-[#4d5156]" style={clampStyle}>{description || 'La descrizione dell’articolo apparirà qui sotto il titolo.'}</p>
       </div>
+      <p className="mt-2 text-xs text-ink-soft">Simulazione orientativa: Google può riscrivere il link del titolo e lo snippet in base alla ricerca e allo spazio disponibile.</p>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { LIMITS, SEVERITY_WEIGHT, TITLE_SUFFIX } from './constants'
+import { LIMITS, SEVERITY_WEIGHT } from './constants'
 import { inspectHtml, type PageFacts } from './html-inspect'
 import type { SeoIssue } from './types'
 
@@ -81,11 +81,12 @@ async function checkPage(origin: string, siteUrl: string, path: string): Promise
   if (robotsMeta.includes('noindex')) add('error', 'noindex', 'La pagina è bloccata all’indicizzazione (noindex).', 'Rimuovi la direttiva noindex se vuoi che compaia su Google.')
 
   if (!facts.title) add('error', 'title-missing', 'Manca il tag <title>.')
-  else if (facts.title.length > LIMITS.titleMax) add('warning', 'title-long', `Il <title> è lungo (${facts.title.length} caratteri) e verrà troncato.`)
-  else if (path !== '/' && !facts.title.endsWith(TITLE_SUFFIX.trim()) && facts.title.length < LIMITS.titleMin) add('warning', 'title-short', `Il <title> è corto (${facts.title.length} caratteri).`)
+  else if (facts.title.length > LIMITS.titleMax) add('info', 'title-long', `Il <title> è lungo (${facts.title.length} caratteri).`, 'Google non applica un limite fisso: il link del titolo può essere abbreviato in base allo spazio disponibile.')
+  else if (path !== '/' && facts.title.length < LIMITS.titleMin) add('info', 'title-short', `Il <title> è breve (${facts.title.length} caratteri).`, 'Verifica che descriva chiaramente il contenuto; l’intervallo indicato è solo una guida editoriale.')
 
-  if (!facts.description) add('error', 'description-missing', 'Manca la meta description.', 'Google genererà un frammento automatico, spesso poco efficace.')
-  else if (facts.description.length > LIMITS.descriptionMax + 20) add('warning', 'description-long', `La meta description è molto lunga (${facts.description.length} caratteri).`)
+  if (!facts.description) add('error', 'description-missing', 'Manca la meta description.', 'Google può generare uno snippet dal contenuto della pagina.')
+  else if (facts.description.length < LIMITS.descriptionMin) add('info', 'description-short', `La meta description è breve (${facts.description.length} caratteri).`, 'È una guida editoriale, non una soglia obbligatoria: privilegia un riepilogo specifico e utile.')
+  else if (facts.description.length > LIMITS.descriptionMax + 20) add('info', 'description-long', `La meta description è lunga (${facts.description.length} caratteri).`, 'Google non impone un limite fisso e può abbreviare lo snippet in base allo spazio disponibile o scegliere un estratto della pagina.')
 
   if (!facts.canonical) {
     add('warning', 'canonical-missing', 'Manca il tag canonical.', 'Senza canonical, varianti dell’URL (parametri, www/non-www) possono essere indicizzate come duplicati.')

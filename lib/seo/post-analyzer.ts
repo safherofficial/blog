@@ -41,16 +41,15 @@ export function analyzePost(draft: PostDraft, ctx: AnalysisContext = { others: [
   const title = draft.title.trim()
   const rawTitle = (draft.seoTitle.trim() || title)
   const fullTitle = rawTitle ? rawTitle + TITLE_SUFFIX : ''
-  const maxRaw = LIMITS.titleMax - TITLE_SUFFIX.length
   if (!title) {
     add('error', 'title', 'title-missing', 'Manca il titolo dell’articolo.', 'Il titolo è il primo elemento che Google e i lettori vedono.', 'title')
   } else {
     if (fullTitle.length < LIMITS.titleMin) {
-      add('warning', 'title', 'title-short', `Il titolo è molto corto (${fullTitle.length} caratteri).`, `Punta a ${LIMITS.titleMin}-${LIMITS.titleMax} caratteri: spiega meglio il contenuto e aggancia più ricerche.`, draft.seoTitle.trim() ? 'seoTitle' : 'title')
+      add('info', 'title', 'title-short', `Titolo breve (${fullTitle.length} caratteri, incluso il nome del sito).`, 'È un’indicazione editoriale, non una soglia di Google: verifica che il titolo descriva chiaramente il contenuto.', draft.seoTitle.trim() ? 'seoTitle' : 'title')
     } else if (fullTitle.length > LIMITS.titleMax) {
-      add('warning', 'title', 'title-long', `Il titolo in Google sarà ${fullTitle.length} caratteri (incluso «${TITLE_SUFFIX.trim()}»): oltre ${LIMITS.titleMax} viene troncato.`, `Accorcialo a circa ${maxRaw} caratteri oppure scrivi un Titolo SEO dedicato.`, draft.seoTitle.trim() ? 'seoTitle' : 'title')
+      add('info', 'title', 'title-long', `Titolo lungo (${fullTitle.length} caratteri, incluso il nome del sito).`, 'Google non impone un limite fisso: il link del titolo può essere abbreviato in base allo spazio disponibile. Metti le parole più distintive all’inizio.', draft.seoTitle.trim() ? 'seoTitle' : 'title')
     } else {
-      add('good', 'title', 'title-length', `Lunghezza del titolo ideale (${fullTitle.length} caratteri).`, undefined, 'title')
+      add('good', 'title', 'title-length', `Titolo nell’intervallo editoriale indicativo (${fullTitle.length} caratteri).`, undefined, 'title')
     }
     const letters = rawTitle.replace(/[^A-Za-zÀ-ÿ]/g, '')
     if (letters.length > 8 && letters === letters.toUpperCase()) {
@@ -70,11 +69,11 @@ export function analyzePost(draft: PostDraft, ctx: AnalysisContext = { others: [
     add('error', 'description', 'description-missing', 'Manca la descrizione (anteprima o descrizione SEO).', 'Senza descrizione Google sceglie un frammento a caso del testo.', 'excerpt')
   } else {
     if (description.length < LIMITS.descriptionMin) {
-      add('warning', 'description', 'description-short', `La descrizione è corta (${description.length} caratteri).`, `Usa ${LIMITS.descriptionMin}-${LIMITS.descriptionMax} caratteri per sfruttare lo spazio nei risultati.`, draft.seoDescription.trim() ? 'seoDescription' : 'excerpt')
+      add('info', 'description', 'description-short', `Descrizione breve (${description.length} caratteri).`, 'È un’indicazione editoriale: punta a un riepilogo specifico e utile, senza allungarlo solo per raggiungere una soglia.', draft.seoDescription.trim() ? 'seoDescription' : 'excerpt')
     } else if (description.length > LIMITS.descriptionMax) {
-      add('warning', 'description', 'description-long', `La descrizione è lunga (${description.length} caratteri): Google la taglia dopo circa ${LIMITS.descriptionMax}.`, 'Metti le informazioni più importanti all’inizio.', draft.seoDescription.trim() ? 'seoDescription' : 'excerpt')
+      add('info', 'description', 'description-long', `Descrizione lunga (${description.length} caratteri).`, 'Google non impone un limite fisso: può abbreviare lo snippet in base al dispositivo o scegliere un estratto della pagina. Metti subito le informazioni più importanti.', draft.seoDescription.trim() ? 'seoDescription' : 'excerpt')
     } else {
-      add('good', 'description', 'description-length', `Lunghezza della descrizione ideale (${description.length} caratteri).`, undefined, 'seoDescription')
+      add('good', 'description', 'description-length', `Descrizione nell’intervallo editoriale indicativo (${description.length} caratteri).`, undefined, 'seoDescription')
     }
     if (norm(description) === norm(title)) {
       add('warning', 'description', 'description-equals-title', 'La descrizione è identica al titolo.', 'Aggiungi un dettaglio o un beneficio che il titolo non dice.', 'seoDescription')
@@ -128,14 +127,12 @@ export function analyzePost(draft: PostDraft, ctx: AnalysisContext = { others: [
   }
 
   // ---------- Contenuto ----------
-  if (words < LIMITS.wordsThin) {
-    add('error', 'content', 'content-thin', `Contenuto troppo breve (${words} parole).`, `Sotto le ${LIMITS.wordsThin} parole Google tende a considerarlo «thin content» e a non posizionarlo.`, 'bodyText')
-  } else if (words < LIMITS.wordsShort) {
-    add('warning', 'content', 'content-short', `Contenuto breve (${words} parole).`, `Approfondisci fino ad almeno ${LIMITS.wordsShort} parole per coprire meglio l’argomento.`, 'bodyText')
-  } else {
-    add('good', 'content', 'content-length', `Lunghezza del testo adeguata (${words} parole).`, undefined, 'bodyText')
+  if (words === 0) {
+    add('error', 'content', 'content-empty', 'Il testo dell’articolo è vuoto.', 'Inserisci il contenuto dell’articolo prima di pubblicarlo.', 'bodyText')
+  } else if (words < 300) {
+    add('info', 'content', 'content-short', `Testo breve (${words} parole).`, 'Google non stabilisce un numero minimo di parole. Verifica che il testo risponda in modo completo e utile all’argomento; amplia solo quando serve al lettore.', 'bodyText')
   }
-  if (h2.length === 0 && words >= LIMITS.wordsShort) {
+  if (h2.length === 0 && words >= 300) {
     add('warning', 'content', 'headings-missing', 'Nel testo non ci sono sottotitoli (H2).', 'Dividi l’articolo in sezioni con «## Titolo»: migliorano lettura e comprensione dei motori.', 'bodyText')
   } else if (h2.length > 0) {
     add('good', 'content', 'headings-ok', `Struttura con ${h2.length} sottotitol${h2.length === 1 ? 'o' : 'i'} (H2).`, undefined, 'bodyText')
@@ -215,13 +212,13 @@ export function analyzePost(draft: PostDraft, ctx: AnalysisContext = { others: [
     }
     const occurrences = countOccurrences(norm(bodyPlain), k)
     if (occurrences === 0) {
-      add('error', 'keyword', 'keyword-body', 'La parola chiave non compare mai nel testo.', 'Se l’articolo non la contiene, Google difficilmente lo proporrà per quella ricerca.', 'bodyText')
+      add('info', 'keyword', 'keyword-body', 'La frase chiave esatta non compare nel testo.', 'Controlla che l’argomento sia trattato chiaramente: non è necessario ripetere la stessa formulazione se sinonimi e contesto esprimono già il tema.', 'bodyText')
     } else if (words > 0) {
       const density = (occurrences * kWords / words) * 100
-      if (density > LIMITS.keywordDensityMax) {
-        add('warning', 'keyword', 'keyword-stuffing', `La parola chiave è ripetuta troppo (${density.toFixed(1)}% del testo).`, 'Usa sinonimi e variazioni: la ripetizione forzata viene penalizzata.', 'bodyText')
+      if (density > LIMITS.keywordReviewDensity) {
+        add('info', 'keyword', 'keyword-stuffing', `La frase chiave compare con frequenza elevata (${occurrences} volte).`, 'È un controllo euristico interno, non una percentuale usata da Google. Rileggi il testo e verifica che le ripetizioni siano naturali e davvero utili.', 'bodyText')
       } else {
-        add('good', 'keyword', 'keyword-density', `Frequenza della parola chiave naturale (${occurrences} volte).`, undefined, 'bodyText')
+        add('good', 'keyword', 'keyword-density', `Frequenza della frase chiave senza segnali di ripetizione eccessiva (${occurrences} occorrenze).`, undefined, 'bodyText')
       }
     }
   }

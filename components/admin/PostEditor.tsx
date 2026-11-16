@@ -401,10 +401,10 @@ export default function PostEditor({ post, posts, categories, settings, notify, 
               <Field id="post-focusKeyword" label="Parola chiave principale" hint="La ricerca con cui vuoi essere trovata. Serve solo per i controlli, non viene salvata.">
                 <input id="post-focusKeyword" value={form.focusKeyword} onChange={(e) => set('focusKeyword', e.target.value)} className={inputClass} placeholder="es. rituali del mattino" />
               </Field>
-              <Field id="post-seoTitle" label="Titolo SEO" hint={`Il sito aggiunge in automatico «${TITLE_SUFFIX.trim()}».`} counter={<Counter value={analysis.stats.titleLength} ideal={[LIMITS.titleMin, LIMITS.titleMax]} />}>
+              <Field id="post-seoTitle" label="Titolo SEO" hint={`Il sito aggiunge in automatico «${TITLE_SUFFIX.trim()}». L’intervallo mostrato è indicativo: Google non impone un limite fisso e può abbreviare il titolo in base allo spazio disponibile.`} counter={<Counter value={analysis.stats.titleLength} ideal={[LIMITS.titleMin, LIMITS.titleMax]} />}>
                 <input id="post-seoTitle" value={form.seoTitle} onChange={(e) => set('seoTitle', e.target.value)} maxLength={180} className={inputClass} placeholder={form.title || 'Se vuoto usa il titolo dell’articolo'} />
               </Field>
-              <Field id="post-seoDescription" label="Descrizione SEO" counter={<Counter value={serpDescription.length} ideal={[LIMITS.descriptionMin, LIMITS.descriptionMax]} />}>
+              <Field id="post-seoDescription" label="Descrizione SEO" hint="L’intervallo mostrato è indicativo, non un limite di Google: scrivi un riepilogo specifico e utile. Google può abbreviare lo snippet o scegliere un estratto della pagina." counter={<Counter value={serpDescription.length} ideal={[LIMITS.descriptionMin, LIMITS.descriptionMax]} />}>
                 <textarea id="post-seoDescription" value={form.seoDescription} onChange={(e) => set('seoDescription', e.target.value)} maxLength={320} className={`${inputClass} min-h-20`} placeholder={form.excerpt || 'Se vuota usa il riassunto'} />
               </Field>
               <SerpPreview title={serpTitle} description={serpDescription} slug={form.slug} />

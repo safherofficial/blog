@@ -4,16 +4,16 @@
 export const TITLE_SUFFIX = ' — Controluce'
 
 export const LIMITS = {
+  // Editorial display ranges, not fixed Google limits.
   titleMin: 30,
   titleMax: 60,
   descriptionMin: 70,
   descriptionMax: 160,
   slugMax: 60,
-  wordsThin: 150,
-  wordsShort: 300,
   paragraphWords: 150,
   sentenceWords: 25,
-  keywordDensityMax: 3,
+  // Internal review heuristic only; never used as a Google ranking threshold.
+  keywordReviewDensity: 3,
   altMax: 125,
   staleDays: 90,
   slowResponseMs: 2500,
