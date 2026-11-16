@@ -76,6 +76,14 @@ export default async function ArchivePage({
     return encoded ? `/articoli?${encoded}` : '/articoli'
   }
 
+  const categoryUrl = (slug: string) => {
+    const next = new URLSearchParams()
+    if (query) next.set('q', query)
+    next.set('categoria', slug)
+    if (sort !== 'newest') next.set('ordine', sort)
+    return `/articoli?${next.toString()}`
+  }
+
   return (
     <section className="archive-page">
       <script
@@ -168,13 +176,7 @@ export default async function ArchivePage({
             {categories.map((category) => (
               <Link
                 key={category.slug}
-                href={archiveUrl(1).replace(/([?&])categoria=[^&]*/, '$1').replace(/[?&]$/, '') === '/articoli' ? `/articoli?categoria=${encodeURIComponent(category.slug)}` : (() => {
-                  const next = new URLSearchParams()
-                  if (query) next.set('q', query)
-                  next.set('categoria', category.slug)
-                  if (sort !== 'newest') next.set('ordine', sort)
-                  return `/articoli?${next.toString()}`
-                })()}
+                href={categoryUrl(category.slug)}
                 aria-current={categorySlug === category.slug ? 'true' : undefined}
                 className={`border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors ${categorySlug === category.slug ? 'border-wine bg-wine text-bg' : 'border-line text-ink-soft hover:border-ochre hover:bg-bg-soft hover:text-wine'}`}
               >
