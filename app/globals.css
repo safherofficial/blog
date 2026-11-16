@@ -15,6 +15,11 @@ html {
   background: #F5EFE5;
 }
 
+/* Mantiene visibile la sezione della home sotto la barra compatta durante l'ancoraggio. */
+#in-evidenza {
+  scroll-margin-top: 3.5rem;
+}
+
 body {
   background: theme('colors.bg');
   color: theme('colors.ink');
