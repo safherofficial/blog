@@ -197,6 +197,7 @@ html.has-reveal-motion .reveal-on-scroll:not(.is-visible) {
 
 /* Signature visual language: light passing behind a dark silhouette. */
 .home-hero {
+  min-height: clamp(500px, 62svh, 660px);
   background: #211A15;
   isolation: isolate;
 }
@@ -819,7 +820,7 @@ button {
   }
 
   .home-hero {
-    min-height: max(650px, calc(100svh - 112px));
+    min-height: clamp(500px, 72svh, 600px);
   }
 
   .home-hero h1 {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import PostCard from '@/components/PostCard'
-import { getLatestPosts, getSiteSettings } from '@/lib/db'
+import { getLatestPosts, getPublishedCategories, getSiteSettings } from '@/lib/db'
 import { pageMetadata } from '@/lib/seo/metadata'
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from '@/lib/seo/site'
 
@@ -16,14 +16,15 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default async function HomePage() {
-  const [posts, settings] = await Promise.all([
+  const [posts, settings, categories] = await Promise.all([
     getLatestPosts(3).catch(() => []),
     getSiteSettings().catch(() => null),
+    getPublishedCategories().catch(() => []),
   ])
 
   return (
     <>
-      <section className="home-hero relative isolate flex min-h-[700px] overflow-hidden border-b border-line md:min-h-[78vh] lg:min-h-[calc(100svh-130px)]">
+      <section className="home-hero relative isolate flex overflow-hidden border-b border-line">
         <Image
           src="/images/controluce-hero.webp"
           alt=""
@@ -49,7 +50,7 @@ export default async function HomePage() {
             </p>
             <div className="flex flex-wrap items-center gap-5">
               <Link
-                href="#articoli"
+                href="#in-evidenza"
                 className="hero-cta inline-flex items-center gap-4 border border-[#D3AB76] bg-[#D3AB76] px-6 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#211A15]"
               >
                 Esplora gli articoli <span aria-hidden="true" className="text-lg leading-none">↘</span>
@@ -64,30 +65,54 @@ export default async function HomePage() {
         <div className="hero-edge-mark pointer-events-none absolute bottom-0 right-8 z-10 hidden h-20 w-px origin-bottom bg-gradient-to-t from-[#D5B27F]/80 to-transparent md:block" aria-hidden="true" />
       </section>
 
-      <section id="articoli" className="py-20 md:py-28">
+      <section id="in-evidenza" className="py-16 md:py-20">
         <div className="wrap">
           <div className="reveal-on-scroll mb-12 flex flex-col gap-5 border-b border-line pb-7 sm:flex-row sm:items-end sm:justify-between md:mb-14">
             <div>
               <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.25em] text-ochre">Dal blog</p>
-              <h2 className="font-display text-4xl leading-tight tracking-tight md:text-5xl">Ultimi articoli</h2>
+              <h2 className="font-display text-4xl leading-tight tracking-tight md:text-5xl">In primo piano</h2>
             </div>
             <p className="max-w-[34ch] font-serif text-base leading-relaxed text-ink-soft">
-              Pensieri, scoperte e storie quotidiane, raccontati con calma e curiosità.
+              Idee, storie e punti di vista da leggere senza fretta. Si comincia dal racconto più recente.
             </p>
           </div>
+
           {posts.length === 0 ? (
             <p className="reveal-on-scroll border-l border-ochre py-2 pl-5 text-ink-soft">Nessun articolo è ancora disponibile. Torna presto per leggere i nuovi contenuti.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-3 md:gap-y-16">
-              {posts.map((post, i) => <PostCard key={post._id} post={post} index={i} />)}
-            </div>
-          )}
-          {posts.length > 0 && (
-            <div className="reveal-on-scroll mt-16 text-center md:mt-20">
-              <Link href="/articoli" className="editorial-button inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine hover:bg-wine hover:text-bg">
-                Tutti gli articoli <span aria-hidden="true" className="text-lg leading-none">→</span>
-              </Link>
-            </div>
+            <>
+              <div className="reveal-on-scroll mb-14 md:mb-16">
+                <PostCard post={posts[0]} index={0} featured />
+              </div>
+
+              {categories.length > 0 && (
+                <nav aria-label="Esplora gli articoli per tema" className="reveal-on-scroll mb-14 flex flex-wrap items-center gap-3 border-y border-line py-7">
+                  <span className="mr-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Esplora per tema</span>
+                  {categories.map((category) => (
+                    <Link key={category.slug} href={`/categoria/${category.slug}`} className="border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft transition-colors hover:border-ochre hover:bg-bg-soft hover:text-wine">
+                      {category.title} <span className="text-ochre">{category.count}</span>
+                    </Link>
+                  ))}
+                </nav>
+              )}
+
+              {posts.length > 1 && (
+                <>
+                  <div className="reveal-on-scroll mb-8">
+                    <h2 className="font-display text-3xl leading-tight tracking-tight md:text-4xl">Altre storie recenti</h2>
+                  </div>
+                  <div className="grid grid-cols-1 gap-x-9 gap-y-14 md:grid-cols-2 md:gap-y-16">
+                    {posts.slice(1).map((post, i) => <PostCard key={post._id} post={post} index={i + 1} />)}
+                  </div>
+                </>
+              )}
+
+              <div className="reveal-on-scroll mt-16 text-center md:mt-20">
+                <Link href="/articoli" className="editorial-button inline-flex items-center gap-4 border border-wine px-7 py-4 font-mono text-[11px] uppercase tracking-[0.18em] text-wine hover:bg-wine hover:text-bg">
+                  Tutti gli articoli <span aria-hidden="true" className="text-lg leading-none">→</span>
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>

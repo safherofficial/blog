@@ -99,6 +99,18 @@ export type CategoryInfo = {
   slug: string
 }
 
+export async function getPublishedCategories(): Promise<Array<{ title: string; slug: string; count: number }>> {
+  const { rows } = await sql<{ title: string; slug: string; count: number }>`
+    SELECT c.title, c.slug, COUNT(p.id)::int AS count
+    FROM categories c
+    INNER JOIN posts p ON p.category_id = c.id
+    WHERE p.slug IS NOT NULL AND p.published = TRUE AND p.published_at <= NOW()
+    GROUP BY c.id, c.title, c.slug
+    ORDER BY c.title ASC
+  `
+  return rows
+}
+
 export async function getAllPosts(): Promise<PostSummary[]> {
   const { rows } = await sql<PostSummary>`
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,
