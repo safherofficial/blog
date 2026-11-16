@@ -30,7 +30,7 @@ export default function PostBody({ value }: { value: PortableTextBlock[] }) {
       image: ({ value: image }) => (
         <figure className="article-figure editorial-media-frame reveal-on-scroll relative my-14 aspect-video overflow-hidden border border-line">
           <CropFrame />
-          <Image src={image.url} alt={image.alt || ''} fill quality={90} unoptimized={!isUploadedCoverImageUrl(image.url)} sizes="(max-width: 760px) 100vw, 860px" className="object-cover" />
+          <Image src={image.url} alt={image.alt || ''} fill quality={90} unoptimized={!isUploadedCoverImageUrl(image.url)} sizes="(max-width: 640px) calc(100vw - 44px), (max-width: 767px) calc(100vw - 66px), (max-width: 1099px) 740px, 868px" className="object-cover" />
           {image.alt && <figcaption className="absolute bottom-4 left-4 z-10 max-w-[80%] bg-ink/75 px-3 py-2 font-mono text-[10px] tracking-wide text-bg">{image.alt}</figcaption>}
         </figure>
       ),
