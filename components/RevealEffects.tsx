@@ -59,7 +59,7 @@ export default function RevealEffects() {
       }
     }
 
-    if (!reducedMotion && 'IntersectionObserver' in window) {
+    if (!reducedMotion && finePointer && 'IntersectionObserver' in window) {
       observer = new IntersectionObserver((entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
