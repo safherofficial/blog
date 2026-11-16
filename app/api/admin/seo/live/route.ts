@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
 import { isAdminRequest } from '@/lib/admin-auth'
+import { getIndexNowKey } from '@/lib/seo/indexnow'
 import { getSiteUrl } from '@/lib/seo/site'
 import { runLiveCheck } from '@/lib/seo/live-check'
 
@@ -34,6 +35,7 @@ export async function POST() {
     const result = await runLiveCheck({
       origin,
       siteUrl: origin,
+      indexNowKey: getIndexNowKey(),
       postSlugs: posts.rows.map((r) => r.slug as string),
       categorySlugs: categories.rows.map((r) => r.slug as string),
     })

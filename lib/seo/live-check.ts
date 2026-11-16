@@ -7,6 +7,8 @@ export type LiveCheckInput = {
   origin: string
   /** URL canonico configurato (SITE_URL o il valore di ripiego). */
   siteUrl: string
+  /** Chiave server-side: usata solo per confrontare /indexnow.txt, mai restituita al client. */
+  indexNowKey?: string | null
   postSlugs: string[]
   categorySlugs: string[]
 }
@@ -115,10 +117,11 @@ async function checkGlobals(input: LiveCheckInput, expectedPaths: string[]): Pro
   const siteHost = new URL(input.siteUrl).host
 
   // I tre controlli indipendenti vengono eseguiti in parallelo per rispettare il limite della funzione Vercel.
-  const [robots, sitemap, feed] = await Promise.all([
+  const [robots, sitemap, feed, indexNowKeyFile] = await Promise.all([
     get(input.origin + '/robots.txt').catch(() => null),
     get(input.origin + '/sitemap.xml').catch(() => null),
     get(input.origin + '/feed.xml').catch(() => null),
+    input.indexNowKey ? get(input.origin + '/indexnow.txt').catch(() => null) : Promise.resolve(null),
   ])
 
   if (!robots) {
@@ -157,6 +160,18 @@ async function checkGlobals(input: LiveCheckInput, expectedPaths: string[]): Pro
 
   if (!feed) add('warning', 'feed-unreachable', 'Il feed RSS non è raggiungibile.')
   else if (feed.status !== 200) add('warning', 'feed-missing', `Il feed RSS risponde ${feed.status}.`)
+
+  if (input.indexNowKey) {
+    if (!indexNowKeyFile) {
+      add('error', 'indexnow-keyfile-unreachable', 'Il file di verifica IndexNow non è raggiungibile.', 'Controlla che /indexnow.txt sia pubblicato sul dominio canonico e che la funzione risponda senza errori.')
+    } else if (indexNowKeyFile.status !== 200) {
+      add('error', 'indexnow-keyfile-status', `Il file di verifica IndexNow risponde ${indexNowKeyFile.status}.`, 'IndexNow non può verificare la proprietà se il file non risponde direttamente con HTTP 200.')
+    } else if (indexNowKeyFile.body.trim() !== input.indexNowKey) {
+      add('error', 'indexnow-keyfile-mismatch', 'Il contenuto di /indexnow.txt non corrisponde a INDEXNOW_KEY.', 'La chiave pubblicata nel file deve coincidere con la variabile INDEXNOW_KEY configurata su Vercel.')
+    } else {
+      add('good', 'indexnow-keyfile-ok', 'File di verifica IndexNow raggiungibile e coerente con la chiave configurata.', 'Questo controllo verifica il file pubblico; non dimostra che un motore abbia già indicizzato le pagine.')
+    }
+  }
 
   return issues
 }
