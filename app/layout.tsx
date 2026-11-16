@@ -16,7 +16,7 @@ const sourceSerif = Source_Serif_4({
   weight: ['400', '500', '600'],
   variable: '--font-serif',
 })
-const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-space-mono' })
+const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400'], variable: '--font-space-mono' })
 
 const googleVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim()
 const bingVerification = process.env.BING_SITE_VERIFICATION?.trim() || 'C2F2AE380902663B014F3BFFD6AF7A93'
