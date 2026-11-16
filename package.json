@@ -5,6 +5,7 @@
   "packageManager": "npm@11.20.0",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "if [ \"$VERCEL_ENV\" = \"production\" ]; then npm run db:migrate; else echo \"Database migrations skipped outside Vercel Production.\"; fi",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
