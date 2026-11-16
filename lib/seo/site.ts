@@ -1,6 +1,6 @@
 /** Identità e indirizzi del sito: un'unica fonte per metadati, sitemap, feed e dati strutturati. */
 
-export const FALLBACK_SITE_URL = 'https://controluce.blog'
+export const FALLBACK_SITE_URL = 'https://www.controluce.blog'
 export const SITE_NAME = 'Controluce'
 export const SITE_LOCALE = 'it_IT'
 export const DEFAULT_TITLE = 'Controluce — Blog di lifestyle e vita quotidiana'
@@ -9,7 +9,21 @@ export const DEFAULT_DESCRIPTION =
 
 export function getSiteUrl(): string {
   // SITE_URL è la variabile ufficiale (solo lato server); NEXT_PUBLIC_SITE_URL resta come ripiego per le installazioni esistenti.
-  return (process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim() || FALLBACK_SITE_URL).replace(/\/+$/, '')
+  const configured = process.env.SITE_URL?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim() || FALLBACK_SITE_URL
+  const value = configured.replace(/\/+$/, '')
+
+  // Il dominio pubblico reindirizza in modo permanente al sottodominio www:
+  // canonical, sitemap, robots, feed e dati strutturati devono usare lo stesso host finale.
+  try {
+    const url = new URL(value)
+    if (url.hostname === 'controluce.blog' || url.hostname === 'www.controluce.blog') {
+      url.protocol = 'https:'
+      url.hostname = 'www.controluce.blog'
+    }
+    return url.toString().replace(/\/+$/, '')
+  } catch {
+    return value
+  }
 }
 
 export function absoluteUrl(path = '/'): string {
