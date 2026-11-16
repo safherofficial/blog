@@ -4,7 +4,7 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
   return (
     <footer className="site-footer relative overflow-hidden border-t border-[#4A392A] bg-ink text-bg">
       <div className="footer-light" aria-hidden="true" />
-      <div className="wrap relative z-10 grid grid-cols-1 gap-10 py-14 md:grid-cols-3 md:gap-12 md:py-16">
+      <div className="wrap relative z-10 grid grid-cols-1 gap-10 py-14 md:grid-cols-[1.1fr_0.8fr_1.1fr] md:gap-12 md:py-16">
         <div>
           <Link href="/" className="footer-brand inline-block font-display text-3xl tracking-tight text-bg transition-colors hover:text-ochre">
             {siteTitle || 'Controluce'}
@@ -21,19 +21,22 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
           <Link href="/about" className="footer-link nav-link transition-colors hover:text-ochre">Chi sono</Link>
           <Link href="/articoli" className="footer-link nav-link transition-colors hover:text-ochre">Articoli</Link>
           <Link href="/scrivimi" className="footer-link nav-link transition-colors hover:text-ochre">Parliamone</Link>
-          <Link href="/rss" className="footer-link nav-link transition-colors hover:text-ochre">Feed RSS</Link>
         </nav>
 
         <div className="md:text-right">
-          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-ochre">Resta in ascolto</p>
-          <p className="mb-5 max-w-[31ch] font-serif leading-relaxed text-[#D5C7B7] md:ml-auto">
-            Prenditi il tempo per leggere. Le storie nuove ti aspettano qui.
+          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-ochre">Segui e partecipa</p>
+          <p className="mb-5 max-w-[34ch] font-serif leading-relaxed text-[#D5C7B7] md:ml-auto">
+            Puoi seguire i nuovi articoli tramite il feed RSS{instagramUrl ? ' e trovare gli aggiornamenti anche su Instagram' : ''}. Per condividere un pensiero o suggerire un tema, c&apos;è lo spazio Parliamone.
           </p>
-          {instagramUrl ? (
-            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="footer-link nav-link inline-block font-mono text-[10px] uppercase tracking-[0.2em] text-bg transition-colors hover:text-ochre">Instagram ↗</a>
-          ) : (
-            <Link href="/rss" className="footer-link nav-link inline-block font-mono text-[10px] uppercase tracking-[0.2em] text-bg transition-colors hover:text-ochre">Ricevi gli aggiornamenti ↗</Link>
-          )}
+          <nav aria-label="Canali e contatti" className="flex flex-wrap gap-x-5 gap-y-3 font-mono text-[10px] uppercase tracking-[0.2em] text-bg md:justify-end">
+            <Link href="/rss" className="footer-link nav-link inline-block transition-colors hover:text-ochre">Feed RSS ↗</Link>
+            <Link href="/scrivimi" className="footer-link nav-link inline-block transition-colors hover:text-ochre">Parliamone ↗</Link>
+            {instagramUrl && (
+              <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="footer-link nav-link inline-block transition-colors hover:text-ochre">
+                Instagram ↗
+              </a>
+            )}
+          </nav>
         </div>
       </div>
 
