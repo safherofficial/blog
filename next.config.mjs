@@ -2,7 +2,6 @@
 const noindex = [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }]
 const nextConfig = {
   reactStrictMode: true,
-  images: { unoptimized: true },
   experimental: {
     outputFileTracingIncludes: {
       '/og': ['./assets/fonts/**'],
