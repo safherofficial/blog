@@ -28,7 +28,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid #A17A45;
+  outline: 2px solid #9D7440;
   outline-offset: 4px;
 }
 
@@ -880,9 +880,7 @@ html {
   transform: none;
 }
 
-main:focus {
-  outline: none;
-}
+
 
 /* ------------------------------------------------------------------ */
 /* Barra compatta con indicatore di lettura                              */
@@ -1113,4 +1111,20 @@ h2:hover .heading-anchor,
     height: 100%;
     object-fit: contain;
   }
+}
+
+
+/* U6-A: accessible text contrast and visible skip-link destination. */
+.text-ochre,
+.hover\\:text-ochre:hover {
+  color: #795832;
+}
+
+.toc-index {
+  color: #795832;
+}
+
+main:focus-visible {
+  outline: 2px solid #9D7440;
+  outline-offset: 4px;
 }

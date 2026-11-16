@@ -6,7 +6,7 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
       <div className="footer-light" aria-hidden="true" />
       <div className="wrap relative z-10 grid grid-cols-1 gap-10 py-14 md:grid-cols-[1.1fr_0.8fr_1.1fr] md:gap-12 md:py-16">
         <div>
-          <Link href="/" className="footer-brand inline-block font-display text-3xl tracking-tight text-bg transition-colors hover:text-ochre">
+          <Link href="/" className="footer-brand inline-block font-display text-3xl tracking-tight text-bg transition-colors hover:text-[#D5B27F]">
             {siteTitle || 'Controluce'}
           </Link>
           <p className="mt-4 max-w-[34ch] font-serif text-base leading-relaxed text-[#D5C7B7]">
@@ -16,11 +16,11 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
         </div>
 
         <nav aria-label="Navigazione footer" className="flex flex-col items-start gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-[#D5C7B7] md:mx-auto">
-          <p className="mb-1 text-[9px] tracking-[0.25em] text-ochre">Esplora</p>
-          <Link href="/" className="footer-link nav-link transition-colors hover:text-ochre">Home</Link>
-          <Link href="/about" className="footer-link nav-link transition-colors hover:text-ochre">Chi sono</Link>
-          <Link href="/articoli" className="footer-link nav-link transition-colors hover:text-ochre">Articoli</Link>
-          <Link href="/scrivimi" className="footer-link nav-link transition-colors hover:text-ochre">Parliamone</Link>
+          <p className="mb-1 text-[9px] tracking-[0.25em] text-[#D5B27F]">Esplora</p>
+          <Link href="/" className="footer-link nav-link transition-colors hover:text-[#D5B27F]">Home</Link>
+          <Link href="/about" className="footer-link nav-link transition-colors hover:text-[#D5B27F]">Chi sono</Link>
+          <Link href="/articoli" className="footer-link nav-link transition-colors hover:text-[#D5B27F]">Articoli</Link>
+          <Link href="/scrivimi" className="footer-link nav-link transition-colors hover:text-[#D5B27F]">Parliamone</Link>
         </nav>
 
         <div className="md:text-right">
@@ -29,10 +29,10 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
             Puoi seguire i nuovi articoli tramite il feed RSS{instagramUrl ? ' e trovare gli aggiornamenti anche su Instagram' : ''}. Per condividere un pensiero o suggerire un tema, c&apos;è lo spazio Parliamone.
           </p>
           <nav aria-label="Canali e contatti" className="flex flex-wrap gap-x-5 gap-y-3 font-mono text-[10px] uppercase tracking-[0.2em] text-bg md:justify-end">
-            <Link href="/rss" className="footer-link nav-link inline-block transition-colors hover:text-ochre">Feed RSS ↗</Link>
-            <Link href="/scrivimi" className="footer-link nav-link inline-block transition-colors hover:text-ochre">Parliamone ↗</Link>
+            <Link href="/rss" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">Feed RSS ↗</Link>
+            <Link href="/scrivimi" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">Parliamone ↗</Link>
             {instagramUrl && (
-              <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="footer-link nav-link inline-block transition-colors hover:text-ochre">
+              <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">
                 Instagram ↗
               </a>
             )}
@@ -44,7 +44,7 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl }: { sit
         <span>
           &copy; {new Date().getFullYear()} {siteTitle || 'Controluce'}. Tutti i diritti riservati.
         </span>
-        <Link href="/privacy-policy" className="footer-link nav-link w-fit transition-colors hover:text-ochre">Privacy Policy</Link>
+        <Link href="/privacy-policy" className="footer-link nav-link w-fit transition-colors hover:text-[#D5B27F]">Privacy Policy</Link>
       </div>
     </footer>
   )
