@@ -10,7 +10,7 @@ const gradients = [
   'from-[#C09B69] to-[#4A3024]',
 ]
 
-export default function PostCard({ post, index = 0, featured = false, headingLevel = 3 }: { post: PostSummary; index?: number; featured?: boolean; headingLevel?: 2 | 3 }) {
+export default function PostCard({ post, index = 0, featured = false, headingLevel = 3, imageSizes = '(max-width: 640px) calc(100vw - 46px), (max-width: 767px) calc(100vw - 66px), (max-width: 1375px) calc((min(100vw, 1240px) - 144px) / 3), 365px' }: { post: PostSummary; index?: number; featured?: boolean; headingLevel?: 2 | 3; imageSizes?: string }) {
   const Heading = headingLevel === 2 ? 'h2' : 'h3'
   const date = new Date(post.publishedAt).toLocaleDateString('it-IT', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -27,7 +27,7 @@ export default function PostCard({ post, index = 0, featured = false, headingLev
               alt={post.coverImage.alt || post.title}
               width={1200}
               height={800}
-              sizes="(max-width: 767px) 100vw, (max-width: 1100px) 50vw, 33vw"
+              sizes={imageSizes}
               quality={90}
               unoptimized={!isUploadedCoverImageUrl(post.coverImage.url)}
               className="editorial-card-image block h-auto w-full object-contain"
