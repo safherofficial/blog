@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getAllPosts } from '@/lib/db'
+import { getAllPosts, type PostSummary } from '@/lib/db'
 import { absoluteUrl } from '@/lib/seo/site'
 
 // Refresh sitemap entries for newly published and scheduled posts without a new deployment.
@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Derive populated categories from the already-fetched public posts.
   // This avoids one additional database query per category while excluding empty archives.
-  const postsByCategory = new Map<string, typeof posts>()
+  const postsByCategory = new Map<string, PostSummary[]>()
   for (const post of posts) {
     const slug = post.category?.slug
     if (!slug) continue
