@@ -158,7 +158,7 @@ export default function ArticlePreview({
       image: ({ value: image }) => (
         <figure className="article-figure editorial-media-frame reveal-on-scroll relative my-14 aspect-video overflow-hidden border border-line">
           <CropFrame />
-          <Image src={image.url} alt={image.alt || ''} fill quality={90} unoptimized={!isUploadedCoverImageUrl(image.url)} sizes="(max-width: 760px) 100vw, 860px" className="object-cover" />
+          <Image src={image.url} alt={image.alt || ''} fill quality={90} unoptimized={!isUploadedCoverImageUrl(image.url)} sizes="(max-width: 640px) calc(100vw - 44px), (max-width: 767px) calc(100vw - 66px), (max-width: 1099px) 740px, 868px" className="object-cover" />
           {image.alt && <figcaption className="absolute bottom-4 left-4 z-10 max-w-[80%] bg-ink/75 px-3 py-2 font-mono text-[10px] tracking-wide text-bg">{image.alt}</figcaption>}
         </figure>
       ),
@@ -240,7 +240,7 @@ export default function ArticlePreview({
                       width={1600}
                       height={1000}
                       priority
-                      sizes="(max-width: 767px) 100vw, 1160px"
+                      sizes="(max-width: 640px) calc(100vw - 46px), (max-width: 1375px) calc(100vw - 66px), 1176px"
                       quality={90}
                       unoptimized={!isUploadedCoverImageUrl(coverImageUrl.trim())}
                       className="block h-auto w-full object-contain"
