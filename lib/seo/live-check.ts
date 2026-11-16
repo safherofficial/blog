@@ -143,18 +143,45 @@ async function checkGlobals(input: LiveCheckInput, expectedPaths: string[]): Pro
     if (locs.length === 0) {
       add('error', 'sitemap-empty', 'La sitemap è vuota.')
     } else {
-      const foreign = locs.filter((loc) => {
-        try { return new URL(loc).host !== siteHost } catch { return true }
+      const parsedLocs = locs.map((loc) => {
+        try { return new URL(loc) } catch { return null }
       })
+      const invalid = parsedLocs.filter((url) => url === null).length
+      const validLocs = parsedLocs.filter((url): url is URL => url !== null)
+      if (invalid > 0) {
+        add('error', 'sitemap-invalid-url', `La sitemap contiene ${invalid} URL non assoluti o non validi.`, 'Ogni <loc> deve contenere un URL completo e valido, incluso https:// e il dominio.')
+      }
+
+      const foreign = validLocs.filter((url) => url.host !== siteHost)
       if (foreign.length > 0) {
         add('error', 'sitemap-host', `La sitemap contiene ${foreign.length} URL su un host diverso dal dominio canonico ${siteHost}.`, 'Verifica SITE_URL e assicurati che tutte le voci della sitemap puntino al dominio principale.')
       }
-      const present = new Set(locs.map((loc) => {
-        try { return trimSlash(new URL(loc).pathname) } catch { return loc }
-      }))
-      const missing = expectedPaths.filter((path) => path.startsWith('/blog/') && !present.has(trimSlash(path)))
-      if (missing.length > 0) add('warning', 'sitemap-missing-posts', `${missing.length} articol${missing.length === 1 ? 'o pubblico manca' : 'i pubblici mancano'} nella sitemap.`, 'La sitemap si aggiorna ogni 5 minuti: se è un articolo appena pubblicato, ricontrolla più tardi.')
-      else if (foreign.length === 0) add('good', 'sitemap-ok', `Sitemap raggiungibile con ${locs.length} URL.`)
+
+      const nonHttps = validLocs.filter((url) => url.protocol !== 'https:')
+      if (nonHttps.length > 0) {
+        add('error', 'sitemap-https', `La sitemap contiene ${nonHttps.length} URL che non usano HTTPS.`, 'La sitemap deve indicare gli indirizzi canonici HTTPS del sito.')
+      }
+
+      const variants = validLocs.filter((url) => Boolean(url.search || url.hash))
+      if (variants.length > 0) {
+        add('warning', 'sitemap-url-variants', `La sitemap contiene ${variants.length} URL con parametri o frammenti.`, 'Inserisci nella sitemap solo gli URL canonici, senza parametri di ricerca o frammenti.')
+      }
+
+      const normalizedLocs = validLocs.map((url) => `${url.origin}${trimSlash(url.pathname)}${url.search}${url.hash}`)
+      const duplicates = normalizedLocs.length - new Set(normalizedLocs).size
+      if (duplicates > 0) {
+        add('warning', 'sitemap-duplicates', `La sitemap contiene ${duplicates} URL duplicati.`, 'Rimuovi le voci ripetute, comprese quelle che differiscono soltanto per la barra finale.')
+      }
+
+      const present = new Set(validLocs.filter((url) => url.host === siteHost).map((url) => trimSlash(url.pathname)))
+      const missing = expectedPaths.filter((path) => !present.has(trimSlash(path)))
+      if (missing.length > 0) {
+        add('warning', 'sitemap-missing-pages', `${missing.length} pagin${missing.length === 1 ? 'a pubblica manca' : 'e pubbliche mancano'} nella sitemap.`, 'Il controllo confronta tutte le pagine pubbliche note dal database, non soltanto quelle visitate nel campione. La sitemap si aggiorna ogni 5 minuti: ricontrolla se hai appena pubblicato un articolo.')
+      }
+
+      if (invalid === 0 && foreign.length === 0 && nonHttps.length === 0 && variants.length === 0 && duplicates === 0 && missing.length === 0) {
+        add('good', 'sitemap-ok', `Sitemap coerente: ${locs.length} URL validi e tutte le pagine pubbliche note sono presenti.`)
+      }
     }
   }
 
@@ -191,7 +218,9 @@ export async function runLiveCheck(input: LiveCheckInput): Promise<LiveCheck> {
   }
 
   const paths = [...new Set([...staticPaths, ...selectedContentPaths])].slice(0, MAX_PAGES)
-  const global = await checkGlobals(input, paths)
+  // La scansione HTML resta limitata a 32 pagine, ma la coerenza della sitemap
+  // viene verificata rispetto a tutte le pagine pubbliche note dal database.
+  const global = await checkGlobals(input, allPaths)
   const pages: LivePage[] = new Array(paths.length)
   let cursor = 0
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, paths.length) }, async () => {

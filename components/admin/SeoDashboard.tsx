@@ -121,7 +121,7 @@ export default function SeoDashboard({ onEditPost, notify, onUnauthorized }: { o
 
       <Card
         title="Scansione del sito pubblicato"
-        description="Controlla robots.txt, sitemap, feed RSS, file di verifica IndexNow (se configurato) e un campione fino a 32 pagine pubbliche sul dominio canonico (stato HTTP, title, description, canonical, noindex, H1, immagini e velocità)."
+        description="Controlla robots.txt, la coerenza di tutte le URL pubbliche nella sitemap, feed RSS, file di verifica IndexNow (se configurato) e un campione fino a 32 pagine pubbliche sul dominio canonico (stato HTTP, title, description, canonical, noindex, H1, immagini e velocità)."
         action={<button type="button" onClick={() => void scan()} disabled={scanning} className={primaryButton}>{scanning ? 'Scansione in corso…' : live ? 'Scansiona di nuovo' : 'Avvia scansione'}</button>}
       >
         {!live && !scanning && <p className="text-sm text-ink-soft">La scansione usa il dominio definito in SITE_URL e visita fino a 32 pagine per restare entro il limite della funzione server. Non modifica nulla.</p>}
