@@ -1256,3 +1256,22 @@ main:focus-visible {
   }
 }
 
+/* U20 — Keep article metadata readable when the masthead wraps on phones. */
+@media (max-width: 520px) {
+  .article-meta-separator {
+    display: none;
+  }
+
+  .article-date {
+    column-gap: 0.6rem;
+    row-gap: 0.55rem;
+    line-height: 1.6;
+  }
+
+  .article-masthead-content .article-back-link {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.5;
+  }
+}
+

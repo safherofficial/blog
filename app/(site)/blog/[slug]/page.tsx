@@ -76,6 +76,11 @@ export default async function PostPage({ params }: PostRouteProps) {
     getAdjacentPosts(post._id).catch(() => ({ newer: null, older: null })),
     getSiteSettings().catch(() => null),
   ])
+  const categoryInfo = post.category
+    ? getCategoryEditorialInfo(post.category.slug, post.category.title)
+    : null
+  const backHref = post.category ? `/categoria/${post.category.slug}` : '/articoli'
+  const backLabel = categoryInfo ? `← Torna a ${categoryInfo.label}` : '← Torna agli articoli'
   const coverImageUrl = getImageUrl(post.coverImage)
   const headings = getHeadings(post.body)
   const minutes = readingMinutes(post.body)
@@ -117,7 +122,7 @@ export default async function PostPage({ params }: PostRouteProps) {
             breadcrumbJsonLd([
               { name: 'Home', path: '/' },
               { name: 'Articoli', path: '/articoli' },
-              ...(post.category ? [{ name: getCategoryEditorialInfo(post.category.slug, post.category.title).label, path: `/categoria/${post.category.slug}` }] : []),
+              ...(post.category ? [{ name: categoryInfo?.label || post.category.title, path: `/categoria/${post.category.slug}` }] : []),
               { name: post.title, path: `/blog/${post.slug}` },
             ]),
           ]),
@@ -128,15 +133,15 @@ export default async function PostPage({ params }: PostRouteProps) {
         <div className="article-masthead-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="wrap article-masthead-content relative z-10 reveal-on-scroll">
           <Link
-            href="/articoli"
-            className="article-back-link nav-link mb-9 inline-block font-mono text-[10px] uppercase tracking-[0.19em]"
+            href={backHref}
+            className="article-back-link nav-link mb-9 inline-flex min-h-[44px] items-center font-mono text-[10px] uppercase tracking-[0.19em]"
           >
-            {'← Torna agli articoli'}
+            {backLabel}
           </Link>
           <p className="article-category mb-5 font-mono text-[10px] uppercase tracking-[0.26em]">
             {post.category ? (
               <Link href={`/categoria/${post.category.slug}`} className="nav-link">
-                {getCategoryEditorialInfo(post.category.slug, post.category.title).label}
+                {categoryInfo?.label || post.category.title}
               </Link>
             ) : (
               'Dal diario'
@@ -146,9 +151,9 @@ export default async function PostPage({ params }: PostRouteProps) {
           <div role="group" aria-label="Informazioni sull’articolo" className="article-date mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.16em]">
             <span className="inline-block h-px w-8 bg-[#C9A879]" />
             <span>Pubblicato il <time dateTime={post.publishedAt}>{date}</time></span>
-            <span aria-hidden="true">·</span>
+            <span className="article-meta-separator" aria-hidden="true">·</span>
             <span>{minutes} min di lettura</span>
-            <span aria-hidden="true">·</span>
+            <span className="article-meta-separator" aria-hidden="true">·</span>
             <span>
               A cura di{' '}
               <Link href="/about" className="nav-link font-semibold text-[#E8CEAA] transition-colors hover:text-[#F5D7A8]">
@@ -157,7 +162,7 @@ export default async function PostPage({ params }: PostRouteProps) {
             </span>
             {updated && (
               <>
-                <span aria-hidden="true">·</span>
+                <span className="article-meta-separator" aria-hidden="true">·</span>
                 <span>Aggiornato il <time dateTime={post.updatedAt}>{updated}</time></span>
               </>
             )}
