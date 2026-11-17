@@ -44,6 +44,7 @@ export async function generateMetadata({ params }: PostRouteProps): Promise<Meta
     path: `/blog/${post.slug}`,
     image: coverImageUrl || `/blog/${post.slug}/og`,
     imageAlt: post.coverImage?.alt || post.title,
+    ...(!coverImageUrl ? { imageWidth: 1200, imageHeight: 630, imageType: 'image/png' } : {}),
   })
 
   return {
