@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless'
+import { cache } from 'react'
 import { getRelatedCategorySlugs } from '@/lib/seo/categories'
 
 type NeonQueryResult<Row> = {
@@ -132,7 +133,7 @@ export type CategoryInfo = {
   slug: string
 }
 
-export async function getPublishedCategories(): Promise<Array<{ title: string; slug: string; count: number }>> {
+export const getPublishedCategories = cache(async function getPublishedCategories(): Promise<Array<{ title: string; slug: string; count: number }>> {
   const { rows } = await sql<{ title: string; slug: string; count: number }>`
     SELECT c.title, c.slug, COUNT(p.id)::int AS count
     FROM categories c
@@ -142,7 +143,7 @@ export async function getPublishedCategories(): Promise<Array<{ title: string; s
     ORDER BY c.title ASC
   `
   return rows
-}
+})
 
 export type CategoryReadingPath = {
   title: string
@@ -406,7 +407,7 @@ export async function getAllPostSlugs(): Promise<string[]> {
   return rows.map((row) => row.slug)
 }
 
-export async function getSiteSettings(): Promise<SiteSettings | null> {
+export const getSiteSettings = cache(async function getSiteSettings(): Promise<SiteSettings | null> {
   await ensureSiteSettingsSchema()
   const { rows } = await sql<SiteSettings>`
     SELECT site_title AS "siteTitle", tagline, author_name AS "authorName",
@@ -417,7 +418,7 @@ export async function getSiteSettings(): Promise<SiteSettings | null> {
     FROM site_settings WHERE id = 1 LIMIT 1
   `
   return rows[0] || null
-}
+})
 
 export async function getAllCategorySlugs(): Promise<string[]> {
   const { rows } = await sql<{ slug: string }>`SELECT slug FROM categories ORDER BY title`
