@@ -182,7 +182,7 @@ export default async function PostPage({ params }: PostRouteProps) {
               height={1000}
               priority
               sizes="(max-width: 640px) calc(100vw - 46px), (max-width: 1375px) calc(100vw - 66px), 1176px"
-              quality={90}
+              quality={75}
               unoptimized={!isUploadedCoverImageUrl(post.coverImage.url)}
               className="block h-auto w-full object-contain"
             />
