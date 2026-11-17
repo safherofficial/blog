@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation'
 export default function RevealEffects() {
   const pathname = usePathname()
   const lastTrackedPath = useRef('')
+  const scanRevealElements = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -62,6 +63,8 @@ export default function RevealEffects() {
       root.classList.add('has-reveal-motion')
     }
 
+    scanRevealElements.current = () => observeRevealElements(document)
+
     const paintScrollState = () => {
       const scrollY = window.scrollY
       if (siteBar) siteBar.dataset.visible = String(scrollY > 280)
@@ -91,6 +94,7 @@ export default function RevealEffects() {
 
     return () => {
       observer?.disconnect()
+      scanRevealElements.current = null
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('scroll', handleScrollOrResize)
       window.removeEventListener('resize', handleScrollOrResize)
@@ -106,12 +110,7 @@ export default function RevealEffects() {
 
     // App Router commits the new page before this effect runs, so newly rendered
     // reveal elements can be observed without watching every DOM mutation.
-    const revealElements = document.querySelectorAll('.reveal-on-scroll')
-    revealElements.forEach((element) => {
-      if (!element.classList.contains('is-visible') && !document.documentElement.classList.contains('has-reveal-motion')) {
-        element.classList.add('is-visible')
-      }
-    })
+    scanRevealElements.current?.()
 
     document.querySelectorAll<HTMLAnchorElement>('[data-site-navigation] a[href]').forEach((link) => {
       const linkPath = new URL(link.href, window.location.origin).pathname
