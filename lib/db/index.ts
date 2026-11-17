@@ -458,14 +458,23 @@ export async function getRelatedPosts(currentId: string, categorySlug?: string |
                 ELSE json_build_object('title', c.title, 'slug', c.slug) END AS category
     FROM posts p
     LEFT JOIN categories c ON c.id = p.category_id
-    WHERE p.id <> ${currentId} AND p.published = TRUE AND p.published_at <= NOW()
+    WHERE p.id <> ${currentId}
+      AND p.slug IS NOT NULL
+      AND p.published = TRUE
+      AND p.published_at <= NOW()
+      AND (
+        c.slug = ${categorySlug}
+        OR c.slug = ${relatedSlugs[0] || null}
+        OR c.slug = ${relatedSlugs[1] || null}
+        OR c.slug = ${relatedSlugs[2] || null}
+      )
     ORDER BY
       CASE
         WHEN c.slug = ${categorySlug} THEN 0
-        WHEN c.slug = ${relatedSlugs[0] || null}
-          OR c.slug = ${relatedSlugs[1] || null}
-          OR c.slug = ${relatedSlugs[2] || null} THEN 1
-        ELSE 2
+        WHEN c.slug = ${relatedSlugs[0] || null} THEN 1
+        WHEN c.slug = ${relatedSlugs[1] || null} THEN 2
+        WHEN c.slug = ${relatedSlugs[2] || null} THEN 3
+        ELSE 4
       END ASC,
       p.published_at DESC,
       p.id ASC

@@ -12,6 +12,7 @@ import ArticleToc from '@/components/ArticleToc'
 import CropFrame from '@/components/CropFrame'
 import { getHeadings, readingMinutes } from '@/lib/content/article'
 import { isUploadedCoverImageUrl } from '@/lib/content/images'
+import { getRelatedCategorySlugs } from '@/lib/seo/categories'
 import { editorTextToPortableText } from '@/lib/content/editor'
 import type { PortableTextBlock } from '@/lib/db'
 import AuthorCard from '@/components/AuthorCard'
@@ -91,11 +92,17 @@ export default function ArticlePreview({
     ? livePosts.filter((item) => item.category_id === currentCategoryId)
     : []
   const selectedSameCategory = sameCategory.slice(0, 3)
-  const excludedRelatedIds = new Set([previewId, ...selectedSameCategory.map((item) => item.id)])
-  const relatedFillers = livePosts
-    .filter((item) => !excludedRelatedIds.has(item.id))
+  const selectedIds = new Set([previewId, ...selectedSameCategory.map((item) => item.id)])
+  const relatedCategoryIds = category
+    ? getRelatedCategorySlugs(category.slug)
+      .map((slug) => categories.find((item) => item.slug === slug)?.id)
+      .filter((id): id is string => Boolean(id))
+    : []
+  const relatedFillers = relatedCategoryIds
+    .flatMap((categoryId) => livePosts.filter((item) => item.category_id === categoryId))
+    .filter((item) => !selectedIds.has(item.id))
     .slice(0, Math.max(0, 3 - selectedSameCategory.length))
-  const relatedPosts = [...selectedSameCategory, ...relatedFillers]
+  const relatedPosts = [...selectedSameCategory, ...relatedFillers].slice(0, 3)
 
   function asPostSummary(item: Post) {
     const itemCategory = categories.find((entry) => entry.id === item.category_id)

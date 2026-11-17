@@ -221,8 +221,11 @@ export default async function PostPage({ params }: PostRouteProps) {
         <section className="border-t border-line bg-bg-soft py-20 md:py-24">
           <div className="wrap">
             <div className="reveal-on-scroll mb-10">
-              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">Continua a leggere</p>
-              <h2 className="font-display text-3xl md:text-4xl">Articoli collegati</h2>
+              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">Altre prospettive</p>
+              <h2 className="font-display text-3xl md:text-4xl">In tema con questa lettura</h2>
+              <p className="mt-3 max-w-[58ch] font-serif text-base leading-relaxed text-ink-soft">
+                Articoli della stessa categoria e di temi editorialmente affini, scelti per proseguire il percorso.
+              </p>
             </div>
             <div className="grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-3">
               {relatedPosts.map((relatedPost, i) => (
