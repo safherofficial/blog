@@ -161,15 +161,17 @@ export async function getCategoryReadingPaths(): Promise<CategoryReadingPath[]> 
     SELECT
       c.title,
       c.slug,
-      COUNT(p.id)::int AS count,
+      (
+        SELECT COUNT(*)::int
+        FROM posts p
+        WHERE p.category_id = c.id
+          AND p.slug IS NOT NULL
+          AND p.published = TRUE
+          AND p.published_at <= NOW()
+      ) AS count,
       archive.post AS "archivePost"
     FROM categories c
-    INNER JOIN posts p
-      ON p.category_id = c.id
-      AND p.slug IS NOT NULL
-      AND p.published = TRUE
-      AND p.published_at <= NOW()
-    LEFT JOIN LATERAL (
+    INNER JOIN LATERAL (
       SELECT json_build_object(
         '_id', item.id::text,
         'title', item.title,
@@ -191,7 +193,6 @@ export async function getCategoryReadingPaths(): Promise<CategoryReadingPath[]> 
       ORDER BY item.published_at ASC, item.id ASC
       LIMIT 1
     ) archive ON TRUE
-    GROUP BY c.id, c.title, c.slug, archive.post
     ORDER BY c.title ASC
   `
   return rows
