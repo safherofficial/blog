@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import PostCard from '@/components/PostCard'
-import { getLatestPosts, getPublishedCategories, getSiteSettings } from '@/lib/db'
+import { getLatestPosts, getCategoryReadingPaths, getSiteSettings } from '@/lib/db'
 import { pageMetadata } from '@/lib/seo/metadata'
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from '@/lib/seo/site'
 import { AUTHOR_PEN_NAME } from '@/lib/author'
@@ -18,10 +18,10 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default async function HomePage() {
-  const [posts, settings, categories] = await Promise.all([
+  const [posts, settings, readingPaths] = await Promise.all([
     getLatestPosts(3).catch(() => []),
     getSiteSettings().catch(() => null),
-    getPublishedCategories().catch(() => []),
+    getCategoryReadingPaths().catch(() => []),
   ])
 
   return (
@@ -119,15 +119,46 @@ export default async function HomePage() {
                 <PostCard post={posts[0]} index={0} featured imageSizes="(max-width: 640px) calc(100vw - 46px), (max-width: 1023px) calc(100vw - 66px), (max-width: 1375px) calc((min(100vw, 1240px) - 592px) * 7 / 12 + 288px), 665px" />
               </div>
 
-              {categories.length > 0 && (
-                <nav aria-label="Esplora gli articoli per tema" className="reveal-on-scroll mb-14 flex flex-wrap items-center gap-3 border-y border-line py-7">
-                  <span className="mr-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Esplora per tema</span>
-                  {categories.map((category) => (
-                    <Link key={category.slug} href={`/categoria/${category.slug}`} className="border border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-soft transition-colors hover:border-ochre hover:bg-bg-soft hover:text-wine">
-                      {getCategoryEditorialInfo(category.slug, category.title).label} <span className="text-ochre">{category.count}</span>
-                    </Link>
-                  ))}
-                </nav>
+              {readingPaths.length > 0 && (
+                <section aria-labelledby="reading-paths-title" className="reveal-on-scroll mb-16 border-y border-line py-10 md:py-14">
+                  <div className="mb-8 flex flex-col gap-3 md:mb-10 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">Percorsi di lettura</p>
+                      <h2 id="reading-paths-title" className="font-display text-3xl leading-tight tracking-tight md:text-4xl">Scegli un tema, segui il filo.</h2>
+                    </div>
+                    <p className="max-w-[44ch] font-serif text-base leading-relaxed text-ink-soft">
+                      Ogni argomento è un punto di partenza. Puoi cominciare da una lettura e proseguire tra tutte le storie della stessa sezione.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {readingPaths.map((path) => {
+                      const info = getCategoryEditorialInfo(path.slug, path.title)
+                      return (
+                        <article key={path.slug} className="flex min-w-0 flex-col border border-line bg-bg-soft/50 p-5 md:p-6">
+                          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.19em] text-ochre">
+                            {path.count} {path.count === 1 ? 'articolo pubblicato' : 'articoli pubblicati'}
+                          </p>
+                          <h3 className="mb-3 font-display text-2xl leading-tight text-ink">{info.label}</h3>
+                          <p className="mb-6 flex-1 font-serif text-[15px] leading-relaxed text-ink-soft">{info.description}</p>
+
+                          {path.archivePost && (
+                            <div className="mb-5 border-t border-line pt-4">
+                              <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.16em] text-ochre">Una lettura dall&apos;archivio</p>
+                              <Link href={`/blog/${path.archivePost.slug}`} className="nav-link font-display text-lg leading-snug text-ink hover:text-wine">
+                                {path.archivePost.title} <span aria-hidden="true">↗</span>
+                              </Link>
+                            </div>
+                          )}
+
+                          <Link href={`/categoria/${path.slug}`} className="mt-auto inline-flex items-center gap-2 border-t border-line pt-4 font-mono text-[9px] uppercase tracking-[0.15em] text-wine transition-colors hover:text-ochre">
+                            Esplora il percorso <span aria-hidden="true">→</span>
+                          </Link>
+                        </article>
+                      )
+                    })}
+                  </div>
+                </section>
               )}
 
               {posts.length > 1 && (

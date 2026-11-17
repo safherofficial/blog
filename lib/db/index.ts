@@ -144,6 +144,59 @@ export async function getPublishedCategories(): Promise<Array<{ title: string; s
   return rows
 }
 
+export type CategoryReadingPath = {
+  title: string
+  slug: string
+  count: number
+  archivePost: PostSummary
+}
+
+/**
+ * Returns one real, published entry point for every category.
+ * The archive article is the oldest published post in that category, so
+ * older work remains discoverable without editorially ranking its quality.
+ */
+export async function getCategoryReadingPaths(): Promise<CategoryReadingPath[]> {
+  const { rows } = await sql<CategoryReadingPath>`
+    SELECT
+      c.title,
+      c.slug,
+      COUNT(p.id)::int AS count,
+      archive.post AS "archivePost"
+    FROM categories c
+    INNER JOIN posts p
+      ON p.category_id = c.id
+      AND p.slug IS NOT NULL
+      AND p.published = TRUE
+      AND p.published_at <= NOW()
+    LEFT JOIN LATERAL (
+      SELECT json_build_object(
+        '_id', item.id::text,
+        'title', item.title,
+        'slug', item.slug,
+        'excerpt', item.excerpt,
+        'coverImage', CASE
+          WHEN item.cover_image_url IS NULL THEN NULL
+          ELSE json_build_object('url', item.cover_image_url, 'alt', item.cover_image_alt)
+        END,
+        'publishedAt', item.published_at,
+        'updatedAt', item.updated_at,
+        'category', json_build_object('title', c.title, 'slug', c.slug)
+      ) AS post
+      FROM posts item
+      WHERE item.category_id = c.id
+        AND item.slug IS NOT NULL
+        AND item.published = TRUE
+        AND item.published_at <= NOW()
+      ORDER BY item.published_at ASC, item.id ASC
+      LIMIT 1
+    ) archive ON TRUE
+    GROUP BY c.id, c.title, c.slug, archive.post
+    ORDER BY c.title ASC
+  `
+  return rows
+}
+
 export type ArchiveSort = 'newest' | 'oldest'
 
 export type ArchivePostsResult = {
