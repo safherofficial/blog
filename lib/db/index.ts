@@ -277,6 +277,92 @@ export async function getAllPosts(): Promise<PostSummary[]> {
   return rows
 }
 
+export type AdjacentPosts = {
+  newer: PostSummary | null
+  older: PostSummary | null
+}
+
+/**
+ * Fetch only the two published articles immediately surrounding the current one.
+ * Uses the same deterministic ordering as the archive: newest date first,
+ * then ascending id for articles published at the same time.
+ */
+export async function getAdjacentPosts(currentId: string): Promise<AdjacentPosts> {
+  const { rows } = await sql<AdjacentPosts>`
+    WITH current_post AS (
+      SELECT id, published_at
+      FROM posts
+      WHERE id = ${currentId}
+        AND slug IS NOT NULL
+        AND published = TRUE
+        AND published_at <= NOW()
+      LIMIT 1
+    )
+    SELECT newer.post AS newer, older.post AS older
+    FROM current_post
+    LEFT JOIN LATERAL (
+      SELECT json_build_object(
+        '_id', p.id::text,
+        'title', p.title,
+        'slug', p.slug,
+        'excerpt', p.excerpt,
+        'coverImage', CASE
+          WHEN p.cover_image_url IS NULL THEN NULL
+          ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt)
+        END,
+        'publishedAt', p.published_at,
+        'updatedAt', p.updated_at,
+        'category', CASE
+          WHEN c.id IS NULL THEN NULL
+          ELSE json_build_object('title', c.title, 'slug', c.slug)
+        END
+      ) AS post
+      FROM posts p
+      LEFT JOIN categories c ON c.id = p.category_id
+      WHERE p.slug IS NOT NULL
+        AND p.published = TRUE
+        AND p.published_at <= NOW()
+        AND (
+          p.published_at > current_post.published_at
+          OR (p.published_at = current_post.published_at AND p.id < current_post.id)
+        )
+      ORDER BY p.published_at ASC, p.id DESC
+      LIMIT 1
+    ) newer ON TRUE
+    LEFT JOIN LATERAL (
+      SELECT json_build_object(
+        '_id', p.id::text,
+        'title', p.title,
+        'slug', p.slug,
+        'excerpt', p.excerpt,
+        'coverImage', CASE
+          WHEN p.cover_image_url IS NULL THEN NULL
+          ELSE json_build_object('url', p.cover_image_url, 'alt', p.cover_image_alt)
+        END,
+        'publishedAt', p.published_at,
+        'updatedAt', p.updated_at,
+        'category', CASE
+          WHEN c.id IS NULL THEN NULL
+          ELSE json_build_object('title', c.title, 'slug', c.slug)
+        END
+      ) AS post
+      FROM posts p
+      LEFT JOIN categories c ON c.id = p.category_id
+      WHERE p.slug IS NOT NULL
+        AND p.published = TRUE
+        AND p.published_at <= NOW()
+        AND (
+          p.published_at < current_post.published_at
+          OR (p.published_at = current_post.published_at AND p.id > current_post.id)
+        )
+      ORDER BY p.published_at DESC, p.id ASC
+      LIMIT 1
+    ) older ON TRUE
+  `
+
+  return rows[0] || { newer: null, older: null }
+}
+
 export async function getLatestPosts(limit = 3): Promise<PostSummary[]> {
   const { rows } = await sql<PostSummary>`
     SELECT p.id AS "_id", p.title, p.slug, p.excerpt,

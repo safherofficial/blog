@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { getAllPosts, getAllPostSlugs, getPostBySlug, getRelatedPosts, getSiteSettings } from '@/lib/db'
+import { getAdjacentPosts, getAllPostSlugs, getPostBySlug, getRelatedPosts, getSiteSettings } from '@/lib/db'
 import { bodyWordCount, getHeadings, readingMinutes } from '@/lib/content/article'
 import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
@@ -71,17 +71,15 @@ export default async function PostPage({ params }: PostRouteProps) {
     year: 'numeric',
   })
 
-  const [relatedPosts, allPosts, settings] = await Promise.all([
+  const [relatedPosts, adjacentPosts, settings] = await Promise.all([
     getRelatedPosts(post._id, post.category?.slug).catch(() => []),
-    getAllPosts().catch(() => []),
+    getAdjacentPosts(post._id).catch(() => ({ newer: null, older: null })),
     getSiteSettings().catch(() => null),
   ])
   const coverImageUrl = getImageUrl(post.coverImage)
   const headings = getHeadings(post.body)
   const minutes = readingMinutes(post.body)
-  const position = allPosts.findIndex((candidate) => candidate._id === post._id)
-  const newer = position > 0 ? allPosts[position - 1] : null
-  const older = position >= 0 && position < allPosts.length - 1 ? allPosts[position + 1] : null
+  const { newer, older } = adjacentPosts
   const siteUrl = getSiteUrl()
   // Mostriamo l'aggiornamento solo se è davvero successivo alla pubblicazione (oltre un giorno).
   const updated =
