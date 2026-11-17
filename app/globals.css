@@ -1302,3 +1302,80 @@ main:focus-visible {
   transition-delay: 0s;
 }
 
+/* PARLIAMONE — invito alla partecipazione, evidenziato con un bagliore editoriale discreto. */
+.site-nav a[href="/scrivimi"],
+.site-bar [data-site-navigation] a[href="/scrivimi"] {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  padding-inline: 0.55rem;
+  border: 1px solid rgba(161, 122, 69, 0.34);
+  border-radius: 999px;
+  color: #604633;
+  text-shadow: 0 0 12px rgba(201, 168, 121, 0.12);
+  transition:
+    color 300ms ease,
+    border-color 300ms ease,
+    background-color 300ms ease,
+    text-shadow 300ms ease;
+}
+
+.site-nav a[href="/scrivimi"]::before,
+.site-bar [data-site-navigation] a[href="/scrivimi"]::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -0.35rem -0.55rem;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(201, 168, 121, 0.38) 0%,
+    rgba(201, 168, 121, 0.16) 48%,
+    rgba(201, 168, 121, 0) 80%
+  );
+  filter: blur(8px);
+  opacity: 0.48;
+  transform: scale(0.88);
+  pointer-events: none;
+  animation: parliamone-soft-glow 3.8s ease-in-out infinite;
+}
+
+.site-nav a[href="/scrivimi"]:hover,
+.site-nav a[href="/scrivimi"]:focus-visible,
+.site-bar [data-site-navigation] a[href="/scrivimi"]:hover,
+.site-bar [data-site-navigation] a[href="/scrivimi"]:focus-visible {
+  color: #3B2A20;
+  border-color: rgba(138, 104, 63, 0.7);
+  background-color: rgba(201, 168, 121, 0.1);
+  text-shadow: 0 0 16px rgba(201, 168, 121, 0.28);
+}
+
+.site-nav a[href="/scrivimi"]:hover::before,
+.site-nav a[href="/scrivimi"]:focus-visible::before,
+.site-bar [data-site-navigation] a[href="/scrivimi"]:hover::before,
+.site-bar [data-site-navigation] a[href="/scrivimi"]:focus-visible::before {
+  opacity: 0.9;
+  animation-duration: 2.4s;
+}
+
+@keyframes parliamone-soft-glow {
+  0%,
+  100% {
+    opacity: 0.38;
+    transform: scale(0.88);
+  }
+  50% {
+    opacity: 0.78;
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav a[href="/scrivimi"]::before,
+  .site-bar [data-site-navigation] a[href="/scrivimi"]::before {
+    animation: none;
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
