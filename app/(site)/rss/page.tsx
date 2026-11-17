@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { pageMetadata } from '@/lib/seo/metadata'
+import { getSiteUrl } from '@/lib/seo/site'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Segui Controluce via RSS',
@@ -20,7 +21,7 @@ export default async function RssPage() {
   const protocol = forwardedProtocol || (host.startsWith('localhost') ? 'http' : 'https')
   const requestOrigin = host ? `${protocol}://${host}` : 'https://controluce.blog'
   const localRequest = host.startsWith('localhost') || host.startsWith('127.0.0.1')
-  const origin = (process.env.SITE_URL?.trim() || (localRequest ? requestOrigin : 'https://controluce.blog')).replace(/\/$/, '')
+  const origin = localRequest ? requestOrigin : getSiteUrl()
   const feedUrl = new URL('/feed.xml', origin).toString()
 
   return (
