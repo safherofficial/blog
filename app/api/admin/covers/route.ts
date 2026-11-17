@@ -91,7 +91,7 @@ export async function POST(request: Request) {
     const id = rows[0]?.id
     if (!id) return NextResponse.json({ error: 'Il file è stato ricevuto ma non è stato salvato.' }, { status: 500 })
     return NextResponse.json({
-      url: '/api/media/covers/' + id,
+      url: '/media/covers/' + id,
       contentType,
       sizeBytes: bytes.byteLength,
     }, { status: 201 })

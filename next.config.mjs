@@ -6,6 +6,7 @@ const nextConfig = {
     qualities: [75, 90],
     localPatterns: [
       { pathname: '/api/media/covers/**', search: '' },
+      { pathname: '/media/covers/**', search: '' },
     ],
   },
   experimental: {

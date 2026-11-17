@@ -6,7 +6,7 @@ import { getAdjacentPosts, getAllPostSlugs, getPostBySlug, getRelatedPosts, getS
 import { bodyWordCount, getHeadings, readingMinutes } from '@/lib/content/article'
 import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
-import { getSiteUrl } from '@/lib/seo/site'
+import { absoluteUrl, getSiteUrl } from '@/lib/seo/site'
 import { imageUrl as getImageUrl, isUploadedCoverImageUrl } from '@/lib/content/images'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import PostBody from '@/components/PostBody'
@@ -109,14 +109,19 @@ export default async function PostPage({ params }: PostRouteProps) {
               inLanguage: 'it-IT',
               url: `${siteUrl}/blog/${post.slug}`,
               mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/blog/${post.slug}` },
-              image: coverImageUrl || `${siteUrl}/blog/${post.slug}/og`,
+              image: absoluteUrl(coverImageUrl || `/blog/${post.slug}/og`),
               articleSection: post.category ? getCategoryEditorialInfo(post.category.slug, post.category.title).label : undefined,
               wordCount: bodyWordCount(post.body),
               timeRequired: `PT${minutes}M`,
               isPartOf: { '@type': 'Blog', '@id': `${siteUrl}/#blog`, name: settings?.siteTitle || 'Controluce' },
               // Reference the canonical Person and Organization nodes emitted by the site-wide graph.
               // This keeps the public pen name and its Instagram sameAs link consistent on every article.
-              author: { '@id': `${siteUrl}/#author` },
+              author: {
+                '@type': 'Person',
+                '@id': `${siteUrl}/#author`,
+                name: AUTHOR_PEN_NAME,
+                url: absoluteUrl('/about'),
+              },
               publisher: { '@id': `${siteUrl}/#organization` },
             },
             breadcrumbJsonLd([
@@ -176,14 +181,14 @@ export default async function PostPage({ params }: PostRouteProps) {
           <div className="editorial-media-frame cover-image-frame reveal-on-scroll relative my-10 overflow-hidden border border-line md:my-14">
             <CropFrame />
             <Image
-              src={post.coverImage.url}
+              src={coverImageUrl || post.coverImage.url}
               alt={post.coverImage.alt || post.title}
               width={1600}
               height={1000}
               priority
               sizes="(max-width: 640px) calc(100vw - 46px), (max-width: 1375px) calc(100vw - 66px), 1176px"
               quality={75}
-              unoptimized={!isUploadedCoverImageUrl(post.coverImage.url)}
+              unoptimized={!isUploadedCoverImageUrl(coverImageUrl || post.coverImage.url)}
               className="block h-auto w-full object-contain"
             />
           </div>

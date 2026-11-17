@@ -1,6 +1,7 @@
 import { getAllPosts, getPostBySlug, getSiteSettings } from '@/lib/db'
 import { portableTextToHtml } from '@/lib/content/html'
 import { getSiteUrl } from '@/lib/seo/site'
+import { imageUrl as getImageUrl } from '@/lib/content/images'
 import { AUTHOR_PEN_NAME } from '@/lib/author'
 
 export const revalidate = 600
@@ -34,7 +35,9 @@ export async function GET(request: Request) {
 
   const items = latest.map((post, index) => {
     const link = absoluteUrl(`/blog/${post.slug}`)
-    const cover = post.coverImage?.url?.startsWith('https://') ? `<p><img src="${escapeXml(post.coverImage.url)}" alt="${escapeXml(post.coverImage.alt || post.title)}" /></p>\n` : ''
+    const imagePath = getImageUrl(post.coverImage)
+    const imageSrc = imagePath ? (imagePath.startsWith('https://') ? imagePath : absoluteUrl(imagePath)) : null
+    const cover = imageSrc ? `<p><img src="${escapeXml(imageSrc)}" alt="${escapeXml(post.coverImage?.alt || post.title)}" /></p>\n` : ''
     return `
     <item>
       <title>${escapeXml(post.title)}</title>

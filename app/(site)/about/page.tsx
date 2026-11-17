@@ -22,21 +22,19 @@ export default function AboutPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: safeJsonLd({
-            '@context': 'https://schema.org',
-            '@graph': [
-              {
-                '@type': 'ProfilePage',
-                '@id': absoluteUrl('/about#profile'),
-                url: absoluteUrl('/about'),
-                name: `Chi sono — ${AUTHOR_PEN_NAME}`,
-                description: AUTHOR_DESCRIPTION,
-                inLanguage: 'it-IT',
-                mainEntity: { '@id': absoluteUrl('/#author') },
-              },
-              breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Chi sono', path: '/about' }]),
-            ],
-          }),
+          __html: safeJsonLd([
+            {
+              '@context': 'https://schema.org',
+              '@type': 'ProfilePage',
+              '@id': absoluteUrl('/about#profile'),
+              url: absoluteUrl('/about'),
+              name: `Chi sono — ${AUTHOR_PEN_NAME}`,
+              description: AUTHOR_DESCRIPTION,
+              inLanguage: 'it-IT',
+              mainEntity: { '@id': absoluteUrl('/#author') },
+            },
+            breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Chi sono', path: '/about' }]),
+          ]),
         }}
       />
 
