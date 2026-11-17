@@ -29,14 +29,14 @@ export default function Header({ siteTitle = 'Controluce', instagramUrl }: { sit
         </Link>
       </div>
 
-      <nav aria-label="Navigazione principale" className="site-nav wrap flex items-center justify-center gap-5 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft sm:gap-8 sm:text-[11px]">
-        <Link href="/" className="site-nav-link nav-link transition-colors hover:text-wine">Home</Link>
+      <nav aria-label="Navigazione principale" className="site-nav wrap flex min-h-[44px] items-center justify-center gap-5 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-soft sm:gap-8 sm:text-[11px]">
+        <Link href="/" className="site-nav-link nav-link inline-flex min-h-[44px] items-center transition-colors hover:text-wine">Home</Link>
         <span aria-hidden="true" className="nav-separator">✳</span>
-        <Link href="/about" className="site-nav-link nav-link transition-colors hover:text-wine">Chi sono</Link>
+        <Link href="/about" className="site-nav-link nav-link inline-flex min-h-[44px] items-center transition-colors hover:text-wine">Chi sono</Link>
         <span aria-hidden="true" className="nav-separator">✳</span>
-        <Link href="/articoli" className="site-nav-link nav-link transition-colors hover:text-wine">Articoli</Link>
+        <Link href="/articoli" className="site-nav-link nav-link inline-flex min-h-[44px] items-center transition-colors hover:text-wine">Articoli</Link>
         <span aria-hidden="true" className="nav-separator">✳</span>
-        <Link href="/scrivimi" className="site-nav-link nav-link transition-colors hover:text-wine">Parliamone</Link>
+        <Link href="/scrivimi" className="site-nav-link nav-link inline-flex min-h-[44px] items-center transition-colors hover:text-wine">Parliamone</Link>
       </nav>
     </header>
   )

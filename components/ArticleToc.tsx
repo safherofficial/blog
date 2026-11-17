@@ -39,7 +39,7 @@ export default function ArticleToc({ items, variant }: { items: Heading[]; varia
   if (variant === 'inline') {
     return (
       <details className="toc-inline mb-10 border border-line bg-bg-soft/60 px-5 py-4">
-        <summary className="flex cursor-pointer items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">
+        <summary className="flex min-h-[44px] cursor-pointer items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">
           <span>In questo articolo</span>
           <span className="text-ink-soft">{items.length} {items.length === 1 ? 'sezione' : 'sezioni'}</span>
         </summary>

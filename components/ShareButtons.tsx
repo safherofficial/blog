@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-const button = 'share-button inline-flex items-center gap-2 border border-line bg-transparent px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft transition-colors hover:border-ochre hover:text-wine'
+const button = 'share-button inline-flex min-h-[44px] items-center justify-center gap-2 border border-line bg-transparent px-4 py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft transition-colors hover:border-ochre hover:text-wine'
 
 export default function ShareButtons({ title }: { title: string }) {
   const [status, setStatus] = useState('')
