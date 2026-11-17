@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import PostCard from '@/components/PostCard'
-import { getAllCategorySlugs, getArchivePosts, getCategoryBySlug, getPublishedCategories } from '@/lib/db'
+import { getArchivePosts, getCategoryBySlug, getPublishedCategories } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import { breadcrumbJsonLd, collectionJsonLd } from '@/lib/seo/jsonld'
 import { pageMetadata } from '@/lib/seo/metadata'
@@ -25,8 +25,9 @@ function getRequestedPage(value: string | string[] | undefined): number {
 }
 
 export async function generateStaticParams() {
-  const slugs = await getAllCategorySlugs().catch(() => [])
-  return slugs.map((slug) => ({ slug }))
+  // Pre-render only categories with published articles, matching the sitemap and public navigation.
+  const categories = await getPublishedCategories().catch(() => [])
+  return categories.map(({ slug }) => ({ slug }))
 }
 
 export async function generateMetadata({
