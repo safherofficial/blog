@@ -1,22 +1,29 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 
 /**
- * Dependency-free motion for the public editorial experience.
- * Keeps effects light, respects reduced-motion preferences and avoids
- * doing layout work on every pointer/scroll event.
+ * Coordinates non-critical public-page enhancements through one scroll loop.
+ * Route-aware scans replace the previous subtree MutationObserver.
  */
 export default function RevealEffects() {
+  const pathname = usePathname()
+  const lastTrackedPath = useRef('')
+
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const root = document.documentElement
+    const siteBar = document.querySelector<HTMLElement>('.site-bar')
+    const backToTop = document.querySelector<HTMLElement>('[data-back-to-top]')
 
     let pointerFrame = 0
     let scrollFrame = 0
     let pointerX = window.innerWidth * 0.58
     let pointerY = window.innerHeight * 0.24
+    let observer: IntersectionObserver | undefined
+    const observed = new WeakSet<Element>()
 
     const paintPointer = () => {
       root.style.setProperty('--pointer-x', `${pointerX}px`)
@@ -29,22 +36,6 @@ export default function RevealEffects() {
       pointerY = event.clientY
       if (!pointerFrame) pointerFrame = window.requestAnimationFrame(paintPointer)
     }
-
-    const paintScrollProgress = () => {
-      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = scrollableHeight > 0
-        ? Math.min(1, Math.max(0, window.scrollY / scrollableHeight))
-        : 0
-      root.style.setProperty('--scroll-progress', String(progress))
-      scrollFrame = 0
-    }
-
-    const handleScrollOrResize = () => {
-      if (!scrollFrame) scrollFrame = window.requestAnimationFrame(paintScrollProgress)
-    }
-
-    let observer: IntersectionObserver | undefined
-    const observed = new WeakSet<Element>()
 
     const observeRevealElements = (scope: ParentNode) => {
       const elements: Element[] = []
@@ -68,18 +59,25 @@ export default function RevealEffects() {
           }
         }
       }, { rootMargin: '0px 0px -7% 0px', threshold: 0.08 })
-      observeRevealElements(document)
       root.classList.add('has-reveal-motion')
     }
 
-    const mutationObserver = new MutationObserver((records) => {
-      for (const record of records) {
-        record.addedNodes.forEach((node) => {
-          if (node instanceof Element) observeRevealElements(node)
-        })
-      }
-    })
-    mutationObserver.observe(document.body, { childList: true, subtree: true })
+    const paintScrollState = () => {
+      const scrollY = window.scrollY
+      if (siteBar) siteBar.dataset.visible = String(scrollY > 280)
+      if (backToTop) backToTop.dataset.visible = String(scrollY > 500)
+
+      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = scrollableHeight > 0
+        ? Math.min(1, Math.max(0, scrollY / scrollableHeight))
+        : 0
+      root.style.setProperty('--scroll-progress', String(progress))
+      scrollFrame = 0
+    }
+
+    const handleScrollOrResize = () => {
+      if (!scrollFrame) scrollFrame = window.requestAnimationFrame(paintScrollState)
+    }
 
     if (finePointer && !reducedMotion) {
       window.addEventListener('pointermove', handlePointerMove, { passive: true })
@@ -88,11 +86,11 @@ export default function RevealEffects() {
 
     window.addEventListener('scroll', handleScrollOrResize, { passive: true })
     window.addEventListener('resize', handleScrollOrResize, { passive: true })
-    paintScrollProgress()
+    observeRevealElements(document)
+    paintScrollState()
 
     return () => {
       observer?.disconnect()
-      mutationObserver.disconnect()
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('scroll', handleScrollOrResize)
       window.removeEventListener('resize', handleScrollOrResize)
@@ -102,6 +100,66 @@ export default function RevealEffects() {
       root.style.removeProperty('--scroll-progress')
     }
   }, [])
+
+  useEffect(() => {
+    if (!pathname) return
+
+    // App Router commits the new page before this effect runs, so newly rendered
+    // reveal elements can be observed without watching every DOM mutation.
+    const revealElements = document.querySelectorAll('.reveal-on-scroll')
+    revealElements.forEach((element) => {
+      if (!element.classList.contains('is-visible') && !document.documentElement.classList.contains('has-reveal-motion')) {
+        element.classList.add('is-visible')
+      }
+    })
+
+    document.querySelectorAll<HTMLAnchorElement>('[data-site-navigation] a[href]').forEach((link) => {
+      const linkPath = new URL(link.href, window.location.origin).pathname
+      if (linkPath === pathname) link.setAttribute('aria-current', 'page')
+      else link.removeAttribute('aria-current')
+    })
+
+    if (pathname.startsWith('/stats') || pathname.startsWith('/api/') || lastTrackedPath.current === pathname) return
+    lastTrackedPath.current = pathname
+
+    const params = new URLSearchParams(window.location.search)
+    let referrerHost = ''
+    if (document.referrer) {
+      try {
+        referrerHost = new URL(document.referrer).hostname
+      } catch {
+        referrerHost = ''
+      }
+    }
+
+    const payload = {
+      path: pathname,
+      referrerHost,
+      utmSource: params.get('utm_source') || '',
+      utmMedium: params.get('utm_medium') || '',
+      utmCampaign: params.get('utm_campaign') || '',
+    }
+    const sendAnalytics = () => {
+      fetch('/api/analytics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true,
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer',
+      }).catch(() => {})
+    }
+
+    // Analytics is non-blocking; use idle time with a bounded fallback.
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number
+    }
+    if (idleWindow.requestIdleCallback) {
+      idleWindow.requestIdleCallback(sendAnalytics, { timeout: 1500 })
+    } else {
+      window.setTimeout(sendAnalytics, 500)
+    }
+  }, [pathname])
 
   return (
     <>

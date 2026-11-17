@@ -3,7 +3,6 @@ import Footer from '@/components/Footer'
 import BackToTop from '@/components/BackToTop'
 import SiteBar from '@/components/SiteBar'
 import RevealEffects from '@/components/RevealEffects'
-import StatsTracker from '@/components/StatsTracker'
 import { getPublishedCategories, getSiteSettings } from '@/lib/db'
 import { safeJsonLd } from '@/lib/content/safe-json'
 import { siteGraphJsonLd } from '@/lib/seo/jsonld'
@@ -15,8 +14,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   ])
   const siteTitle = settings?.siteTitle || 'Controluce'
   return (
-    <div className="site-shell">
-      <StatsTracker />
+    <div id="top" className="site-shell">
       <RevealEffects />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(siteGraphJsonLd(settings)) }} />
       <a href="#contenuto" className="skip-link">Vai al contenuto</a>

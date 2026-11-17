@@ -1275,3 +1275,30 @@ main:focus-visible {
   }
 }
 
+/* U24 — The back-to-top control is server-rendered and revealed by the shared scroll controller. */
+.scroll-top-control {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 300ms ease,
+    visibility 0s,
+    transform 350ms var(--motion-ease),
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 350ms ease;
+}
+
+.scroll-top-control[data-visible='false'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition-delay: 0s, 300ms, 0s, 0s, 0s, 0s;
+}
+
+.scroll-top-control[data-visible='true'] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
