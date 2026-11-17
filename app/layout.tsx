@@ -9,12 +9,13 @@ const fraunces = Fraunces({
   weight: ['500', '600'],
   variable: '--font-fraunces',
 })
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-inter' })
+const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-inter', preload: false })
 const sourceSerif = Source_Serif_4({
   subsets: ['latin'],
   style: ['normal', 'italic'],
   weight: ['400', '500', '600'],
   variable: '--font-serif',
+  preload: false,
 })
 const spaceMono = Space_Mono({ subsets: ['latin'], weight: ['400'], variable: '--font-space-mono' })
 
