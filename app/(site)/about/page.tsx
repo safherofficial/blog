@@ -11,8 +11,9 @@ import { pageMetadata } from '@/lib/seo/metadata'
 export const revalidate = 60
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Chi sono',
-  description: 'La storia dietro Controluce: una voce editoriale personale, la passione per la scrittura e il desiderio di raccontare storie per lettori di tutte le età.',
+  title: 'Chi scrive Controluce: la storia dietro la firma',
+  absoluteTitle: true,
+  description: 'Scopri chi scrive Controluce: la storia dietro lo pseudonimo, il percorso nella scrittura e la visione editoriale del blog.',
   path: '/about',
 })
 
@@ -28,7 +29,7 @@ export default function AboutPage() {
               '@type': 'ProfilePage',
               '@id': absoluteUrl('/about#profile'),
               url: absoluteUrl('/about'),
-              name: `Chi sono — ${AUTHOR_PEN_NAME}`,
+              name: `Chi scrive ${AUTHOR_PEN_NAME}`,
               description: AUTHOR_DESCRIPTION,
               inLanguage: 'it-IT',
               mainEntity: { '@id': absoluteUrl('/#author') },

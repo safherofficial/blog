@@ -24,6 +24,7 @@ export function personJsonLd(settings: SiteSettings | null): Json {
     '@type': 'Person',
     '@id': `${getSiteUrl()}/#author`,
     name: AUTHOR_PEN_NAME,
+    jobTitle: 'Autrice',
     url: absoluteUrl('/about'),
     description: AUTHOR_DESCRIPTION,
     ...(settings?.instagramUrl ? { sameAs: [settings.instagramUrl] } : {}),

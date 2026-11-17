@@ -120,6 +120,7 @@ export default async function PostPage({ params }: PostRouteProps) {
                 '@type': 'Person',
                 '@id': `${siteUrl}/#author`,
                 name: AUTHOR_PEN_NAME,
+                jobTitle: 'Autrice',
                 url: absoluteUrl('/about'),
               },
               publisher: { '@id': `${siteUrl}/#organization` },
@@ -160,7 +161,7 @@ export default async function PostPage({ params }: PostRouteProps) {
             <span>{minutes} min di lettura</span>
             <span className="article-meta-separator" aria-hidden="true">·</span>
             <span>
-              A cura di{' '}
+              Scritto da{' '}
               <Link href="/about" className="nav-link font-semibold text-[#E8CEAA] transition-colors hover:text-[#F5D7A8]">
                 {AUTHOR_PEN_NAME}
               </Link>

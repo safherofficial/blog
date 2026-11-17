@@ -6,7 +6,7 @@
 export const AUTHOR_PEN_NAME = 'Controluce'
 
 export const AUTHOR_SHORT_BIO =
-  'Autrice italiana, appassionata di scrittura, approfondimento e narrazione. Ha pubblicato un libro per bambini e coltiva nuovi progetti per lettori di età diverse.'
+  'Autrice italiana dietro Controluce. Scrive e cura articoli su società, benessere, relazioni, tecnologia e vita quotidiana; ha pubblicato un libro per bambini e continua a sviluppare nuove storie.'
 
 export const AUTHOR_DESCRIPTION =
-  'Controluce è lo pseudonimo di un’autrice italiana. La sua scrittura nasce dalla passione per l’osservazione, l’approfondimento e il racconto; ha già pubblicato un libro per bambini e progetta nuove storie per piccoli e grandi lettori.'
+  'Controluce è lo pseudonimo di un’autrice italiana che scrive e cura un blog indipendente. Attraverso articoli e riflessioni esplora temi legati a società, benessere, relazioni, tecnologia e vita quotidiana. Ha pubblicato un libro per bambini e sviluppa nuovi progetti di scrittura.'
