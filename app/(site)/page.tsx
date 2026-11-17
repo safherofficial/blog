@@ -68,6 +68,37 @@ export default async function HomePage() {
         <div className="hero-edge-mark pointer-events-none absolute bottom-0 right-8 z-10 hidden h-20 w-px origin-bottom bg-gradient-to-t from-[#D5B27F]/80 to-transparent md:block" aria-hidden="true" />
       </section>
 
+      <section aria-labelledby="editorial-voice-title" className="border-y border-line bg-bg-soft/60 py-14 md:py-20">
+        <div className="wrap grid grid-cols-1 gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-20">
+          <div className="reveal-on-scroll">
+            <p className="mb-4 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-ochre">
+              <span className="inline-block h-px w-8 bg-ochre" />
+              La voce dietro Controluce
+            </p>
+            <h2 id="editorial-voice-title" className="mb-6 max-w-[22ch] font-display text-3xl leading-tight tracking-tight text-ink md:text-4xl">
+              Un progetto indipendente. Una voce umana.
+            </h2>
+            <p className="mb-7 max-w-[66ch] font-serif text-lg leading-relaxed text-ink-soft">
+              Controluce è uno spazio editoriale scritto e curato da un’autrice italiana. I testi non sono generati automaticamente: ogni articolo nasce da una scelta personale, dal desiderio di approfondire e dalla volontà di osservare ciò che ci circonda da prospettive diverse.
+            </p>
+            <Link
+              href="/about"
+              className="editorial-button inline-flex items-center gap-4 border border-wine px-6 py-3.5 font-mono text-[10px] uppercase tracking-[0.17em] text-wine hover:bg-wine hover:text-bg"
+            >
+              Conosci chi scrive <span aria-hidden="true" className="text-lg leading-none">↗</span>
+            </Link>
+          </div>
+
+          <aside className="reveal-on-scroll border-l border-ochre px-6 py-2 md:px-8" aria-label="La firma editoriale">
+            <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Una firma, una scelta</p>
+            <p className="mb-3 font-display text-3xl italic text-ink">Controluce</p>
+            <p className="font-serif text-base leading-relaxed text-ink-soft">
+              È lo pseudonimo con cui l’autrice ha scelto di pubblicare, mantenendo privata la propria identità personale. Al centro restano le parole, il lavoro editoriale e lo sguardo con cui ogni storia viene raccontata.
+            </p>
+          </aside>
+        </div>
+      </section>
+
       <section id="in-evidenza" className="py-16 md:py-20">
         <div className="wrap">
           <div className="reveal-on-scroll mb-12 flex flex-col gap-5 border-b border-line pb-7 sm:flex-row sm:items-end sm:justify-between md:mb-14">
