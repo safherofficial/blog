@@ -210,6 +210,23 @@ export default async function ArchivePage({
           </nav>
         )}
 
+        {isDefaultArchive && total > PAGE_SIZE && (
+          <aside aria-labelledby="archive-discovery-title" className="reveal-on-scroll mb-12 flex flex-col gap-6 border border-line bg-bg-soft/60 p-6 md:flex-row md:items-center md:justify-between md:p-8">
+            <div className="max-w-[58ch]">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Un passo indietro</p>
+              <h2 id="archive-discovery-title" className="mb-3 font-display text-2xl leading-tight text-ink md:text-3xl">
+                Le prime storie meritano ancora spazio.
+              </h2>
+              <p className="font-serif text-base leading-relaxed text-ink-soft">
+                L’archivio non segue soltanto le novità: puoi riscoprire gli articoli dalle pubblicazioni più lontane nel tempo e continuare a esplorare da lì.
+              </p>
+            </div>
+            <Link href="/articoli?ordine=oldest" className="editorial-button inline-flex shrink-0 items-center justify-center gap-3 self-start border border-wine bg-wine px-6 py-3.5 font-mono text-[10px] uppercase tracking-[0.16em] text-bg hover:bg-wine-dark md:self-center">
+              Riscopri le prime storie <span aria-hidden="true">↗</span>
+            </Link>
+          </aside>
+        )}
+
         {total === 0 ? (
           <div className="border-l border-ochre py-2 pl-5">
             <p className="font-display text-2xl text-ink">{hasActiveFilters ? 'Nessun risultato trovato.' : 'Nessun articolo è ancora disponibile.'}</p>
