@@ -29,7 +29,7 @@ export default function PostCard({ post, index = 0, featured = false, headingLev
               width={1200}
               height={800}
               sizes={imageSizes}
-              quality={90}
+              quality={75}
               unoptimized={!isUploadedCoverImageUrl(post.coverImage.url)}
               className="editorial-card-image block h-auto w-full object-contain"
             />
