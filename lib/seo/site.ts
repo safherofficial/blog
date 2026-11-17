@@ -3,9 +3,9 @@
 export const FALLBACK_SITE_URL = 'https://www.controluce.blog'
 export const SITE_NAME = 'Controluce'
 export const SITE_LOCALE = 'it_IT'
-export const DEFAULT_TITLE = 'Controluce — Blog di lifestyle e vita quotidiana'
+export const DEFAULT_TITLE = 'Controluce — Storie, idee e punti di vista'
 export const DEFAULT_DESCRIPTION =
-  'Storie, riflessioni e piccoli rituali di vita quotidiana raccontati con uno sguardo personale.'
+  'Un blog indipendente scritto e curato da un’autrice italiana. Storie e riflessioni su società, benessere, relazioni, tecnologia e vita quotidiana.'
 
 export function getSiteUrl(): string {
   // SITE_URL è la variabile ufficiale (solo lato server); NEXT_PUBLIC_SITE_URL resta come ripiego per le installazioni esistenti.
