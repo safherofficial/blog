@@ -56,8 +56,8 @@ export default function PrivacyPolicyPage() {
                 successivi al punto interrogativo. Non inserire dati personali nei parametri UTM dei link.
               </p>
               <p>
-                Le statistiche non registrano indirizzi IP, indirizzi email, nomi, cookie identificativi o codici che
-                permettano al sistema di riconoscere una persona nelle visite successive. L’informazione tecnica sul
+                Nel database delle statistiche di Controluce non vengono salvati indirizzi IP, indirizzi email, nomi,
+                cookie identificativi o codici che permettano di riconoscere una persona nelle visite successive. L’informazione tecnica sul
                 browser (User-Agent) viene letta momentaneamente per riconoscere ed escludere alcuni bot, ma non viene
                 salvata nella tabella delle statistiche. I dati servono soltanto a produrre conteggi aggregati delle
                 visualizzazioni: non misurano le persone uniche e non creano profili individuali.
@@ -84,7 +84,7 @@ export default function PrivacyPolicyPage() {
                 informazioni sensibili, password o dati che non siano necessari.
               </p>
               <p>
-                Il messaggio e gli eventuali recapiti sono visibili soltanto all’amministrazione del blog. Al momento
+                Il messaggio non è pubblico ed è consultabile dal pannello soltanto dall’amministrazione del blog. Al momento
                 non è attiva una cancellazione automatica: i messaggi vengono eliminati dall’amministrazione quando
                 non sono più necessari per gestire la comunicazione, fatti salvi eventuali obblighi di legge.
               </p>
