@@ -164,9 +164,6 @@ export default function PrivacyPolicyPage() {
                 al trattamento nei casi previsti. Per farlo, scrivi tramite la <Link href="/scrivimi">pagina Parliamone</Link>
                 indicando chiaramente che si tratta di una richiesta relativa alla privacy.
               </p>
-              <p>
-                Puoi inoltre proporre reclamo al <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer">Garante per la protezione dei dati personali</a>.
-              </p>
             </div>
           </div>
         </div>
