@@ -15,6 +15,10 @@ export default function ShareButtons({ title }: { title: string }) {
     setCanShare(typeof navigator.share === 'function')
   }, [])
 
+  const encodedUrl = encodeURIComponent(url)
+  const encodedTitle = encodeURIComponent(title)
+  const message = encodeURIComponent(`${title}\n${url}`)
+
   async function copy() {
     try {
       await navigator.clipboard.writeText(url)
@@ -30,13 +34,74 @@ export default function ShareButtons({ title }: { title: string }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3" aria-label="Condividi questo articolo">
       <span className="mr-1 font-mono text-[10px] uppercase tracking-[0.22em] text-ochre">Condividi</span>
-      <button type="button" onClick={copy} disabled={!url} className={button}>Copia link</button>
-      <a className={button} target="_blank" rel="noopener noreferrer" href={url ? `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}` : undefined} aria-disabled={!url}>
+      <button type="button" onClick={copy} disabled={!url} className={button}>
+        Copia link
+      </button>
+      <a
+        className={button}
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url ? `https://wa.me/?text=${message}` : undefined}
+        aria-disabled={!url}
+        aria-label="Condividi su WhatsApp"
+      >
         WhatsApp <span aria-hidden="true">↗</span>
       </a>
-      {canShare && <button type="button" onClick={share} className={button}>Altro…</button>}
+      <a
+        className={button}
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url ? `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}` : undefined}
+        aria-disabled={!url}
+        aria-label="Condividi su Facebook"
+      >
+        Facebook <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        className={button}
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url ? `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}` : undefined}
+        aria-disabled={!url}
+        aria-label="Condividi su X"
+      >
+        X <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        className={button}
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url ? `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}` : undefined}
+        aria-disabled={!url}
+        aria-label="Condividi su Telegram"
+      >
+        Telegram <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        className={button}
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url ? `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}` : undefined}
+        aria-disabled={!url}
+        aria-label="Condividi su LinkedIn"
+      >
+        LinkedIn <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        className={button}
+        href={url ? `mailto:?subject=${encodedTitle}&body=${message}` : undefined}
+        aria-disabled={!url}
+        aria-label="Condividi via email"
+      >
+        Email <span aria-hidden="true">↗</span>
+      </a>
+      {canShare && (
+        <button type="button" onClick={share} disabled={!url} className={button}>
+          Altro… 
+        </button>
+      )}
       <span role="status" aria-live="polite" className="font-mono text-[10px] tracking-wide text-emerald-800">{status}</span>
     </div>
   )
