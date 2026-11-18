@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { SITE_LOCALE, SITE_NAME } from './site'
+import { SITE_LOCALE, SITE_NAME, X_HANDLE } from './site'
 
 export const OG_SIZE = { width: 1200, height: 630 } as const
 export const DEFAULT_OG_IMAGE = '/og'
@@ -44,6 +44,6 @@ export function pageMetadata({ title, description, path, absoluteTitle, image, i
       url: path,
       images: [{ url: imageUrl, ...dimensions, ...(resolvedImageType ? { type: resolvedImageType } : {}), alt: resolvedImageAlt }],
     },
-    twitter: { card: 'summary_large_image', title, description, images: [{ url: imageUrl, alt: resolvedImageAlt }] },
+    twitter: { card: 'summary_large_image', site: X_HANDLE, creator: X_HANDLE, title, description, images: [{ url: imageUrl, alt: resolvedImageAlt }] },
   }
 }

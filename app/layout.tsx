@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Inter, Source_Serif_4, Space_Mono } from 'next/font/google'
 import './globals.css'
-import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, getSiteUrl, SITE_LOCALE, SITE_NAME } from '@/lib/seo/site'
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, getSiteUrl, SITE_LOCALE, SITE_NAME, X_HANDLE } from '@/lib/seo/site'
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: DEFAULT_DESCRIPTION,
     images: [{ url: '/og', width: 1200, height: 630, type: 'image/png', alt: DEFAULT_TITLE }],
   },
-  twitter: { card: 'summary_large_image', title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION, images: [{ url: '/og', alt: DEFAULT_TITLE }] },
+  twitter: { card: 'summary_large_image', site: X_HANDLE, creator: X_HANDLE, title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION, images: [{ url: '/og', alt: DEFAULT_TITLE }] },
   // Anteprime grandi e snippet completi: necessari per Google Discover, risultati ricchi e riassunti AI.
   robots: {
     index: true,

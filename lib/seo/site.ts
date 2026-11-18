@@ -2,6 +2,8 @@
 
 export const FALLBACK_SITE_URL = 'https://www.controluce.blog'
 export const SITE_NAME = 'Controluce'
+export const X_PROFILE_URL = 'https://x.com/Controluceblog'
+export const X_HANDLE = '@Controluceblog'
 export const SITE_LOCALE = 'it_IT'
 export const DEFAULT_TITLE = 'Controluce — Storie, idee e punti di vista'
 export const DEFAULT_DESCRIPTION =

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getCategoryEditorialInfo } from '@/lib/seo/categories'
+import { X_PROFILE_URL } from '@/lib/seo/site'
 
 type FooterCategory = { title: string; slug: string; count: number }
 
@@ -41,10 +42,11 @@ export default function Footer({ siteTitle = 'Controluce', instagramUrl, categor
           )}
           <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-[#D5B27F]">Segui e partecipa</p>
           <p className="mb-5 max-w-[34ch] font-serif leading-relaxed text-[#D5C7B7] md:ml-auto">
-            Puoi seguire i nuovi articoli tramite il feed RSS{instagramUrl ? ' e trovare gli aggiornamenti anche su Instagram' : ''}. Per condividere un pensiero o suggerire un tema, c&apos;è lo spazio Parliamone.
+            Puoi seguire i nuovi articoli tramite il feed RSS e trovare gli aggiornamenti su X{instagramUrl ? ' e Instagram' : ''}. Per condividere un pensiero o suggerire un tema, c&apos;è lo spazio Parliamone.
           </p>
           <nav aria-label="Canali e contatti" className="flex flex-wrap gap-x-5 gap-y-3 font-mono text-[10px] uppercase tracking-[0.2em] text-bg md:justify-end">
             <Link href="/rss" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">Feed RSS ↗</Link>
+            <a href={X_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label="Profilo ufficiale di Controluce su X" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">X ↗</a>
             <Link href="/scrivimi" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">Parliamone ↗</Link>
             {instagramUrl && (
               <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="footer-link nav-link inline-block transition-colors hover:text-[#D5B27F]">

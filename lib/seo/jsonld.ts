@@ -1,11 +1,14 @@
 import { AUTHOR_DESCRIPTION, AUTHOR_PEN_NAME } from '@/lib/author'
 import type { SiteSettings } from '@/lib/db'
-import { absoluteUrl, DEFAULT_DESCRIPTION, getSiteUrl, SITE_NAME } from './site'
+import { absoluteUrl, DEFAULT_DESCRIPTION, getSiteUrl, SITE_NAME, X_PROFILE_URL } from './site'
 
 type Json = Record<string, unknown>
 
 /** Logo dell'organizzazione: deve essere un'immagine raster di almeno 112×112 px. */
 const logoUrl = () => absoluteUrl('/apple-icon.png')
+
+const socialProfileUrls = (settings: SiteSettings | null) =>
+  [X_PROFILE_URL, settings?.instagramUrl].filter((profile): profile is string => Boolean(profile))
 
 export function organizationJsonLd(settings: SiteSettings | null): Json {
   const name = settings?.siteTitle || SITE_NAME
@@ -15,7 +18,7 @@ export function organizationJsonLd(settings: SiteSettings | null): Json {
     name,
     url: getSiteUrl(),
     logo: { '@type': 'ImageObject', url: logoUrl(), width: 180, height: 180 },
-    ...(settings?.instagramUrl ? { sameAs: [settings.instagramUrl] } : {}),
+    sameAs: socialProfileUrls(settings),
   }
 }
 
@@ -27,7 +30,7 @@ export function personJsonLd(settings: SiteSettings | null): Json {
     jobTitle: 'Autrice',
     url: absoluteUrl('/about'),
     description: AUTHOR_DESCRIPTION,
-    ...(settings?.instagramUrl ? { sameAs: [settings.instagramUrl] } : {}),
+    sameAs: socialProfileUrls(settings),
     worksFor: { '@id': `${getSiteUrl()}/#organization` },
   }
 }

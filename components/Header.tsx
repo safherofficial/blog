@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { X_PROFILE_URL } from '@/lib/seo/site'
 
 export default function Header({ siteTitle = 'Controluce', instagramUrl }: { siteTitle?: string | null; instagramUrl?: string | null }) {
   return (
@@ -9,13 +10,18 @@ export default function Header({ siteTitle = 'Controluce', instagramUrl }: { sit
           <span className="topbar-light" aria-hidden="true" />
           Storie, riflessioni e vita quotidiana
         </span>
-        {instagramUrl ? (
-          <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="nav-link font-mono text-[10px] uppercase tracking-widest text-ink-soft transition-colors hover:text-wine">
-            Instagram <span aria-hidden="true">↗</span>
+        <div className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-widest text-ink-soft sm:gap-5 sm:text-[10px]">
+          <a href={X_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label="Profilo ufficiale di Controluce su X" className="nav-link whitespace-nowrap transition-colors hover:text-wine">
+            X <span aria-hidden="true">↗</span>
           </a>
-        ) : (
-          <Link href="/rss" className="nav-link font-mono text-[10px] uppercase tracking-widest text-ink-soft transition-colors hover:text-wine">Feed RSS <span aria-hidden="true">↗</span></Link>
-        )}
+          {instagramUrl ? (
+            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="nav-link whitespace-nowrap transition-colors hover:text-wine">
+              Instagram <span aria-hidden="true">↗</span>
+            </a>
+          ) : (
+            <Link href="/rss" className="nav-link whitespace-nowrap transition-colors hover:text-wine">Feed RSS <span aria-hidden="true">↗</span></Link>
+          )}
+        </div>
       </div>
 
       <div className="wrap brand-masthead border-b border-line py-6 text-center md:py-7">
